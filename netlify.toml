@@ -4,7 +4,7 @@
   publish = ".next"
 
 [dev]
-  command = "next dev -p 9002"
+  command = "npm run dev"
   targetPort = 9002
   port = 8888
 
