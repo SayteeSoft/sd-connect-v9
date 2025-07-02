@@ -1,3 +1,4 @@
+
 // This file now acts as a client-side SDK for interacting with the backend API.
 // It no longer contains direct data or localStorage logic.
 
@@ -68,13 +69,15 @@ export const attributeKeys = [
 
 // --- API Functions ---
 
+const API_BASE_PATH = '/.netlify/functions';
+
 /**
  * Fetches all profiles from the backend.
  * @returns {Promise<Profile[]>} An array of profiles.
  */
 export async function getProfiles(): Promise<Profile[]> {
   try {
-    const response = await fetch('/api/profiles');
+    const response = await fetch(`${API_BASE_PATH}/profiles`);
     if (!response.ok) throw new Error('Failed to fetch profiles');
     return await response.json();
   } catch (error) {
@@ -90,7 +93,7 @@ export async function getProfiles(): Promise<Profile[]> {
  */
 export async function getProfile(id: number): Promise<Profile | undefined> {
   try {
-    const response = await fetch(`/api/profiles?id=${id}`);
+    const response = await fetch(`${API_BASE_PATH}/profiles?id=${id}`);
     if (response.status === 404) return undefined;
     if (!response.ok) throw new Error(`Failed to fetch profile ${id}`);
     return await response.json();
@@ -109,7 +112,7 @@ export async function getProfile(id: number): Promise<Profile | undefined> {
  */
 export async function createProfile(email: string, password: string, role: 'baby' | 'daddy'): Promise<Profile | { error: string }> {
   try {
-    const response = await fetch('/api/profiles', {
+    const response = await fetch(`${API_BASE_PATH}/profiles`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ email, password, role }),
@@ -133,7 +136,7 @@ export async function createProfile(email: string, password: string, role: 'baby
  */
 export async function updateProfile(updatedProfile: Profile): Promise<boolean> {
   try {
-    const response = await fetch('/api/profiles', {
+    const response = await fetch(`${API_BASE_PATH}/profiles`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(updatedProfile),
@@ -154,7 +157,7 @@ export async function updateProfile(updatedProfile: Profile): Promise<boolean> {
  */
 export async function deleteProfile(profileId: number): Promise<boolean> {
   try {
-    const response = await fetch(`/api/profiles?id=${profileId}`, {
+    const response = await fetch(`${API_BASE_PATH}/profiles?id=${profileId}`, {
       method: 'DELETE',
     });
     if (!response.ok) throw new Error('Failed to delete profile');
@@ -172,7 +175,7 @@ export async function deleteProfile(profileId: number): Promise<boolean> {
  */
 export async function getConversations(): Promise<Conversation[]> {
     try {
-        const response = await fetch('/api/conversations');
+        const response = await fetch(`${API_BASE_PATH}/conversations`);
         if (!response.ok) throw new Error('Failed to fetch conversations');
         return await response.json();
     } catch (error) {
@@ -189,7 +192,7 @@ export async function getConversations(): Promise<Conversation[]> {
  */
 export async function saveMessage(conversationId: number, message: Message): Promise<boolean> {
     try {
-        const response = await fetch('/api/conversations', {
+        const response = await fetch(`${API_BASE_PATH}/conversations`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ conversationId, message }),
@@ -209,7 +212,7 @@ export async function saveMessage(conversationId: number, message: Message): Pro
  */
 export async function apiLogin(email: string, password: string): Promise<{ user: Profile } | null> {
     try {
-        const response = await fetch('/api/auth', {
+        const response = await fetch(`${API_BASE_PATH}/auth`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ email, password }),
@@ -231,10 +234,10 @@ export async function apiLogin(email: string, password: string): Promise<{ user:
  */
 export async function updateCredits(userId: number, amount: number, action: 'add' | 'spend'): Promise<number> {
     try {
-        const response = await fetch('/api/credits', {
+        const response = await fetch(`${API_BASE_PATH}/credits?userId=${userId}`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ userId, amount, action }),
+            body: JSON.stringify({ amount, action }),
         });
         if (!response.ok) throw new Error('Failed to update credits');
         const data = await response.json();
