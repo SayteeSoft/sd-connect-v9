@@ -5,7 +5,7 @@
 
 [dev]
   command = "next dev"
-  targetPort = 3000
+  targetPort = 9002
   port = 8888
 
 [functions]
