@@ -38,18 +38,18 @@ export function AdminClient() {
   const router = useRouter();
   const { toast } = useToast();
 
+  const fetchProfiles = async () => {
+    setIsLoading(true);
+    const profilesData = await getProfiles();
+    setProfiles(profilesData);
+    setIsLoading(false);
+  };
+  
   useEffect(() => {
-    const handleProfileUpdate = () => {
-      setProfiles(getProfiles());
-      setIsLoading(false);
-    };
-
-    handleProfileUpdate();
-
-    window.addEventListener('profileUpdated', handleProfileUpdate);
-
+    fetchProfiles();
+    window.addEventListener('profileUpdated', fetchProfiles);
     return () => {
-      window.removeEventListener('profileUpdated', handleProfileUpdate);
+      window.removeEventListener('profileUpdated', fetchProfiles);
     };
   }, []);
 
@@ -61,9 +61,9 @@ export function AdminClient() {
     router.push(`/profile/${id}?edit=true`);
   };
 
-  const handleDelete = (id: number) => {
+  const handleDelete = async (id: number) => {
     const profileToDelete = profiles.find(p => p.id === id);
-    const success = deleteProfile(id);
+    const success = await deleteProfile(id);
 
     if (success) {
         toast({
@@ -71,6 +71,8 @@ export function AdminClient() {
             description: `${profileToDelete?.name || 'User'} has been removed.`,
             variant: "destructive"
         });
+        // Optimistically update UI or re-fetch
+        setProfiles(prev => prev.filter(p => p.id !== id));
     } else {
         toast({
             title: "Error",
@@ -79,11 +81,6 @@ export function AdminClient() {
         });
     }
   };
-
-  const getEmailFromName = (name: string) => {
-      if (name === 'Admin') return 'saytee.software@gmail.com';
-      return `${name.toLowerCase().replace(/ /g, '.')}@example.com`;
-  }
 
   if (isLoading) {
     return (

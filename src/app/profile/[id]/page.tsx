@@ -629,24 +629,24 @@ export default function ProfilePage() {
       return;
     }
     
-    const targetProfile = getProfile(profileId);
+    getProfile(profileId).then(targetProfile => {
+        // Permission check
+        const isOwnProfile = targetProfile?.id === loggedInUser?.id;
+        const isAdmin = loggedInUser?.id === 1;
+        const canEdit = isOwnProfile || isAdmin;
+        const canView = isOwnProfile || isAdmin || (loggedInUser && targetProfile && loggedInUser.role !== targetProfile.role);
 
-    // Permission check
-    const isOwnProfile = targetProfile?.id === loggedInUser?.id;
-    const isAdmin = loggedInUser?.id === 1;
-    const canEdit = isOwnProfile || isAdmin;
-    const canView = isOwnProfile || isAdmin || (loggedInUser && targetProfile && loggedInUser.role !== targetProfile.role);
-
-    if (canView) {
-      setProfileData(targetProfile);
-      if (searchParams.get('edit') === 'true' && canEdit) {
-        setIsEditMode(true);
-      }
-    } else {
-      setProfileData(undefined);
-    }
-    
-    setIsLoadingData(false); // Data loading is complete
+        if (canView) {
+          setProfileData(targetProfile);
+          if (searchParams.get('edit') === 'true' && canEdit) {
+            setIsEditMode(true);
+          }
+        } else {
+          setProfileData(undefined);
+        }
+        
+        setIsLoadingData(false); // Data loading is complete
+    });
       
   }, [profileId, isAuthLoading, isLoggedIn, loggedInUser, router, searchParams]);
 
@@ -709,8 +709,8 @@ export default function ProfilePage() {
     });
   };
   
-  const handleBlock = (profileId: number, profileName: string) => {
-    deleteProfile(profileId);
+  const handleBlock = async (profileId: number, profileName: string) => {
+    await deleteProfile(profileId);
     toast({
       variant: 'destructive',
       title: 'User Blocked',
@@ -719,8 +719,8 @@ export default function ProfilePage() {
     router.push('/search');
   };
   
-  const handleSaveProfile = (updatedProfile: Profile) => {
-    const success = updateProfile(updatedProfile);
+  const handleSaveProfile = async (updatedProfile: Profile) => {
+    const success = await updateProfile(updatedProfile);
     
     // Always switch to view mode as requested
     setIsEditMode(false);
@@ -752,7 +752,7 @@ export default function ProfilePage() {
       router.replace(`/profile/${profileId}`, { scroll: false });
     }
     // Re-fetch the original profile data to discard any local state changes in the edit form
-    setProfileData(getProfile(profileId));
+    getProfile(profileId).then(setProfileData);
   };
 
   const isLoading = isAuthLoading || isLoadingData;

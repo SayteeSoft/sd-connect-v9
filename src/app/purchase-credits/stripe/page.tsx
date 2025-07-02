@@ -27,10 +27,10 @@ function StripePaymentContent() {
   const selectedPackage = useMemo(() => creditPackages.find(p => p.id === packageId), [packageId]);
 
   useEffect(() => {
-      if(selectedPackage) {
-        const timer = setTimeout(() => {
-            if (user?.role === 'daddy' && selectedPackage) {
-                addCredits(selectedPackage.credits);
+      if(selectedPackage && user) {
+        const timer = setTimeout(async () => {
+            if (user?.role === 'daddy') {
+                await addCredits(selectedPackage.credits);
             }
             setIsProcessing(false);
             toast({

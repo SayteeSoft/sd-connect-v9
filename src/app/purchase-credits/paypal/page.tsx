@@ -56,14 +56,14 @@ function PayPalPaymentContent() {
   const onApprove = (data: OnApproveData, actions: any) => {
     setIsProcessing(true);
     setError(null);
-    return actions.order.capture().then((details: any) => {
+    return actions.order.capture().then(async (details: any) => {
       toast({
         title: 'Purchase Successful!',
         description: `You have successfully purchased ${selectedPackage?.credits} credits via PayPal.`,
       });
       
       if (user?.role === 'daddy' && selectedPackage) {
-          addCredits(selectedPackage.credits);
+          await addCredits(selectedPackage.credits);
       }
       
       const redirectUrl = searchParams.get('redirect');

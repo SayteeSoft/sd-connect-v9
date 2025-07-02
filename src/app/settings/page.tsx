@@ -80,13 +80,8 @@ export default function SettingsPage() {
     if (!profile) return;
     setIsSubmittingProfile(true);
     
-    // Simulate API call
-    await new Promise(resolve => setTimeout(resolve, 1000));
-    
-    // Note: In a real app, you would have a backend process for changing email
-    // that includes verification. Here we just update the name.
     const updatedProfileData: Profile = { ...profile, name: data.name };
-    const success = updateProfile(updatedProfileData);
+    const success = await updateProfile(updatedProfileData);
 
     if (success) {
       toast({
@@ -106,11 +101,9 @@ export default function SettingsPage() {
 
   const onPasswordSubmit = async (data: PasswordFormValues) => {
     setIsSubmittingPassword(true);
-    await new Promise(resolve => setTimeout(resolve, 1000));
-    console.log('Password change data:', data);
-
+    
     // In a real app, you would verify the currentPassword against the backend
-    // and then update it. For this demo, we'll just show a success message.
+    // but the backend stores it in plain text, so we check against the auth context
     if (data.currentPassword !== profile?.password) {
         toast({
           variant: "destructive",
@@ -121,18 +114,26 @@ export default function SettingsPage() {
         return;
     }
 
-    // Update password in our mock data
+    // Update password via API
     if (profile) {
       const updatedProfileData: Profile = { ...profile, password: data.newPassword };
-      updateProfile(updatedProfileData);
+      const success = await updateProfile(updatedProfileData);
+      
+      if (success) {
+         toast({
+          title: 'Password Changed',
+          description: 'Your password has been updated successfully.',
+        });
+        passwordForm.reset();
+      } else {
+         toast({
+            variant: "destructive",
+            title: 'Update Failed',
+            description: 'Could not update your password.',
+        });
+      }
     }
     
-    toast({
-      title: 'Password Changed',
-      description: 'Your password has been updated successfully.',
-    });
-
-    passwordForm.reset();
     setIsSubmittingPassword(false);
   };
   

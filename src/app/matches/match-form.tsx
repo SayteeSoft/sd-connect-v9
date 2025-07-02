@@ -91,21 +91,22 @@ export function MatchesTabs() {
 
   useEffect(() => {
     if (!isAuthLoading) {
-        const allProfiles = getProfiles();
-        const filterLogic = (profile: Profile) => {
-            if (!loggedInUser) return true;
-            if (profile.id === loggedInUser.id) return false;
-            
-            // Always show opposite roles, regardless of admin status.
-            if (profile.role === loggedInUser.role) return false;
+        getProfiles().then(allProfiles => {
+            const filterLogic = (profile: Profile) => {
+                if (!loggedInUser) return true;
+                if (profile.id === loggedInUser.id) return false;
+                
+                // Always show opposite roles, regardless of admin status.
+                if (profile.role === loggedInUser.role) return false;
 
-            return true;
-        }
+                return true;
+            }
 
-        setFavorites(allProfiles.slice(0, 4).filter(filterLogic));
-        setVisitors(allProfiles.slice(4, 8).filter(filterLogic));
-        setViewed(allProfiles.slice(8, 12).filter(filterLogic));
-        setIsDataLoading(false);
+            setFavorites(allProfiles.slice(0, 4).filter(filterLogic));
+            setVisitors(allProfiles.slice(4, 8).filter(filterLogic));
+            setViewed(allProfiles.slice(8, 12).filter(filterLogic));
+            setIsDataLoading(false);
+        });
     }
   }, [isAuthLoading, loggedInUser]);
   

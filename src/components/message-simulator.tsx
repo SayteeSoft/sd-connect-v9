@@ -5,8 +5,9 @@ import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useToast } from "@/hooks/use-toast";
 import type { Profile } from "@/lib/data";
-import { getProfiles, getProfile } from "@/lib/data";
+import { getProfiles } from "@/lib/data";
 import { Button } from './ui/button';
+import { useAuth } from '@/hooks/use-auth';
 
 const predefinedMessages = [
     "Hey, I was just looking at your profile, I'm really impressed!",
@@ -24,42 +25,40 @@ const predefinedMessages = [
 export function MessageSimulator() {
   const { toast } = useToast();
   const router = useRouter();
+  const { user: currentUser, isLoggedIn } = useAuth();
 
   useEffect(() => {
-    // Only run this simulation on the client
-    if (typeof window === 'undefined') return;
-    
-    const loggedInStatus = localStorage.getItem("isLoggedIn") === "true";
-    if (!loggedInStatus) {
+    // Only run this simulation on the client when logged in
+    if (typeof window === 'undefined' || !isLoggedIn || !currentUser) {
       return;
     }
-
-    const currentUser = getProfile(1); // Hardcoded admin/daddy user
-    if (!currentUser) return;
-
-    const allProfiles = getProfiles();
-    let potentialSenders: Profile[];
-
-    if (currentUser.role === 'daddy') {
-        potentialSenders = allProfiles.filter(p => p.role === 'baby');
-    } else { // currentUser.role === 'baby'
-        potentialSenders = allProfiles.filter(p => p.role === 'daddy' && p.id !== currentUser.id);
-    }
     
-    if (potentialSenders.length === 0) return;
-
     let timeoutId: NodeJS.Timeout;
 
-    const scheduleRandomMessage = () => {
+    const scheduleRandomMessage = async () => {
         // Random delay between 25 and 75 seconds
         const randomDelay = Math.floor(Math.random() * (75000 - 25000 + 1)) + 25000;
 
-        timeoutId = setTimeout(() => {
+        timeoutId = setTimeout(async () => {
+            const allProfiles = await getProfiles();
+            let potentialSenders: Profile[];
+
+            if (currentUser.role === 'daddy') {
+                potentialSenders = allProfiles.filter(p => p.role === 'baby');
+            } else { // currentUser.role === 'baby'
+                potentialSenders = allProfiles.filter(p => p.role === 'daddy' && p.id !== currentUser.id);
+            }
+            
+            if (potentialSenders.length === 0) {
+                scheduleRandomMessage(); // Reschedule
+                return;
+            };
+            
             const randomSender = potentialSenders[Math.floor(Math.random() * potentialSenders.length)];
             const randomMessage = predefinedMessages[Math.floor(Math.random() * predefinedMessages.length)];
 
             if (!randomSender) {
-                scheduleRandomMessage();
+                scheduleRandomMessage(); // Reschedule
                 return;
             };
 
@@ -77,7 +76,7 @@ export function MessageSimulator() {
                 ),
             });
 
-            scheduleRandomMessage();
+            scheduleRandomMessage(); // Reschedule for the next one
         }, randomDelay);
     };
 
@@ -88,7 +87,7 @@ export function MessageSimulator() {
         clearTimeout(initialDelay);
         clearTimeout(timeoutId);
     };
-  }, [toast, router]);
+  }, [toast, router, isLoggedIn, currentUser]);
 
   return null;
 }

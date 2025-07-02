@@ -26,6 +26,7 @@ export default function LoginPage() {
   const [error, setError] = useState("");
   const router = useRouter();
   const { login, isLoggedIn, isLoading } = useAuth();
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
     if (isLoggedIn) {
@@ -33,11 +34,13 @@ export default function LoginPage() {
     }
   }, [isLoggedIn, router]);
 
-  const handleLogin = (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
+    setIsSubmitting(true);
 
-    const user = login(email, password);
+    const user = await login(email, password);
+    setIsSubmitting(false);
 
     if (user) {
       router.push("/profile");
@@ -103,7 +106,8 @@ export default function LoginPage() {
                   placeholder="12345"
                 />
               </div>
-              <Button type="submit" className="w-full">
+              <Button type="submit" className="w-full" disabled={isSubmitting}>
+                {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                 Sign In
               </Button>
             </form>

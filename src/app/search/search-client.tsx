@@ -52,8 +52,10 @@ export function SearchClient() {
   
   useEffect(() => {
     if (!isAuthLoading) {
-      setProfiles(getProfiles());
-      setIsDataLoading(false);
+      getProfiles().then(profilesData => {
+        setProfiles(profilesData);
+        setIsDataLoading(false);
+      });
     }
   }, [isAuthLoading]);
   

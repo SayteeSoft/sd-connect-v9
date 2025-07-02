@@ -54,7 +54,7 @@ function MessagesContent() {
     const searchParams = useSearchParams();
     const { user: currentUserProfile, isLoading: isAuthLoading } = useAuth();
     
-    // Default state for conversations is null until we fetch them on the client.
+    // Default state for conversations is null until we fetch them.
     const [conversations, setConversations] = useState<Conversation[] | null>(null);
 
     const initialSelectedProfileId = searchParams.get('chatWith')
@@ -64,11 +64,12 @@ function MessagesContent() {
     useEffect(() => {
         // Data fetching only happens on the client, after auth is resolved.
         if (!isAuthLoading && currentUserProfile) {
-            const allConversations = getConversations();
-            const filteredConversations = allConversations.filter(
-                (convo) => convo.participant.role !== currentUserProfile.role
-            );
-            setConversations(filteredConversations);
+            getConversations().then(allConversations => {
+                const filteredConversations = allConversations.filter(
+                    (convo) => convo.participant.role !== currentUserProfile.role
+                );
+                setConversations(filteredConversations);
+            });
         }
     }, [isAuthLoading, currentUserProfile]);
 

@@ -5,9 +5,10 @@ import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useToast } from "@/hooks/use-toast";
 import type { Profile } from "@/lib/data";
-import { getProfiles, getProfile } from "@/lib/data";
+import { getProfiles } from "@/lib/data";
 import { Button } from './ui/button';
 import { Heart, Footprints } from 'lucide-react';
+import { useAuth } from '@/hooks/use-auth';
 
 const socialEvents = [
     { type: 'favorite', text: 'favorited your profile', icon: <Heart className="mr-2 h-4 w-4 text-pink-500 fill-current" /> },
@@ -17,38 +18,36 @@ const socialEvents = [
 export function SocialActivitySimulator() {
   const { toast } = useToast();
   const router = useRouter();
+  const { user: currentUser, isLoggedIn } = useAuth();
 
   useEffect(() => {
-    // Only run this simulation on the client
-    if (typeof window === 'undefined') return;
-    
-    const loggedInStatus = localStorage.getItem("isLoggedIn") === "true";
-    if (!loggedInStatus) {
-      return;
-    }
-
-    const currentUser = getProfile(1); // Hardcoded admin/daddy user
-    if (!currentUser) return;
-
-    const allProfiles = getProfiles();
-    let potentialActors: Profile[];
-
-    // Users with the opposite role can interact
-    if (currentUser.role === 'daddy') {
-        potentialActors = allProfiles.filter(p => p.role === 'baby');
-    } else { // currentUser.role === 'baby'
-        potentialActors = allProfiles.filter(p => p.role === 'daddy' && p.id !== currentUser.id);
+    // Only run this simulation on the client when logged in
+    if (typeof window === 'undefined' || !isLoggedIn || !currentUser) {
+        return;
     }
     
-    if (potentialActors.length === 0) return;
-
     let timeoutId: NodeJS.Timeout;
 
     const scheduleRandomEvent = () => {
         // Random delay between 30 and 80 seconds
         const randomDelay = Math.floor(Math.random() * (80000 - 30000 + 1)) + 30000;
 
-        timeoutId = setTimeout(() => {
+        timeoutId = setTimeout(async () => {
+            const allProfiles = await getProfiles();
+            let potentialActors: Profile[];
+
+            // Users with the opposite role can interact
+            if (currentUser.role === 'daddy') {
+                potentialActors = allProfiles.filter(p => p.role === 'baby');
+            } else { // currentUser.role === 'baby'
+                potentialActors = allProfiles.filter(p => p.role === 'daddy' && p.id !== currentUser.id);
+            }
+            
+            if (potentialActors.length === 0) {
+                scheduleRandomEvent();
+                return;
+            };
+
             const randomActor = potentialActors[Math.floor(Math.random() * potentialActors.length)];
             const randomEvent = socialEvents[Math.floor(Math.random() * socialEvents.length)];
 
@@ -87,8 +86,7 @@ export function SocialActivitySimulator() {
         clearTimeout(initialDelay);
         clearTimeout(timeoutId);
     };
-  }, [toast, router]);
+  }, [toast, router, isLoggedIn, currentUser]);
 
   return null;
 }
-
