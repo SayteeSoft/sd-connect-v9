@@ -6,7 +6,7 @@
 [dev]
   command = "next dev"
   targetPort = 3000
-  port = 8888
+  port = 9002
 
 [functions]
   directory = "netlify/functions"
