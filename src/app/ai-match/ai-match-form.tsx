@@ -85,13 +85,12 @@ export function MatchesTabs() {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    // In a real app, this data would be fetched based on the logged-in user
-    // For this demo, we'll use the static data
-    const allProfiles = getProfiles();
-    setFavorites(allProfiles.slice(0, 4));
-    setVisitors(allProfiles.slice(4, 8));
-    setViewed(allProfiles.slice(8, 12));
-    setIsLoading(false);
+    getProfiles().then(allProfiles => {
+      setFavorites(allProfiles.slice(0, 4));
+      setVisitors(allProfiles.slice(4, 8));
+      setViewed(allProfiles.slice(8, 12));
+      setIsLoading(false);
+    });
   }, []);
   
   const handleRemove = (profileId: number, listType: 'favorites' | 'visitors' | 'viewed') => {
