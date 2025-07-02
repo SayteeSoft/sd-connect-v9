@@ -2,7 +2,6 @@
 'use client';
 
 import { useState, useEffect } from "react";
-import type { Profile } from "@/lib/data";
 import { getProfiles } from "@/lib/data";
 import { Card, CardContent } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -36,19 +35,22 @@ export function Testimonials() {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    const allProfiles = getProfiles();
-    const testimonialProfiles = allProfiles.filter(p => p.id !== 1).slice(0, 5);
-    
-    const generatedTestimonials = testimonialProfiles.map(profile => ({
-      quote: extractQuoteFromBio(profile.bio),
-      name: profile.name,
-      role: formatRole(profile.role),
-      avatar: profile.imageUrl,
-      hint: profile.hint,
-    }));
+    getProfiles().then(allProfiles => {
+        if (Array.isArray(allProfiles)) {
+            const testimonialProfiles = allProfiles.filter(p => p.id !== 1).slice(0, 5);
+            
+            const generatedTestimonials = testimonialProfiles.map(profile => ({
+              quote: extractQuoteFromBio(profile.bio),
+              name: profile.name,
+              role: formatRole(profile.role),
+              avatar: profile.imageUrl,
+              hint: profile.hint,
+            }));
 
-    setTestimonials(generatedTestimonials);
-    setIsLoading(false);
+            setTestimonials(generatedTestimonials);
+        }
+        setIsLoading(false);
+    });
   }, []);
 
   if (isLoading) {

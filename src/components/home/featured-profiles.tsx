@@ -11,12 +11,20 @@ import { useAuth } from "@/hooks/use-auth";
 export function FeaturedProfiles() {
   const [profiles, setProfiles] = useState<Profile[]>([]);
   const { user: loggedInUser, isLoading, isLoggedIn } = useAuth();
+  const [isDataLoading, setIsDataLoading] = useState(true);
 
   useEffect(() => {
-    setProfiles(getProfiles());
+    getProfiles().then(profilesData => {
+        if (Array.isArray(profilesData)) {
+            setProfiles(profilesData);
+        }
+        setIsDataLoading(false);
+    })
   }, []);
 
-  const displayedProfiles = isLoading ? [] : profiles
+  const isComponentLoading = isLoading || isDataLoading;
+
+  const displayedProfiles = isComponentLoading ? [] : profiles
     .filter(profile => {
       // Don't show the admin account on the homepage
       if (profile.id === 1) return false;
@@ -42,7 +50,7 @@ export function FeaturedProfiles() {
           Featured Profiles
         </h2>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
-          {isLoading ? (
+          {isComponentLoading ? (
             Array.from({ length: 4 }).map((_, index) => (
                 <Skeleton key={index} className="rounded-lg aspect-[4/5] w-full" />
             ))
