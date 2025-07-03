@@ -1,7 +1,7 @@
 
 'use client';
 
-import { useState, useEffect, Suspense, useCallback } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { Header } from '@/components/layout/header';
 import { ChatClient } from './chat-client';
@@ -54,32 +54,31 @@ function MessagesContent() {
     const searchParams = useSearchParams();
     const { user: currentUserProfile, isLoading: isAuthLoading } = useAuth();
     
-    // Default state for conversations is null until we fetch them.
     const [conversations, setConversations] = useState<Conversation[] | null>(null);
 
     const initialSelectedProfileId = searchParams.get('chatWith')
         ? parseInt(searchParams.get('chatWith') as string, 10)
         : undefined;
     
-    const fetchConversations = useCallback(() => {
-        // Data fetching only happens on the client, after auth is resolved.
-        if (!isAuthLoading && currentUserProfile) {
-            getConversations().then(allConversations => {
-                const filteredConversations = allConversations.filter(
-                    (convo) => convo.participant.role !== currentUserProfile.role
-                );
-                setConversations(filteredConversations);
-            });
-        }
-    }, [isAuthLoading, currentUserProfile]);
-    
     useEffect(() => {
-        fetchConversations();
-        window.addEventListener('profileUpdated', fetchConversations);
-        return () => {
-            window.removeEventListener('profileUpdated', fetchConversations);
+        const fetchAndSetConversations = () => {
+            if (!isAuthLoading && currentUserProfile) {
+                getConversations().then(allConversations => {
+                    const filteredConversations = allConversations.filter(
+                        (convo) => convo.participant.role !== currentUserProfile.role
+                    );
+                    setConversations(filteredConversations);
+                });
+            }
         };
-    }, [fetchConversations]);
+
+        fetchAndSetConversations();
+
+        window.addEventListener('profileUpdated', fetchAndSetConversations);
+        return () => {
+            window.removeEventListener('profileUpdated', fetchAndSetConversations);
+        };
+    }, [isAuthLoading, currentUserProfile]);
 
     // Show skeleton while auth is loading or we haven't fetched conversations yet.
     if (isAuthLoading || conversations === null) {
