@@ -21,6 +21,7 @@ import {
   Heart,
   Ban,
   MessageSquare,
+  Check,
 } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -240,7 +241,7 @@ const ProfileView = ({ profile, onEdit, isOwnProfile, canEdit, onMessage, onFavo
   </div>
 )};
 
-const ProfileEdit = ({ profile, onSave, onCancel, isSaving }: { profile: Profile; onSave: (p: Profile) => void; onCancel: () => void; isSaving: boolean }) => {
+const ProfileEdit = ({ profile, onSave, onCancel, isSaving, saveSuccess }: { profile: Profile; onSave: (p: Profile) => void; onCancel: () => void; isSaving: boolean; saveSuccess: boolean }) => {
     const [editedProfile, setEditedProfile] = useState(profile);
     const profileImageInputRef = useRef<HTMLInputElement>(null);
     const galleryImageInputRef = useRef<HTMLInputElement>(null);
@@ -437,8 +438,9 @@ const ProfileEdit = ({ profile, onSave, onCancel, isSaving }: { profile: Profile
                             </div>
                             <div className="flex space-x-2 pt-4">
                                 <Button size="lg" className="flex-1" onClick={handleSave} disabled={isSaving}>
-                                    {isSaving && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                                    Save Profile
+                                    {isSaving && !saveSuccess && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                                    {saveSuccess && <Check className="mr-2 h-4 w-4" />}
+                                    {saveSuccess ? 'Saved!' : (isSaving ? 'Saving...' : 'Save Profile')}
                                 </Button>
                                 <Button size="lg" variant="outline" className="flex-1" onClick={onCancel} disabled={isSaving}>
                                     Cancel
@@ -617,6 +619,7 @@ export default function ProfilePage() {
   const [profileData, setProfileData] = useState<Profile | undefined>();
   const [isLoadingData, setIsLoadingData] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
+  const [saveSuccess, setSaveSuccess] = useState(false);
   const [isGalleryOpen, setIsGalleryOpen] = useState(false);
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
   const { toast, dismiss } = useToast();
@@ -727,20 +730,28 @@ export default function ProfilePage() {
   
   const handleSaveProfile = async (updatedProfile: Profile) => {
     setIsSaving(true);
+    setSaveSuccess(false);
     const success = await updateProfile(updatedProfile);
-    setIsSaving(false);
 
     if (success) {
-      setProfileData(updatedProfile);
-      setIsEditMode(false);
-      if (searchParams.get('edit')) {
-        router.replace(`/profile/${profileId}`, { scroll: false });
-      }
+      setSaveSuccess(true);
       toast({
         title: "Profile Saved",
         description: "Your changes have been saved successfully.",
       });
+      setProfileData(updatedProfile);
+      
+      setTimeout(() => {
+        setIsEditMode(false);
+        setIsSaving(false);
+        setSaveSuccess(false); // Reset for next time
+        if (searchParams.get('edit')) {
+          router.replace(`/profile/${profileId}`, { scroll: false });
+        }
+      }, 1200);
     } else {
+      setIsSaving(false);
+      setSaveSuccess(false);
       toast({
         variant: "destructive",
         title: "Save Failed",
@@ -804,6 +815,7 @@ export default function ProfilePage() {
             onSave={handleSaveProfile} 
             onCancel={handleCancelEdit} 
             isSaving={isSaving}
+            saveSuccess={saveSuccess}
           />
         ) : (
           <ProfileView 
