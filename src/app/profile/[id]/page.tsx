@@ -241,8 +241,9 @@ const ProfileView = ({ profile, onEdit, isOwnProfile, canEdit, onMessage, onFavo
   </div>
 )};
 
-const ProfileEdit = ({ profile, onSave, onCancel }: { profile: Profile; onSave: (p: Profile) => void; onCancel: () => void; }) => {
+const ProfileEdit = ({ profile, onSave, onCancel }: { profile: Profile; onSave: (p: Profile) => Promise<void>; onCancel: () => void; }) => {
     const [editedProfile, setEditedProfile] = useState(profile);
+    const [isSubmitting, setIsSubmitting] = useState(false);
     const profileImageInputRef = useRef<HTMLInputElement>(null);
     const galleryImageInputRef = useRef<HTMLInputElement>(null);
     const { toast } = useToast();
@@ -377,8 +378,14 @@ const ProfileEdit = ({ profile, onSave, onCancel }: { profile: Profile; onSave: 
       }));
     };
 
-    const handleSave = () => {
-        onSave(editedProfile);
+    const handleSave = async () => {
+        setIsSubmitting(true);
+        await onSave(editedProfile);
+        // On failure, the parent component will revert the state, and this component will re-render.
+        // The isSubmitting state will be reset because of the re-render.
+        // We set it to false here to handle the case where the parent component's logic might change
+        // and not cause a re-render on failure. This is a safe fallback.
+        setIsSubmitting(false);
     };
 
     return (
@@ -437,10 +444,11 @@ const ProfileEdit = ({ profile, onSave, onCancel }: { profile: Profile; onSave: 
                                 </p>
                             </div>
                             <div className="flex space-x-2 pt-4">
-                                <Button size="lg" className="flex-1" onClick={handleSave}>
-                                    Save Profile
+                                <Button size="lg" className="flex-1" onClick={handleSave} disabled={isSubmitting}>
+                                    {isSubmitting ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
+                                    {isSubmitting ? 'Saving...' : 'Save Profile'}
                                 </Button>
-                                <Button size="lg" variant="outline" className="flex-1" onClick={onCancel}>
+                                <Button size="lg" variant="outline" className="flex-1" onClick={onCancel} disabled={isSubmitting}>
                                     Cancel
                                 </Button>
                             </div>
@@ -523,7 +531,7 @@ const ProfileEdit = ({ profile, onSave, onCancel }: { profile: Profile; onSave: 
                             <dl className="grid grid-cols-2 gap-x-4 gap-y-4">
                                 <div className="space-y-1">
                                     <Label htmlFor="age">Age</Label>
-                                    <Input id="age" name="age" type="number" value={isNaN(editedProfile.age) ? '' : editedProfile.age} onChange={handleChange} />
+                                    <Input id="age" name="age" type="number" value={editedProfile.age || ''} onChange={handleChange} />
                                 </div>
                                 <div className="space-y-1">
                                     <Label htmlFor="attr-Height">Height</Label>
@@ -622,11 +630,17 @@ export default function ProfilePage() {
   const router = useRouter();
   const params = useParams<{ id: string }>();
   const { user: loggedInUser, isLoading: isAuthLoading, isLoggedIn } = useAuth();
+  const justSaved = useRef(false);
   
   const profileId = parseInt(params.id, 10);
   const allImages = [profileData?.imageUrl, ...(profileData?.gallery || [])].filter((url): url is string => !!url);
 
   useEffect(() => {
+    if (justSaved.current) {
+      justSaved.current = false;
+      return;
+    }
+
     if (isAuthLoading) return; // Wait for auth to be resolved
 
     if (!isLoggedIn) {
@@ -727,7 +741,10 @@ export default function ProfilePage() {
   const handleSaveProfile = async (updatedProfile: Profile) => {
     const originalProfile = { ...profileData! };
 
-    // Optimistically update the UI
+    // Set flag to avoid re-fetch from useEffect
+    justSaved.current = true;
+
+    // Optimistically update UI for a seamless experience
     setProfileData(updatedProfile);
     setIsEditMode(false);
     
@@ -735,7 +752,7 @@ export default function ProfilePage() {
       router.replace(`/profile/${profileId}`, { scroll: false });
     }
 
-    // Attempt to save to the backend
+    // Attempt to save to the backend in the background
     const success = await updateProfile(updatedProfile);
 
     if (success) {
@@ -838,3 +855,4 @@ export default function ProfilePage() {
     </>
   );
 }
+
