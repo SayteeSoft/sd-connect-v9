@@ -80,8 +80,8 @@ export const featuredProfiles: Profile[] = [
     wants: ['Mentorship', 'Discreet', 'Long-term', 'Travel Partner'],
     interests: ['Art', 'Travel', 'Fine Dining', 'Theatre', 'Wine Tasting'],
     gallery: [
-      'https://placehold.co/600x401.png',
-      'https://placehold.co/600x402.png',
+      'https://placehold.co/600x400.png',
+      'https://placehold.co/600x400.png',
     ],
     attributes: {
       'Height': "6'1\"",
@@ -111,10 +111,10 @@ export const featuredProfiles: Profile[] = [
     wants: ['Mentorship', 'Travel Partner', 'Casual'],
     interests: ['Art', 'Travel', 'Fine Dining', 'Movies'],
     gallery: [
-      'https://placehold.co/600x401.png',
-      'https://placehold.co/600x402.png',
-      'https://placehold.co/600x403.png',
-      'https://placehold.co/600x404.png'
+      'https://placehold.co/600x400.png',
+      'https://placehold.co/600x400.png',
+      'https://placehold.co/600x400.png',
+      'https://placehold.co/600x400.png'
     ],
     attributes: {
       'Height': "5'5\"",
@@ -144,9 +144,9 @@ export const featuredProfiles: Profile[] = [
     wants: ['Networking', 'Mentorship', 'Friendship'],
     interests: ['Music', 'Cooking', 'Fitness', 'Reading'],
     gallery: [
-      'https://placehold.co/600x405.png',
-      'https://placehold.co/600x406.png',
-      'https://placehold.co/600x407.png',
+      'https://placehold.co/600x400.png',
+      'https://placehold.co/600x400.png',
+      'https://placehold.co/600x400.png',
     ],
     attributes: {
       'Height': "5'7\"",
@@ -176,10 +176,10 @@ export const featuredProfiles: Profile[] = [
     wants: ['Long-term', 'Travel Partner'],
     interests: ['Sports', 'Travel', 'Wine Tasting'],
     gallery: [
-      'https://placehold.co/600x408.png',
-      'https://placehold.co/600x409.png',
-      'https://placehold.co/600x410.png',
-      'https://placehold.co/600x411.png',
+      'https://placehold.co/600x400.png',
+      'https://placehold.co/600x400.png',
+      'https://placehold.co/600x400.png',
+      'https://placehold.co/600x400.png',
     ],
     attributes: {
       'Height': "6'0\"",
@@ -209,8 +209,8 @@ export const featuredProfiles: Profile[] = [
     wants: ['Discreet', 'Casual', 'Travel Partner'],
     interests: ['Art', 'Theatre', 'Reading', 'Cooking'],
     gallery: [
-      'https://placehold.co/600x412.png',
-      'https://placehold.co/600x413.png'
+      'https://placehold.co/600x400.png',
+      'https://placehold.co/600x400.png'
     ],
     attributes: {
       'Height': "5'8\"",
@@ -240,7 +240,7 @@ export const featuredProfiles: Profile[] = [
     wants: ['Networking', 'No Strings Attached', 'Casual'],
     interests: ['Sports', 'Music', 'Movies', 'Reading'],
     gallery: [
-      'https://placehold.co/600x414.png'
+      'https://placehold.co/600x400.png'
     ],
     attributes: {
       'Height': "5'11\"",
@@ -261,7 +261,7 @@ export const featuredProfiles: Profile[] = [
     password: 'password123',
     age: 21,
     location: 'Leeds, UK',
-    imageUrl: 'https://placehold.co/710x710.png',
+    imageUrl: 'https://placehold.co/606x606.png',
     hint: 'woman red hair',
     role: 'baby',
     online: true,
@@ -298,9 +298,9 @@ export const featuredProfiles: Profile[] = [
     wants: ['Travel Partner', 'Discreet', 'Networking'],
     interests: ['Travel', 'Fine Dining', 'Theatre', 'Wine Tasting'],
     gallery: [
-      'https://placehold.co/600x415.png',
-      'https://placehold.co/600x416.png',
-      'https://placehold.co/600x417.png',
+      'https://placehold.co/600x400.png',
+      'https://placehold.co/600x400.png',
+      'https://placehold.co/600x400.png',
     ],
     attributes: {
       'Height': "6'2\"",
@@ -330,8 +330,8 @@ export const featuredProfiles: Profile[] = [
     wants: ['Friendship', 'Casual', 'Long-term'],
     interests: ['Fitness', 'Cooking', 'Travel', 'Reading'],
     gallery: [
-      'https://placehold.co/600x418.png',
-      'https://placehold.co/600x419.png',
+      'https://placehold.co/600x400.png',
+      'https://placehold.co/600x400.png',
     ],
     attributes: {
       'Height': "5'6\"",
@@ -361,7 +361,7 @@ export const featuredProfiles: Profile[] = [
     wants: ['Long-term', 'Mentorship'],
     interests: ['Sports', 'Music', 'Wine Tasting', 'Reading'],
     gallery: [
-        'https://placehold.co/600x420.png'
+        'https://placehold.co/600x400.png'
     ],
     attributes: {
       'Height': "5'10\"",
@@ -391,9 +391,9 @@ export const featuredProfiles: Profile[] = [
     wants: ['Travel Partner', 'Friendship', 'Casual'],
     interests: ['Music', 'Art', 'Travel', 'Movies'],
     gallery: [
-      'https://placehold.co/600x421.png',
-      'https://placehold.co/600x422.png',
-      'https://placehold.co/600x423.png',
+      'https://placehold.co/600x400.png',
+      'https://placehold.co/600x400.png',
+      'https://placehold.co/600x400.png',
     ],
     attributes: {
       'Height': "5'7\"",
@@ -423,8 +423,8 @@ export const featuredProfiles: Profile[] = [
     wants: ['Casual', 'Travel Partner', 'No Strings Attached'],
     interests: ['Sports', 'Travel', 'Fine Dining', 'Reading'],
     gallery: [
-      'https://placehold.co/600x424.png',
-      'https://placehold.co/600x425.png',
+      'https://placehold.co/600x400.png',
+      'https://placehold.co/600x400.png',
     ],
     attributes: {
       'Height': "5'9\"",

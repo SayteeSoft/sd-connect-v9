@@ -80,13 +80,13 @@ export function ProfileCard({ profile, onRemove, loggedInUser, isLoggedIn = true
   return (
     <Link href={isLoggedIn ? `/profile/${profile.id}` : '/signup'} className="block">
       <Card className="group overflow-hidden rounded-lg shadow-lg transition-transform duration-300 ease-in-out hover:-translate-y-2">
-        <div className="relative aspect-[4/5] w-full">
+        <div className="relative aspect-square w-full">
           <Image
-            src={profile.imageUrl ?? 'https://placehold.co/600x750.png'}
+            src={profile.imageUrl ?? 'https://placehold.co/600x600.png'}
             alt={`Profile of ${profile.name}`}
             data-ai-hint={profile.hint}
             width={600}
-            height={750}
+            height={600}
             className={cn(
               "h-full w-full object-cover transition-transform duration-300 group-hover:scale-105",
               !isLoggedIn && "blur-sm"
