@@ -88,9 +88,17 @@ export function MatchesTabs() {
   const fetchProfilesForTabs = useCallback(() => {
     setIsLoading(true);
     getProfiles().then(allProfiles => {
-      setFavorites(allProfiles.slice(0, 4));
-      setVisitors(allProfiles.slice(4, 8));
-      setViewed(allProfiles.slice(8, 12));
+      // Check if allProfiles is an array before slicing
+      if (Array.isArray(allProfiles)) {
+        setFavorites(allProfiles.slice(0, 4));
+        setVisitors(allProfiles.slice(4, 8));
+        setViewed(allProfiles.slice(8, 12));
+      } else {
+        // Handle the case where profiles are not fetched correctly
+        setFavorites([]);
+        setVisitors([]);
+        setViewed([]);
+      }
       setIsLoading(false);
     });
   }, []);

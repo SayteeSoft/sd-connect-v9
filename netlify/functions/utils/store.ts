@@ -39,7 +39,7 @@ export const getProfilesFromStore = async (): Promise<Profile[]> => {
             logWarning();
             localProfilesCache = JSON.parse(JSON.stringify(featuredProfiles));
         }
-        return localProfilesCache;
+        return localProfilesCache!;
     }
 
     const store = getStore(PROFILES_STORE_NAME);
@@ -78,7 +78,7 @@ export const getConversationsFromStore = async (): Promise<any[]> => {
         if (!localConversationsCache) {
             localConversationsCache = JSON.parse(JSON.stringify(rawConversationsData));
         }
-        return localConversationsCache;
+        return localConversationsCache!;
     }
 
     const store = getStore(CONVERSATIONS_STORE_NAME);
