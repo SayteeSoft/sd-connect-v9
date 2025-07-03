@@ -94,12 +94,10 @@ function MessagesContent() {
         );
     }
 
-    const currentUserForChat = { id: currentUserProfile.id, name: currentUserProfile.name };
-
     return (
         <ChatClient
             initialConversations={conversations}
-            currentUser={currentUserForChat}
+            currentUser={currentUserProfile}
             initialSelectedProfileId={initialSelectedProfileId}
         />
     );

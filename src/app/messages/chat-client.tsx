@@ -55,7 +55,7 @@ const formatTimestamp = (timestamp: string) => {
 
 interface ChatClientProps {
   initialConversations: Conversation[];
-  currentUser: { id: number; name: string };
+  currentUser: Profile;
   initialSelectedProfileId?: number;
 }
 
@@ -397,6 +397,12 @@ export function ChatClient({ initialConversations, currentUser, initialSelectedP
                                 >
                                     <p>{message.text}</p>
                                 </div>
+                                {message.senderId === currentUser.id && (
+                                    <Avatar className="h-8 w-8">
+                                        <AvatarImage src={currentUser.imageUrl ?? 'https://placehold.co/100x100.png'} alt={currentUser.name} data-ai-hint={currentUser.hint}/>
+                                        <AvatarFallback>{currentUser.name.charAt(0)}</AvatarFallback>
+                                    </Avatar>
+                                )}
                             </div>
                         ))}
                         <div ref={messagesEndRef} />
