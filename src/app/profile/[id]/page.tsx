@@ -240,7 +240,7 @@ const ProfileView = ({ profile, onEdit, isOwnProfile, canEdit, onMessage, onFavo
   </div>
 )};
 
-const ProfileEdit = ({ profile, onSave, onCancel }: { profile: Profile; onSave: (p: Profile) => void; onCancel: () => void }) => {
+const ProfileEdit = ({ profile, onSave, onCancel, isSaving }: { profile: Profile; onSave: (p: Profile) => void; onCancel: () => void; isSaving: boolean }) => {
     const [editedProfile, setEditedProfile] = useState(profile);
     const profileImageInputRef = useRef<HTMLInputElement>(null);
     const galleryImageInputRef = useRef<HTMLInputElement>(null);
@@ -436,8 +436,13 @@ const ProfileEdit = ({ profile, onSave, onCancel }: { profile: Profile; onSave: 
                                 </p>
                             </div>
                             <div className="flex space-x-2 pt-4">
-                                <Button size="lg" className="flex-1" onClick={handleSave}>Save Profile</Button>
-                                <Button size="lg" variant="outline" className="flex-1" onClick={onCancel}>Cancel</Button>
+                                <Button size="lg" className="flex-1" onClick={handleSave} disabled={isSaving}>
+                                    {isSaving && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                                    Save Profile
+                                </Button>
+                                <Button size="lg" variant="outline" className="flex-1" onClick={onCancel} disabled={isSaving}>
+                                    Cancel
+                                </Button>
                             </div>
                         </CardContent>
                     </Card>
@@ -611,6 +616,7 @@ export default function ProfilePage() {
   const [isEditMode, setIsEditMode] = useState(false);
   const [profileData, setProfileData] = useState<Profile | undefined>();
   const [isLoadingData, setIsLoadingData] = useState(true);
+  const [isSaving, setIsSaving] = useState(false);
   const [isGalleryOpen, setIsGalleryOpen] = useState(false);
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
   const { toast, dismiss } = useToast();
@@ -720,29 +726,34 @@ export default function ProfilePage() {
   };
   
   const handleSaveProfile = async (updatedProfile: Profile) => {
-    const success = await updateProfile(updatedProfile);
-    
-    // Always switch to view mode as requested
-    setIsEditMode(false);
-    if (searchParams.get('edit')) {
-      router.replace(`/profile/${profileId}`, { scroll: false });
-    }
-
-    if (success) {
-      // Use the successfully saved profile data directly to update the state.
-      setProfileData(updatedProfile);
-      toast({
-        title: "Profile Saved",
-        description: "Your changes have been saved successfully.",
-      });
-    } else {
-      // The view mode will show the old data, as the save failed.
-      // It's important to notify the user that their changes were not saved.
-      toast({
-        variant: "destructive",
-        title: "Save Failed",
-        description: "Your changes could not be saved, likely due to storage limits. Please try reducing image sizes.",
-      });
+    setIsSaving(true);
+    try {
+      const success = await updateProfile(updatedProfile);
+      
+      // Always switch to view mode as requested
+      setIsEditMode(false);
+      if (searchParams.get('edit')) {
+        router.replace(`/profile/${profileId}`, { scroll: false });
+      }
+  
+      if (success) {
+        // Use the successfully saved profile data directly to update the state.
+        setProfileData(updatedProfile);
+        toast({
+          title: "Profile Saved",
+          description: "Your changes have been saved successfully.",
+        });
+      } else {
+        // The view mode will show the old data, as the save failed.
+        // It's important to notify the user that their changes were not saved.
+        toast({
+          variant: "destructive",
+          title: "Save Failed",
+          description: "Your changes could not be saved, likely due to storage limits. Please try reducing image sizes.",
+        });
+      }
+    } finally {
+        setIsSaving(false);
     }
   };
 
@@ -800,6 +811,7 @@ export default function ProfilePage() {
             profile={profileData} 
             onSave={handleSaveProfile} 
             onCancel={handleCancelEdit} 
+            isSaving={isSaving}
           />
         ) : (
           <ProfileView 
