@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import type { Profile } from '@/lib/data';
-import { getProfile, apiLogin, createProfile, updateCredits } from '@/lib/data';
+import { getProfile, apiLogin, createProfile, updateCredits, getCredits } from '@/lib/data';
 
 type SignupResult = { user?: Profile; error?: string };
 type LoginResult = Profile | null;
@@ -23,9 +23,8 @@ export function useAuth() {
                 setUser(userProfile);
                 setIsLoggedIn(true);
                 if (userProfile.role === 'daddy' && userProfile.id !== 1) {
-                    const response = await fetch(`/api/credits?userId=${userProfile.id}`);
-                    const data = await response.json();
-                    setCredits(data.credits);
+                    const creditsData = await getCredits(userProfile.id);
+                    setCredits(creditsData);
                 } else {
                     setCredits(Infinity);
                 }

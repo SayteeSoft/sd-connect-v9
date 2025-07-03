@@ -235,6 +235,24 @@ export async function apiLogin(email: string, password: string): Promise<{ user:
 }
 
 /**
+ * Fetches the credit balance for a user.
+ * @param {number} userId
+ * @returns {Promise<number>} The user's credit balance.
+ */
+export async function getCredits(userId: number): Promise<number> {
+    try {
+        const response = await fetch(`${API_BASE_PATH}/credits?userId=${userId}&_=${new Date().getTime()}`);
+        if (!response.ok) throw new Error('Failed to fetch credits');
+        const data = await response.json();
+        return data.credits;
+    } catch (error) {
+        console.error('getCredits error:', error);
+        return 0; // Fallback to 0 on error
+    }
+}
+
+
+/**
  * Updates a user's credits via the backend API.
  * @param {number} userId
  * @param {number} amount
