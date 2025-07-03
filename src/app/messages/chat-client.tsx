@@ -106,47 +106,45 @@ export function ChatClient({ initialConversations, currentUser, initialSelectedP
   const handleSendMessage = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!newMessage.trim() || !selectedConversationId || !loggedInUser) return;
-    
-    const selectedConvo = conversations.find(c => c.id === selectedConversationId);
+
+    const selectedConvo = conversations.find((c) => c.id === selectedConversationId);
     if (!selectedConvo) return;
 
     // Check for credits if the user is a daddy (and not the admin)
     if (loggedInUser.role === 'daddy' && loggedInUser.id !== 1 && credits <= 0) {
-        // Redirect to purchase credits page instead of showing a toast
-        router.push(`/purchase-credits?redirect=/messages&chatWith=${selectedConvo.participant.id}`);
-
-        // Trigger AI message from the sugar baby in the background
-        triggerCreditMessage({
-            sugarDaddyName: loggedInUser.name,
-            sugarBabyName: selectedConvo.participant.name,
-        }).then((response: CreditMessageOutput) => {
-            const aiMessage: Message = {
-                id: Date.now(),
-                senderId: selectedConvo.participant.id, // From the sugar baby
-                text: response.message,
-                timestamp: new Date().toISOString(),
-            };
-            const success = saveMessage(selectedConversationId, aiMessage);
-            if (success) {
-                setConversations(prev =>
-                    prev.map(convo =>
-                        convo.id === selectedConversationId
-                        ? {
-                            ...convo,
-                            messages: [...convo.messages, aiMessage],
-                          }
-                        : convo
-                    )
-                );
-            }
-        }).catch(err => {
-            console.error("Failed to generate AI credit message:", err);
+      router.push(`/purchase-credits?redirect=/messages&chatWith=${selectedConvo.participant.id}`);
+      triggerCreditMessage({
+        sugarDaddyName: loggedInUser.name,
+        sugarBabyName: selectedConvo.participant.name,
+      })
+        .then(async (response: CreditMessageOutput) => {
+          const aiMessage: Message = {
+            id: Date.now(),
+            senderId: selectedConvo.participant.id, // From the sugar baby
+            text: response.message,
+            timestamp: new Date().toISOString(),
+          };
+          const success = await saveMessage(selectedConversationId, aiMessage);
+          if (success) {
+            setConversations((prev) =>
+              prev.map((convo) =>
+                convo.id === selectedConversationId
+                  ? {
+                      ...convo,
+                      messages: [...convo.messages, aiMessage],
+                    }
+                  : convo
+              )
+            );
+          }
+        })
+        .catch((err) => {
+          console.error('Failed to generate AI credit message:', err);
         });
 
-        setNewMessage(''); // Clear input regardless
-        return;
+      setNewMessage('');
+      return;
     }
-
 
     const message: Message = {
       id: Date.now(),
@@ -155,29 +153,50 @@ export function ChatClient({ initialConversations, currentUser, initialSelectedP
       timestamp: new Date().toISOString(),
     };
 
-    const success = saveMessage(selectedConversationId, message);
+    // Optimistically update UI
+    setConversations((prev) =>
+      prev.map((convo) =>
+        convo.id === selectedConversationId
+          ? { ...convo, messages: [...convo.messages, message] }
+          : convo
+      )
+    );
+    setNewMessage('');
 
-    if (success) {
-      if (loggedInUser.role === 'daddy' && loggedInUser.id !== 1) {
-          spendCredits(1);
+    try {
+      // First, save the message to the server
+      const success = await saveMessage(selectedConversationId, message);
+      if (!success) {
+        throw new Error('Failed to save message to server.');
       }
-      setConversations(prev =>
-        prev.map(convo =>
+
+      // If message saved successfully, then spend credits
+      if (loggedInUser.role === 'daddy' && loggedInUser.id !== 1) {
+        await spendCredits(1); // This will update the credits in the auth context
+      }
+    } catch (error) {
+      console.error('Error sending message or spending credits:', error);
+      
+      // Revert the optimistic UI update on failure
+      setConversations((prev) =>
+        prev.map((convo) =>
           convo.id === selectedConversationId
             ? {
                 ...convo,
-                messages: [...convo.messages, message],
+                messages: convo.messages.filter((m) => m.id !== message.id),
               }
             : convo
         )
       );
-      setNewMessage('');
-    } else {
-        toast({
-            variant: "destructive",
-            title: "Message Not Sent",
-            description: "There was an error sending your message. Please try again.",
-        });
+      
+      // Restore the unsent message to the input box
+      setNewMessage(message.text);
+
+      toast({
+        variant: 'destructive',
+        title: 'Message Not Sent',
+        description: 'There was an error. Please try again.',
+      });
     }
   };
 
