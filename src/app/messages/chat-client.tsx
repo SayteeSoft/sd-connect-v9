@@ -1,7 +1,7 @@
 
 'use client';
 
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useMemo } from 'react';
 import type { Conversation, Message, Profile } from '@/lib/data';
 import { saveMessage } from '@/lib/data';
 import { cn } from '@/lib/utils';
@@ -69,6 +69,7 @@ export function ChatClient({ initialConversations, currentUser, initialSelectedP
   };
   
   const [conversations, setConversations] = useState(initialConversations);
+  const [searchTerm, setSearchTerm] = useState('');
   const [selectedConversationId, setSelectedConversationId] = useState<number | null>(
     findConversationIdByProfileId(initialSelectedProfileId) || initialConversations[0]?.id || null
   );
@@ -88,6 +89,15 @@ export function ChatClient({ initialConversations, currentUser, initialSelectedP
   useEffect(() => {
     setConversations(initialConversations);
   }, [initialConversations]);
+  
+  const filteredConversations = useMemo(() => {
+    if (!searchTerm.trim()) {
+      return conversations;
+    }
+    return conversations.filter(convo =>
+      convo.participant.name.toLowerCase().includes(searchTerm.toLowerCase().trim())
+    );
+  }, [conversations, searchTerm]);
 
   const selectedConversation = conversations.find(
     (c) => c.id === selectedConversationId
@@ -200,10 +210,7 @@ export function ChatClient({ initialConversations, currentUser, initialSelectedP
     }
   };
 
-  const handleFavorite = () => {
-    if (!selectedConversation) return;
-    const profile = selectedConversation.participant;
-
+  const handleFavorite = (profile: Profile) => {
     const { id: toastId } = toast({
       duration: 10000,
       className: 'p-4',
@@ -281,52 +288,61 @@ export function ChatClient({ initialConversations, currentUser, initialSelectedP
         <div className="p-4 border-b">
           <div className="relative">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-            <Input placeholder="Search messages" className="pl-9" />
+            <Input 
+              placeholder="Search by name..." 
+              className="pl-9"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+            />
           </div>
         </div>
         <ScrollArea className="flex-grow">
-          {conversations.map((convo) => (
-            <div
-              key={convo.id}
-              className={cn(
-                'flex items-center p-3 cursor-pointer hover:bg-muted/50 transition-colors',
-                selectedConversationId === convo.id && 'bg-muted'
-              )}
-              onClick={() => setSelectedConversationId(convo.id)}
-            >
-              <Avatar className="h-12 w-12 mr-3 relative">
-                <AvatarImage src={convo.participant.imageUrl ?? 'https://placehold.co/100x100.png'} alt={convo.participant.name} data-ai-hint={convo.participant.hint} />
-                <AvatarFallback>{convo.participant.name.charAt(0)}</AvatarFallback>
-                {convo.participant.online && (
-                  <span className="absolute bottom-0 right-0 block h-3 w-3 rounded-full bg-green-500 ring-2 ring-background" />
+          {filteredConversations.length > 0 ? (
+            filteredConversations.map((convo) => (
+              <div
+                key={convo.id}
+                className={cn(
+                  'flex items-center p-3 cursor-pointer hover:bg-muted/50 transition-colors',
+                  selectedConversationId === convo.id && 'bg-muted'
                 )}
-              </Avatar>
-              <div className="flex-grow overflow-hidden">
-                <div className="flex justify-between items-center">
-                  <h3 className="font-semibold truncate">{convo.participant.name}</h3>
-                  <p className="text-xs text-muted-foreground whitespace-nowrap">
-                    {isClient ? formatTimestamp(convo.messages[convo.messages.length - 1].timestamp) : null}
-                  </p>
-                </div>
-                <div className="flex justify-between items-start">
-                  <p className="text-sm text-muted-foreground truncate">
-                    {convo.messages[convo.messages.length - 1].text}
-                  </p>
-                  {convo.unreadCount > 0 && (
-                    <span className="ml-2 flex-shrink-0 text-xs bg-primary text-primary-foreground h-5 w-5 flex items-center justify-center rounded-full font-medium">
-                      {convo.unreadCount}
-                    </span>
+                onClick={() => setSelectedConversationId(convo.id)}
+              >
+                <Avatar className="h-12 w-12 mr-3 relative">
+                  <AvatarImage src={convo.participant.imageUrl ?? 'https://placehold.co/100x100.png'} alt={convo.participant.name} data-ai-hint={convo.participant.hint} />
+                  <AvatarFallback>{convo.participant.name.charAt(0)}</AvatarFallback>
+                  {convo.participant.online && (
+                    <span className="absolute bottom-0 right-0 block h-3 w-3 rounded-full bg-green-500 ring-2 ring-background" />
                   )}
+                </Avatar>
+                <div className="flex-grow overflow-hidden">
+                  <div className="flex justify-between items-center">
+                    <h3 className="font-semibold truncate">{convo.participant.name}</h3>
+                    <p className="text-xs text-muted-foreground whitespace-nowrap">
+                      {isClient ? formatTimestamp(convo.messages[convo.messages.length - 1].timestamp) : null}
+                    </p>
+                  </div>
+                  <div className="flex justify-between items-start">
+                    <p className="text-sm text-muted-foreground truncate">
+                      {convo.messages[convo.messages.length - 1].text}
+                    </p>
+                    {convo.unreadCount > 0 && (
+                      <span className="ml-2 flex-shrink-0 text-xs bg-primary text-primary-foreground h-5 w-5 flex items-center justify-center rounded-full font-medium">
+                        {convo.unreadCount}
+                      </span>
+                    )}
+                  </div>
                 </div>
               </div>
-            </div>
-          ))}
+            ))
+          ) : (
+            <p className="p-4 text-center text-sm text-muted-foreground">No conversations found.</p>
+          )}
         </ScrollArea>
       </aside>
 
       {/* Right Pane: Chat Window */}
       <section className="hidden md:flex flex-col flex-grow h-full">
-        {selectedConversation ? (
+        {selectedConversation && filteredConversations.some(c => c.id === selectedConversation.id) ? (
           <>
             <header className="flex items-center p-3 border-b shadow-sm">
               <Avatar className="h-10 w-10 mr-3 relative">
@@ -365,7 +381,7 @@ export function ChatClient({ initialConversations, currentUser, initialSelectedP
                       </Button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end">
-                      <DropdownMenuItem onSelect={handleFavorite}>
+                      <DropdownMenuItem onSelect={() => handleFavorite(selectedConversation.participant)}>
                         <Heart className="mr-2 h-4 w-4" />
                         <span>Favorite</span>
                       </DropdownMenuItem>
@@ -374,7 +390,7 @@ export function ChatClient({ initialConversations, currentUser, initialSelectedP
                         <span>Delete Chat</span>
                       </DropdownMenuItem>
                       <DropdownMenuSeparator />
-                      <DropdownMenuItem onSelect={handleBlockUser} className="text-destructive focus:text-destructive focus:bg-destructive/10">
+                      <DropdownMenuItem onSelect={() => handleBlockUser()} className="text-destructive focus:text-destructive focus:bg-destructive/10">
                         <Ban className="mr-2 h-4 w-4" />
                         <span>Block User</span>
                       </DropdownMenuItem>
