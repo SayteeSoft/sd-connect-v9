@@ -253,7 +253,7 @@ const ProfileEdit = ({ profile, onSave, onCancel, isSaving, saveSuccess }: { pro
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
         const { name, value } = e.target;
-        setEditedProfile(prev => ({...prev, [name]: name === 'age' ? parseInt(value) : value}));
+        setEditedProfile(prev => ({...prev, [name]: name === 'age' ? parseInt(value, 10) : value}));
     };
 
     const handleProfileImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -525,7 +525,7 @@ const ProfileEdit = ({ profile, onSave, onCancel, isSaving, saveSuccess }: { pro
                             <dl className="grid grid-cols-2 gap-x-4 gap-y-4">
                                 <div className="space-y-1">
                                     <Label htmlFor="age">Age</Label>
-                                    <Input id="age" name="age" type="number" value={editedProfile.age} onChange={handleChange} />
+                                    <Input id="age" name="age" type="number" value={isNaN(editedProfile.age) ? '' : editedProfile.age} onChange={handleChange} />
                                 </div>
                                 <div className="space-y-1">
                                     <Label htmlFor="attr-Height">Height</Label>
