@@ -256,7 +256,7 @@ export const featuredProfiles: Profile[] = [
   },
   {
     id: 7,
-    name: 'Vansessa',
+    name: 'Vanessa',
     email: 'vanessa@example.com',
     password: 'password123',
     age: 21,
