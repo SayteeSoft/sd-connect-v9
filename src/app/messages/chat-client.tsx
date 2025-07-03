@@ -69,6 +69,7 @@ export function ChatClient({ initialConversations, currentUser, initialSelectedP
   };
   
   const [conversations, setConversations] = useState(initialConversations);
+  const [removedIds, setRemovedIds] = useState<number[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedConversationId, setSelectedConversationId] = useState<number | null>(
     findConversationIdByProfileId(initialSelectedProfileId) || initialConversations[0]?.id || null
@@ -76,7 +77,7 @@ export function ChatClient({ initialConversations, currentUser, initialSelectedP
   const [newMessage, setNewMessage] = useState('');
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const [isClient, setIsClient] = useState(false);
-  const { toast, dismiss } = useToast();
+  const { toast } = useToast();
   const router = useRouter();
   const { user: loggedInUser, credits, spendCredits } = useAuth();
 
@@ -85,10 +86,10 @@ export function ChatClient({ initialConversations, currentUser, initialSelectedP
     setIsClient(true);
   }, []);
 
-  // Sync state with props to ensure data is fresh
+  // Sync state with props, but respect removed conversations
   useEffect(() => {
-    setConversations(initialConversations);
-  }, [initialConversations]);
+    setConversations(initialConversations.filter(c => !removedIds.includes(c.id)));
+  }, [initialConversations, removedIds]);
   
   const filteredConversations = useMemo(() => {
     if (!searchTerm.trim()) {
@@ -211,39 +212,9 @@ export function ChatClient({ initialConversations, currentUser, initialSelectedP
   };
 
   const handleFavorite = (profile: Profile) => {
-    const { id: toastId } = toast({
-      duration: 10000,
-      className: 'p-4',
-      children: (
-        <div className="flex items-start gap-4 w-full">
-          <Avatar className="h-12 w-12">
-            <AvatarImage src={profile.imageUrl ?? 'https://placehold.co/100x100.png'} alt={profile.name} data-ai-hint={profile.hint} />
-            <AvatarFallback>{profile.name.charAt(0)}</AvatarFallback>
-          </Avatar>
-          <div className="flex-grow">
-            <p className="font-semibold text-base">Message {profile.name}</p>
-            <p className="text-sm text-muted-foreground mt-1">Introduce yourself and get to know your favorite.</p>
-            <div className="mt-4 flex gap-2">
-              <Button
-                size="sm"
-                onClick={() => {
-                  router.push(`/messages?chatWith=${profile.id}`);
-                  dismiss(toastId);
-                }}
-              >
-                Message
-              </Button>
-              <Button
-                size="sm"
-                variant="outline"
-                onClick={() => dismiss(toastId)}
-              >
-                Not Now
-              </Button>
-            </div>
-          </div>
-        </div>
-      ),
+    toast({
+      title: 'Added to Favorites',
+      description: `${profile.name} has been added to your favorites list.`,
     });
   };
 
@@ -252,9 +223,12 @@ export function ChatClient({ initialConversations, currentUser, initialSelectedP
     const convoToDelete = conversations.find(c => c.id === selectedConversationId);
     if (!convoToDelete) return;
     
-    const remainingConversations = conversations.filter(c => c.id !== selectedConversationId);
-    setConversations(remainingConversations);
-    setSelectedConversationId(remainingConversations[0]?.id || null);
+    // Select the next available conversation
+    const remaining = filteredConversations.filter(c => c.id !== selectedConversationId);
+    setSelectedConversationId(remaining[0]?.id || null);
+
+    // Add to removed list, which will trigger re-render via useEffect
+    setRemovedIds(prev => [...prev, selectedConversationId]);
     
     toast({
       title: 'Chat Deleted',
@@ -268,10 +242,12 @@ export function ChatClient({ initialConversations, currentUser, initialSelectedP
     const convoToBlock = conversations.find(c => c.id === selectedConversationId);
     if (!convoToBlock) return;
     
-    // In a real app, this would also block the user from contacting you.
-    const remainingConversations = conversations.filter(c => c.id !== selectedConversationId);
-    setConversations(remainingConversations);
-    setSelectedConversationId(remainingConversations[0]?.id || null);
+    // Select the next available conversation
+    const remaining = filteredConversations.filter(c => c.id !== selectedConversationId);
+    setSelectedConversationId(remaining[0]?.id || null);
+
+    // Add to removed list, which will trigger re-render via useEffect
+    setRemovedIds(prev => [...prev, selectedConversationId]);
     
     toast({
       title: 'User Blocked',
@@ -342,7 +318,7 @@ export function ChatClient({ initialConversations, currentUser, initialSelectedP
 
       {/* Right Pane: Chat Window */}
       <section className="hidden md:flex flex-col flex-grow h-full">
-        {selectedConversation && filteredConversations.some(c => c.id === selectedConversation.id) ? (
+        {selectedConversation ? (
           <>
             <header className="flex items-center p-3 border-b shadow-sm">
               <Avatar className="h-10 w-10 mr-3 relative">
