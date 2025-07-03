@@ -1,3 +1,4 @@
+
 'use client';
 
 import React, { useState, useEffect } from 'react';
@@ -124,10 +125,12 @@ export function MatchesTabs() {
       setViewed(prev => prev.filter(p => p.id !== profileId));
     }
 
-    toast({
-      title: "Profile Removed",
-      description: `${profileName} has been removed from your ${listType} list.`,
-    });
+    setTimeout(() => {
+        toast({
+          title: "Profile Removed",
+          description: `${profileName} has been removed from your ${listType} list.`,
+        });
+    }, 500);
   };
 
   if (isAuthLoading || isDataLoading) {
