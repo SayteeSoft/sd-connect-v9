@@ -12,7 +12,8 @@ export const handler: Handler = async (event: HandlerEvent) => {
         if (id) {
           const profile = await getProfileByIdFromStore(parseInt(id, 10));
           if (profile) {
-            return { statusCode: 200, body: JSON.stringify(profile) };
+            const { password, ...userToReturn } = profile;
+            return { statusCode: 200, body: JSON.stringify(userToReturn) };
           }
           return { statusCode: 404, body: JSON.stringify({ error: 'Profile not found' }) };
         } else {
@@ -46,7 +47,7 @@ export const handler: Handler = async (event: HandlerEvent) => {
           password,
           age: 18,
           location: '',
-          imageUrl: `https://placehold.co/${600 + newId}x${600 + newId}.png`,
+          imageUrl: `https://placehold.co/${599 + newId}x${599 + newId}.png`,
           hint: role === 'baby' ? 'woman smiling' : 'man suit',
           role,
           online: true,
@@ -84,7 +85,9 @@ export const handler: Handler = async (event: HandlerEvent) => {
 
         profiles[index] = updatedProfile;
         await saveProfilesToStore(profiles);
-        return { statusCode: 200, body: JSON.stringify(updatedProfile) };
+
+        const { password, ...userToReturn } = updatedProfile;
+        return { statusCode: 200, body: JSON.stringify(userToReturn) };
       } catch (error) {
         return { statusCode: 500, body: JSON.stringify({ error: 'Failed to update profile' }) };
       }

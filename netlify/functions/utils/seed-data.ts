@@ -98,7 +98,7 @@ export const featuredProfiles: Profile[] = [
   {
     id: 2,
     name: 'Darianna',
-    email: 'darianna@example.com',
+    email: 'darianna@gmail.com',
     password: 'password123',
     age: 24,
     location: 'London, UK',
@@ -131,7 +131,7 @@ export const featuredProfiles: Profile[] = [
   {
     id: 3,
     name: 'Kateryna',
-    email: 'kateryna@example.com',
+    email: 'kateryna@gmail.com',
     password: 'password123',
     age: 22,
     location: 'Birmingham, UK',
@@ -163,7 +163,7 @@ export const featuredProfiles: Profile[] = [
   {
     id: 4,
     name: 'Mark',
-    email: 'mark@example.com',
+    email: 'mark@gmail.com',
     password: 'password123',
     age: 52,
     location: 'Glasgow, UK',
@@ -196,7 +196,7 @@ export const featuredProfiles: Profile[] = [
   {
     id: 5,
     name: 'Sofia',
-    email: 'sofia@example.com',
+    email: 'sofia@gmail.com',
     password: 'password123',
     age: 26,
     location: 'Liverpool, UK',
@@ -227,7 +227,7 @@ export const featuredProfiles: Profile[] = [
   {
     id: 6,
     name: 'James',
-    email: 'james@example.com',
+    email: 'james@gmail.com',
     password: 'password123',
     age: 38,
     location: 'Bristol, UK',
@@ -257,7 +257,7 @@ export const featuredProfiles: Profile[] = [
   {
     id: 7,
     name: 'Vanessa',
-    email: 'vanessa@example.com',
+    email: 'vanessa@gmail.com',
     password: 'password123',
     age: 21,
     location: 'Leeds, UK',
@@ -285,7 +285,7 @@ export const featuredProfiles: Profile[] = [
   {
     id: 8,
     name: 'Richard',
-    email: 'richard@example.com',
+    email: 'richard@gmail.com',
     password: 'password123',
     age: 49,
     location: 'Edinburgh, UK',
@@ -317,7 +317,7 @@ export const featuredProfiles: Profile[] = [
   {
     id: 9,
     name: 'Olivia',
-    email: 'olivia@example.com',
+    email: 'olivia@gmail.com',
     password: 'password123',
     age: 23,
     location: 'Sheffield, UK',
@@ -348,7 +348,7 @@ export const featuredProfiles: Profile[] = [
   {
     id: 10,
     name: 'William',
-    email: 'william@example.com',
+    email: 'william@gmail.com',
     password: 'password123',
     age: 45,
     location: 'Cardiff, UK',
@@ -378,7 +378,7 @@ export const featuredProfiles: Profile[] = [
   {
     id: 11,
     name: 'Isla',
-    email: 'isla@example.com',
+    email: 'isla@gmail.com',
     password: 'password123',
     age: 25,
     location: 'Belfast, UK',
@@ -410,7 +410,7 @@ export const featuredProfiles: Profile[] = [
   {
     id: 12,
     name: 'George',
-    email: 'george@example.com',
+    email: 'george@gmail.com',
     password: 'password123',
     age: 55,
     location: 'Southampton, UK',
