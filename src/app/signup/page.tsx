@@ -50,7 +50,7 @@ export default function SignupPage() {
     setError('');
     setIsSubmitting(true);
     
-    const result = signup(data.email, data.password, data.role);
+    const result = await signup(data.email, data.password, data.role);
 
     if (result.user) {
       router.push(`/profile/${result.user.id}?edit=true`);
