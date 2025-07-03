@@ -20,6 +20,7 @@ import {
   Ban,
   Trash2,
   Coins,
+  ArrowLeft,
 } from 'lucide-react';
 import {
   Tooltip,
@@ -95,11 +96,15 @@ export function ChatClient({ initialConversations, currentUser, initialSelectedP
   );
   const [newMessage, setNewMessage] = useState('');
   const [isClient, setIsClient] = useState(false);
-
+  const [mobileView, setMobileView] = useState<'list' | 'chat'>('list');
 
   useEffect(() => {
     setIsClient(true);
-  }, []);
+    // If a specific chat is requested via URL, switch to the chat view on mobile
+    if (initialSelectedProfileId) {
+        setMobileView('chat');
+    }
+  }, [initialSelectedProfileId]);
 
   // Sync state with props, filtering out blocked/removed users
   useEffect(() => {
@@ -281,7 +286,10 @@ export function ChatClient({ initialConversations, currentUser, initialSelectedP
   return (
     <div className="flex h-full w-full bg-background">
       {/* Left Pane: Conversation List */}
-      <aside className="w-full md:w-1/3 lg:w-1/4 h-full flex flex-col border-r">
+      <aside className={cn(
+        "w-full md:w-1/3 lg:w-1/4 h-full flex-col border-r",
+        mobileView === 'list' ? 'flex' : 'hidden md:flex'
+      )}>
         <div className="p-4 border-b">
           <div className="relative">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
@@ -302,7 +310,10 @@ export function ChatClient({ initialConversations, currentUser, initialSelectedP
                   'flex items-center p-3 cursor-pointer hover:bg-muted/50 transition-colors',
                   selectedConversationId === convo.id && 'bg-muted'
                 )}
-                onClick={() => setSelectedConversationId(convo.id)}
+                onClick={() => {
+                  setSelectedConversationId(convo.id);
+                  setMobileView('chat');
+                }}
               >
                 <Avatar className="h-12 w-12 mr-3 relative">
                   <AvatarImage src={convo.participant.imageUrl ?? 'https://placehold.co/100x100.png'} alt={convo.participant.name} data-ai-hint={convo.participant.hint} />
@@ -338,10 +349,17 @@ export function ChatClient({ initialConversations, currentUser, initialSelectedP
       </aside>
 
       {/* Right Pane: Chat Window */}
-      <section className="hidden md:flex flex-col flex-grow h-full">
+      <section className={cn(
+        "flex-col flex-grow h-full",
+        mobileView === 'chat' ? 'flex' : 'hidden md:flex'
+      )}>
         {selectedConversation ? (
           <>
             <header className="flex items-center p-3 border-b shadow-sm">
+               <Button variant="ghost" size="icon" className="mr-2 md:hidden" onClick={() => setMobileView('list')}>
+                <ArrowLeft className="h-6 w-6" />
+                <span className="sr-only">Back to conversations</span>
+              </Button>
               <Avatar className="h-10 w-10 mr-3 relative">
                 <AvatarImage
                   src={selectedConversation.participant.imageUrl ?? 'https://placehold.co/100x100.png'}
