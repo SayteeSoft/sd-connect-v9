@@ -1,36 +1,16 @@
 import type { Handler, HandlerEvent } from '@netlify/functions';
-import { getConversationsFromStore, saveConversationsToStore, getProfilesFromStore } from './utils/store';
-import type { Message, Conversation, Profile } from './utils/seed-data';
+import { getConversationsFromStore, saveConversationsToStore } from './utils/store';
+import type { Message } from './utils/seed-data';
 
 export const handler: Handler = async (event: HandlerEvent) => {
     if (event.httpMethod === 'GET') {
         try {
+            // Return raw conversation data directly.
+            // The client will be responsible for joining profile data.
             const rawConversations = await getConversationsFromStore();
-            const profiles = await getProfilesFromStore();
-            
-            const profileMap = new Map(profiles.map((p: Profile) => [p.id, p]));
-
-            const conversations: Conversation[] = rawConversations.map((convo: any) => {
-                const participant = profileMap.get(convo.participantId);
-                if (!participant) return null;
-                return {
-                    id: convo.id,
-                    participant,
-                    messages: convo.messages,
-                    unreadCount: convo.unreadCount,
-                };
-            }).filter((c: any): c is Conversation => c !== null);
-
-            // Sort by most recent message
-            conversations.sort((a, b) => {
-                const lastMessageA = new Date(a.messages[a.messages.length - 1].timestamp).getTime();
-                const lastMessageB = new Date(b.messages[b.messages.length - 1].timestamp).getTime();
-                return lastMessageB - lastMessageA;
-            });
-            
             return {
                 statusCode: 200,
-                body: JSON.stringify(conversations),
+                body: JSON.stringify(rawConversations),
             };
         } catch (error) {
             return { statusCode: 500, body: JSON.stringify({ error: 'Failed to fetch conversations' }) };

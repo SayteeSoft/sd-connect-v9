@@ -5,10 +5,9 @@ import { useState, useEffect, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { Header } from '@/components/layout/header';
 import { ChatClient } from './chat-client';
-import { getConversations, type Conversation, type Profile } from '@/lib/data';
+import { getConversations, getProfiles, type Conversation, type Profile } from '@/lib/data';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useAuth } from '@/hooks/use-auth';
-import { Loader2 } from 'lucide-react';
 
 const ChatSkeleton = () => (
   <div className="flex h-full w-full">
@@ -61,22 +60,48 @@ function MessagesContent() {
         : undefined;
     
     useEffect(() => {
-        const fetchAndSetConversations = () => {
+        const fetchAndJoinData = async () => {
             if (!isAuthLoading && currentUserProfile) {
-                getConversations().then(allConversations => {
-                    const filteredConversations = allConversations.filter(
-                        (convo) => convo.participant.role !== currentUserProfile.role
-                    );
-                    setConversations(filteredConversations);
-                });
+                // Fetch both conversations and profiles in parallel
+                const [rawConversations, profiles] = await Promise.all([
+                    getConversations(),
+                    getProfiles()
+                ]);
+
+                const profileMap = new Map(profiles.map(p => [p.id, p]));
+
+                const joinedConversations: Conversation[] = rawConversations
+                    .map(rawConvo => {
+                        const participant = profileMap.get(rawConvo.participantId);
+                        if (!participant) return null;
+
+                        // Filter out conversations with users of the same role
+                        if (participant.role === currentUserProfile.role) return null;
+
+                        return {
+                            id: rawConvo.id,
+                            participant,
+                            messages: rawConvo.messages,
+                            unreadCount: rawConvo.unreadCount,
+                        };
+                    })
+                    .filter((c): c is Conversation => c !== null)
+                    .sort((a, b) => { // Sort by most recent message
+                        const lastMessageA = new Date(a.messages[a.messages.length - 1].timestamp).getTime();
+                        const lastMessageB = new Date(b.messages[b.messages.length - 1].timestamp).getTime();
+                        return lastMessageB - lastMessageA;
+                    });
+
+                setConversations(joinedConversations);
             }
         };
 
-        fetchAndSetConversations();
+        fetchAndJoinData();
 
-        window.addEventListener('profileUpdated', fetchAndSetConversations);
+        // When a profile is updated anywhere, re-run the entire fetch and join process
+        window.addEventListener('profileUpdated', fetchAndJoinData);
         return () => {
-            window.removeEventListener('profileUpdated', fetchAndSetConversations);
+            window.removeEventListener('profileUpdated', fetchAndJoinData);
         };
     }, [isAuthLoading, currentUserProfile]);
 

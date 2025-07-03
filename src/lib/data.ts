@@ -36,6 +36,15 @@ export type Conversation = {
   unreadCount: number;
 };
 
+// This is what the API will now return
+export type ConversationWithParticipantId = {
+  id: number;
+  participantId: number;
+  messages: Message[];
+  unreadCount: number;
+};
+
+
 // Static options can remain here as they are part of the client-side UI definition.
 export const wantsOptions = [
   'Mentorship', 'Discreet', 'Long-term', 'Travel Partner', 
@@ -171,9 +180,9 @@ export async function deleteProfile(profileId: number): Promise<boolean> {
 
 /**
  * Fetches all conversations from the backend.
- * @returns {Promise<Conversation[]>} An array of conversation objects.
+ * @returns {Promise<ConversationWithParticipantId[]>} An array of conversation objects with participant IDs.
  */
-export async function getConversations(): Promise<Conversation[]> {
+export async function getConversations(): Promise<ConversationWithParticipantId[]> {
     try {
         const response = await fetch(`${API_BASE_PATH}/conversations?_=${new Date().getTime()}`);
         if (!response.ok) throw new Error('Failed to fetch conversations');
