@@ -10,7 +10,6 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
-import { sendEmail } from './actions';
 import { Loader2 } from 'lucide-react';
 import { useState } from 'react';
 
@@ -35,19 +34,30 @@ export default function ContactPage() {
     resolver: zodResolver(contactFormSchema),
   });
 
+  const encode = (data: Record<string, any>) => {
+    return Object.keys(data)
+      .map(key => encodeURIComponent(key) + "=" + encodeURIComponent(data[key]))
+      .join("&");
+  }
+
   const onSubmit = async (data: ContactFormValues) => {
     setIsSubmitting(true);
     try {
-      const result = await sendEmail(data);
-      if (result.success) {
-        toast({
-          title: 'Message Sent!',
-          description: 'Thank you for contacting us. We will get back to you shortly.',
-        });
-        reset();
-      } else {
-        throw new Error(result.error);
+      const response = await fetch("/", {
+        method: "POST",
+        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+        body: encode({ "form-name": "contact", ...data })
+      });
+      
+      if (!response.ok) {
+        throw new Error("Form submission failed.");
       }
+      
+      toast({
+        title: 'Message Sent!',
+        description: 'Thank you for contacting us. We will get back to you shortly.',
+      });
+      reset();
     } catch (error) {
       toast({
         variant: 'destructive',
@@ -71,7 +81,19 @@ export default function ContactPage() {
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+            <form
+              name="contact"
+              onSubmit={handleSubmit(onSubmit)}
+              className="space-y-6"
+              data-netlify="true"
+              data-netlify-honeypot="bot-field"
+            >
+              <input type="hidden" name="form-name" value="contact" />
+              <p className="hidden">
+                <label>
+                  Don’t fill this out if you’re human: <input name="bot-field" />
+                </label>
+              </p>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className="space-y-2">
                   <Label htmlFor="name">Your Name</Label>
