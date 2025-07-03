@@ -8,6 +8,7 @@ import type { Profile } from "@/lib/data";
 import { getProfiles } from "@/lib/data";
 import { Button } from './ui/button';
 import { useAuth } from '@/hooks/use-auth';
+import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar';
 
 const predefinedMessages = [
     "Hey, I was just looking at your profile, I'm really impressed!",
@@ -23,7 +24,7 @@ const predefinedMessages = [
 ];
 
 export function MessageSimulator() {
-  const { toast } = useToast();
+  const { toast, dismiss } = useToast();
   const router = useRouter();
   const { user: currentUser, isLoggedIn } = useAuth();
 
@@ -62,17 +63,38 @@ export function MessageSimulator() {
                 return;
             };
 
-            toast({
-                title: `New message from ${randomSender.name}`,
-                description: randomMessage,
-                action: (
-                    <Button
-                        variant="secondary"
-                        size="sm"
-                        onClick={() => router.push(`/messages?chatWith=${randomSender.id}`)}
-                    >
-                        Reply
-                    </Button>
+            const { id: toastId } = toast({
+                duration: 10000,
+                className: 'p-4',
+                children: (
+                  <div className="flex items-start gap-4 w-full">
+                    <Avatar className="h-12 w-12">
+                      <AvatarImage src={randomSender.imageUrl ?? 'https://placehold.co/100x100.png'} alt={randomSender.name} data-ai-hint={randomSender.hint} />
+                      <AvatarFallback>{randomSender.name.charAt(0)}</AvatarFallback>
+                    </Avatar>
+                    <div className="flex-grow overflow-hidden">
+                      <p className="font-semibold text-base">New message from {randomSender.name}</p>
+                      <p className="text-sm text-muted-foreground mt-1 truncate">{randomMessage}</p>
+                      <div className="mt-4 flex gap-2">
+                        <Button
+                          size="sm"
+                          onClick={() => {
+                              router.push(`/messages?chatWith=${randomSender.id}`);
+                              dismiss(toastId);
+                          }}
+                        >
+                          Reply
+                        </Button>
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={() => dismiss(toastId)}
+                        >
+                          Not Now
+                        </Button>
+                      </div>
+                    </div>
+                  </div>
                 ),
             });
 
@@ -87,7 +109,7 @@ export function MessageSimulator() {
         clearTimeout(initialDelay);
         clearTimeout(timeoutId);
     };
-  }, [toast, router, isLoggedIn, currentUser]);
+  }, [toast, router, isLoggedIn, currentUser, dismiss]);
 
   return null;
 }

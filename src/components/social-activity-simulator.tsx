@@ -9,6 +9,7 @@ import { getProfiles } from "@/lib/data";
 import { Button } from './ui/button';
 import { Heart, Footprints } from 'lucide-react';
 import { useAuth } from '@/hooks/use-auth';
+import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar';
 
 const socialEvents = [
     { type: 'favorite', text: 'favorited your profile', icon: <Heart className="mr-2 h-4 w-4 text-pink-500 fill-current" /> },
@@ -16,7 +17,7 @@ const socialEvents = [
 ];
 
 export function SocialActivitySimulator() {
-  const { toast } = useToast();
+  const { toast, dismiss } = useToast();
   const router = useRouter();
   const { user: currentUser, isLoggedIn } = useAuth();
 
@@ -56,22 +57,41 @@ export function SocialActivitySimulator() {
                 return;
             };
 
-            toast({
-                title: randomActor.name,
-                description: (
-                    <div className="flex items-center">
-                        {randomEvent.icon}
-                        <span className="ml-1">{`just ${randomEvent.text}!`}</span>
+            const { id: toastId } = toast({
+                duration: 10000,
+                className: 'p-4',
+                children: (
+                  <div className="flex items-start gap-4 w-full">
+                    <Avatar className="h-12 w-12">
+                      <AvatarImage src={randomActor.imageUrl ?? 'https://placehold.co/100x100.png'} alt={randomActor.name} data-ai-hint={randomActor.hint} />
+                      <AvatarFallback>{randomActor.name.charAt(0)}</AvatarFallback>
+                    </Avatar>
+                    <div className="flex-grow">
+                      <p className="font-semibold text-base">{randomActor.name}</p>
+                      <div className="flex items-center text-sm text-muted-foreground mt-1">
+                          {randomEvent.icon}
+                          <span className="ml-1">{`just ${randomEvent.text}!`}</span>
+                      </div>
+                      <div className="mt-4 flex gap-2">
+                        <Button
+                          size="sm"
+                          onClick={() => {
+                              router.push(`/profile/${randomActor.id}`);
+                              dismiss(toastId);
+                          }}
+                        >
+                          View Profile
+                        </Button>
+                         <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={() => dismiss(toastId)}
+                        >
+                          Not Now
+                        </Button>
+                      </div>
                     </div>
-                ),
-                action: (
-                    <Button
-                        variant="secondary"
-                        size="sm"
-                        onClick={() => router.push(`/profile/${randomActor.id}`)}
-                    >
-                        View Profile
-                    </Button>
+                  </div>
                 ),
             });
 
@@ -86,7 +106,7 @@ export function SocialActivitySimulator() {
         clearTimeout(initialDelay);
         clearTimeout(timeoutId);
     };
-  }, [toast, router, isLoggedIn, currentUser]);
+  }, [toast, router, isLoggedIn, currentUser, dismiss]);
 
   return null;
 }
