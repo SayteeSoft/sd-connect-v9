@@ -1,17 +1,5 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  async rewrites() {
-    // In development, proxy API requests to the Netlify Functions server
-    if (process.env.NODE_ENV === 'development') {
-      return [
-        {
-          source: '/.netlify/functions/:path*',
-          destination: 'http://localhost:9999/.netlify/functions/:path*',
-        },
-      ];
-    }
-    return [];
-  },
   /* config options here */
   images: {
     remotePatterns: [
