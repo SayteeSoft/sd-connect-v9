@@ -53,18 +53,10 @@ export function useAuth() {
     checkAuth();
     
     const handleAuthChange = () => checkAuth();
-    const handleCreditsChange = (event: Event) => {
-        const customEvent = event as CustomEvent<{ newCredits: number }>;
-        if (typeof customEvent.detail.newCredits === 'number') {
-            setCredits(customEvent.detail.newCredits);
-        }
-    };
 
     window.addEventListener('authChanged', handleAuthChange);
-    window.addEventListener('creditsChanged', handleCreditsChange);
     return () => {
       window.removeEventListener('authChanged', handleAuthChange);
-      window.removeEventListener('creditsChanged', handleCreditsChange);
     };
   }, [checkAuth]);
 
@@ -102,7 +94,7 @@ export function useAuth() {
   const spendCredits = async (amount: number) => {
     if (user?.role === 'daddy' && user.id !== 1) {
         const newCredits = await updateCredits(user.id, amount, 'spend');
-        window.dispatchEvent(new CustomEvent('creditsChanged', { detail: { newCredits } }));
+        setCredits(newCredits);
         return newCredits;
     }
     return credits;
@@ -111,7 +103,7 @@ export function useAuth() {
   const addCredits = async (amount: number) => {
     if (user?.role === 'daddy' && user.id !== 1) {
         const newCredits = await updateCredits(user.id, amount, 'add');
-        window.dispatchEvent(new CustomEvent('creditsChanged', { detail: { newCredits } }));
+        setCredits(newCredits);
     }
   };
 
