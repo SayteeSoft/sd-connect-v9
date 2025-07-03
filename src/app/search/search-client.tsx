@@ -64,16 +64,19 @@ export function SearchClient() {
   
   useEffect(() => {
     fetchAllProfiles();
-    window.addEventListener('profileUpdated', fetchAllProfiles);
-     // Listen for block list changes to re-filter
-    window.addEventListener('storage', (e) => {
+    
+    const handleStorageChange = (e: StorageEvent) => {
         if (e.key === 'sugarconnect_blocked') {
             fetchAllProfiles();
         }
-    });
+    };
+    
+    window.addEventListener('profileUpdated', fetchAllProfiles);
+    window.addEventListener('storage', handleStorageChange);
+
     return () => {
       window.removeEventListener('profileUpdated', fetchAllProfiles);
-      window.removeEventListener('storage', fetchAllProfiles);
+      window.removeEventListener('storage', handleStorageChange);
     };
   }, [fetchAllProfiles]);
   

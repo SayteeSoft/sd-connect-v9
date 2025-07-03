@@ -1,7 +1,7 @@
 
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import type { Profile } from '@/lib/data';
 import { getProfiles, deleteProfile } from '@/lib/data';
 import {
@@ -38,12 +38,12 @@ export function AdminClient() {
   const router = useRouter();
   const { toast } = useToast();
 
-  const fetchProfiles = async () => {
+  const fetchProfiles = useCallback(async () => {
     setIsLoading(true);
     const profilesData = await getProfiles();
     setProfiles(profilesData);
     setIsLoading(false);
-  };
+  }, []);
   
   useEffect(() => {
     fetchProfiles();
@@ -51,7 +51,7 @@ export function AdminClient() {
     return () => {
       window.removeEventListener('profileUpdated', fetchProfiles);
     };
-  }, []);
+  }, [fetchProfiles]);
 
   const handleView = (id: number) => {
     router.push(`/profile/${id}`);

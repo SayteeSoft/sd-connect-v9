@@ -1,7 +1,7 @@
 
 'use client';
 
-import { useState, useEffect, Suspense } from 'react';
+import { useState, useEffect, Suspense, useCallback } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { Header } from '@/components/layout/header';
 import { ChatClient } from './chat-client';
@@ -58,44 +58,44 @@ function MessagesContent() {
     const initialSelectedProfileId = searchParams.get('chatWith')
         ? parseInt(searchParams.get('chatWith') as string, 10)
         : undefined;
+
+    const fetchAndJoinData = useCallback(async () => {
+        if (!isAuthLoading && currentUserProfile) {
+            // Fetch both conversations and profiles in parallel
+            const [rawConversations, profiles] = await Promise.all([
+                getConversations(),
+                getProfiles()
+            ]);
+
+            const profileMap = new Map(profiles.map(p => [p.id, p]));
+
+            const joinedConversations: Conversation[] = rawConversations
+                .map(rawConvo => {
+                    const participant = profileMap.get(rawConvo.participantId);
+                    if (!participant) return null;
+
+                    // Filter out conversations with users of the same role
+                    if (participant.role === currentUserProfile.role) return null;
+
+                    return {
+                        id: rawConvo.id,
+                        participant,
+                        messages: rawConvo.messages,
+                        unreadCount: rawConvo.unreadCount,
+                    };
+                })
+                .filter((c): c is Conversation => c !== null)
+                .sort((a, b) => { // Sort by most recent message
+                    const lastMessageA = new Date(a.messages[a.messages.length - 1].timestamp).getTime();
+                    const lastMessageB = new Date(b.messages[b.messages.length - 1].timestamp).getTime();
+                    return lastMessageB - lastMessageA;
+                });
+
+            setConversations(joinedConversations);
+        }
+    }, [isAuthLoading, currentUserProfile]);
     
     useEffect(() => {
-        const fetchAndJoinData = async () => {
-            if (!isAuthLoading && currentUserProfile) {
-                // Fetch both conversations and profiles in parallel
-                const [rawConversations, profiles] = await Promise.all([
-                    getConversations(),
-                    getProfiles()
-                ]);
-
-                const profileMap = new Map(profiles.map(p => [p.id, p]));
-
-                const joinedConversations: Conversation[] = rawConversations
-                    .map(rawConvo => {
-                        const participant = profileMap.get(rawConvo.participantId);
-                        if (!participant) return null;
-
-                        // Filter out conversations with users of the same role
-                        if (participant.role === currentUserProfile.role) return null;
-
-                        return {
-                            id: rawConvo.id,
-                            participant,
-                            messages: rawConvo.messages,
-                            unreadCount: rawConvo.unreadCount,
-                        };
-                    })
-                    .filter((c): c is Conversation => c !== null)
-                    .sort((a, b) => { // Sort by most recent message
-                        const lastMessageA = new Date(a.messages[a.messages.length - 1].timestamp).getTime();
-                        const lastMessageB = new Date(b.messages[b.messages.length - 1].timestamp).getTime();
-                        return lastMessageB - lastMessageA;
-                    });
-
-                setConversations(joinedConversations);
-            }
-        };
-
         fetchAndJoinData();
 
         // When a profile is updated anywhere, re-run the entire fetch and join process
@@ -103,7 +103,7 @@ function MessagesContent() {
         return () => {
             window.removeEventListener('profileUpdated', fetchAndJoinData);
         };
-    }, [isAuthLoading, currentUserProfile]);
+    }, [fetchAndJoinData]);
 
     // Show skeleton while auth is loading or we haven't fetched conversations yet.
     if (isAuthLoading || conversations === null) {

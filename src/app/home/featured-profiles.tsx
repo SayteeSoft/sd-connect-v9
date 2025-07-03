@@ -27,17 +27,20 @@ export function FeaturedProfiles() {
 
   useEffect(() => {
     fetchFeaturedProfiles();
-    window.addEventListener('profileUpdated', fetchFeaturedProfiles);
-    // Listen for block list changes to re-filter
-    window.addEventListener('storage', (e) => {
+    
+    const handleProfileUpdate = () => fetchFeaturedProfiles();
+    const handleStorageChange = (e: StorageEvent) => {
         if (e.key === 'sugarconnect_blocked') {
             fetchFeaturedProfiles();
         }
-    });
+    };
+
+    window.addEventListener('profileUpdated', handleProfileUpdate);
+    window.addEventListener('storage', handleStorageChange);
 
     return () => {
-      window.removeEventListener('profileUpdated', fetchFeaturedProfiles);
-      window.removeEventListener('storage', fetchFeaturedProfiles);
+      window.removeEventListener('profileUpdated', handleProfileUpdate);
+      window.removeEventListener('storage', handleStorageChange);
     };
   }, [fetchFeaturedProfiles]);
 
