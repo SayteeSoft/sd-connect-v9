@@ -727,33 +727,25 @@ export default function ProfilePage() {
   
   const handleSaveProfile = async (updatedProfile: Profile) => {
     setIsSaving(true);
-    try {
-      const success = await updateProfile(updatedProfile);
-      
-      // Always switch to view mode as requested
+    const success = await updateProfile(updatedProfile);
+    setIsSaving(false);
+
+    if (success) {
+      setProfileData(updatedProfile);
       setIsEditMode(false);
       if (searchParams.get('edit')) {
         router.replace(`/profile/${profileId}`, { scroll: false });
       }
-  
-      if (success) {
-        // Use the successfully saved profile data directly to update the state.
-        setProfileData(updatedProfile);
-        toast({
-          title: "Profile Saved",
-          description: "Your changes have been saved successfully.",
-        });
-      } else {
-        // The view mode will show the old data, as the save failed.
-        // It's important to notify the user that their changes were not saved.
-        toast({
-          variant: "destructive",
-          title: "Save Failed",
-          description: "Your changes could not be saved, likely due to storage limits. Please try reducing image sizes.",
-        });
-      }
-    } finally {
-        setIsSaving(false);
+      toast({
+        title: "Profile Saved",
+        description: "Your changes have been saved successfully.",
+      });
+    } else {
+      toast({
+        variant: "destructive",
+        title: "Save Failed",
+        description: "Your changes could not be saved. Please check your connection and try again.",
+      });
     }
   };
 
