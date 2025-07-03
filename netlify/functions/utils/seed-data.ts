@@ -1,3 +1,4 @@
+
 export type Profile = {
   id: number;
   name: string;
@@ -101,7 +102,7 @@ export const featuredProfiles: Profile[] = [
     password: 'password123',
     age: 24,
     location: 'London, UK',
-    imageUrl: 'https://placehold.co/601x750.png',
+    imageUrl: 'https://placehold.co/600x751.png',
     hint: 'portrait woman',
     role: 'baby',
     online: true,
@@ -110,10 +111,10 @@ export const featuredProfiles: Profile[] = [
     wants: ['Mentorship', 'Travel Partner', 'Casual'],
     interests: ['Art', 'Travel', 'Fine Dining', 'Movies'],
     gallery: [
-      'https://placehold.co/601x400.png',
-      'https://placehold.co/602x400.png',
-      'https://placehold.co/603x400.png',
-      'https://placehold.co/604x400.png'
+      'https://placehold.co/600x401.png',
+      'https://placehold.co/600x402.png',
+      'https://placehold.co/600x403.png',
+      'https://placehold.co/600x404.png'
     ],
     attributes: {
       'Height': "5'5\"",
@@ -134,7 +135,7 @@ export const featuredProfiles: Profile[] = [
     password: 'password123',
     age: 22,
     location: 'Birmingham, UK',
-    imageUrl: 'https://placehold.co/602x750.png',
+    imageUrl: 'https://placehold.co/600x752.png',
     hint: 'portrait woman',
     role: 'baby',
     online: true,
@@ -143,9 +144,9 @@ export const featuredProfiles: Profile[] = [
     wants: ['Networking', 'Mentorship', 'Friendship'],
     interests: ['Music', 'Cooking', 'Fitness', 'Reading'],
     gallery: [
-      'https://placehold.co/605x400.png',
-      'https://placehold.co/606x400.png',
-      'https://placehold.co/607x400.png',
+      'https://placehold.co/600x405.png',
+      'https://placehold.co/600x406.png',
+      'https://placehold.co/600x407.png',
     ],
     attributes: {
       'Height': "5'7\"",
@@ -166,7 +167,7 @@ export const featuredProfiles: Profile[] = [
     password: 'password123',
     age: 52,
     location: 'Glasgow, UK',
-    imageUrl: 'https://placehold.co/603x750.png',
+    imageUrl: 'https://placehold.co/600x753.png',
     hint: 'portrait man',
     role: 'daddy',
     online: true,
@@ -175,10 +176,10 @@ export const featuredProfiles: Profile[] = [
     wants: ['Long-term', 'Travel Partner'],
     interests: ['Sports', 'Travel', 'Wine Tasting'],
     gallery: [
-      'https://placehold.co/608x400.png',
-      'https://placehold.co/609x400.png',
-      'https://placehold.co/610x400.png',
-      'https://placehold.co/611x400.png',
+      'https://placehold.co/600x408.png',
+      'https://placehold.co/600x409.png',
+      'https://placehold.co/600x410.png',
+      'https://placehold.co/600x411.png',
     ],
     attributes: {
       'Height': "6'0\"",
@@ -199,7 +200,7 @@ export const featuredProfiles: Profile[] = [
     password: 'password123',
     age: 26,
     location: 'Liverpool, UK',
-    imageUrl: 'https://placehold.co/604x750.png',
+    imageUrl: 'https://placehold.co/600x754.png',
     hint: 'portrait woman',
     role: 'baby',
     online: false,
@@ -208,8 +209,8 @@ export const featuredProfiles: Profile[] = [
     wants: ['Discreet', 'Casual', 'Travel Partner'],
     interests: ['Art', 'Theatre', 'Reading', 'Cooking'],
     gallery: [
-      'https://placehold.co/612x400.png',
-      'https://placehold.co/613x400.png'
+      'https://placehold.co/600x412.png',
+      'https://placehold.co/600x413.png'
     ],
     attributes: {
       'Height': "5'8\"",
@@ -230,7 +231,7 @@ export const featuredProfiles: Profile[] = [
     password: 'password123',
     age: 38,
     location: 'Bristol, UK',
-    imageUrl: 'https://placehold.co/605x750.png',
+    imageUrl: 'https://placehold.co/600x755.png',
     hint: 'portrait man',
     role: 'daddy',
     online: true,
@@ -239,7 +240,7 @@ export const featuredProfiles: Profile[] = [
     wants: ['Networking', 'No Strings Attached', 'Casual'],
     interests: ['Sports', 'Music', 'Movies', 'Reading'],
     gallery: [
-      'https://placehold.co/614x400.png'
+      'https://placehold.co/600x414.png'
     ],
     attributes: {
       'Height': "5'11\"",
@@ -260,7 +261,7 @@ export const featuredProfiles: Profile[] = [
     password: 'password123',
     age: 21,
     location: 'Leeds, UK',
-    imageUrl: 'https://placehold.co/606x750.png',
+    imageUrl: 'https://placehold.co/600x756.png',
     hint: 'portrait woman',
     role: 'baby',
     online: true,
@@ -288,7 +289,7 @@ export const featuredProfiles: Profile[] = [
     password: 'password123',
     age: 49,
     location: 'Edinburgh, UK',
-    imageUrl: 'https://placehold.co/607x750.png',
+    imageUrl: 'https://placehold.co/600x757.png',
     hint: 'portrait man',
     role: 'daddy',
     online: false,
@@ -297,9 +298,9 @@ export const featuredProfiles: Profile[] = [
     wants: ['Travel Partner', 'Discreet', 'Networking'],
     interests: ['Travel', 'Fine Dining', 'Theatre', 'Wine Tasting'],
     gallery: [
-      'https://placehold.co/615x400.png',
-      'https://placehold.co/616x400.png',
-      'https://placehold.co/617x400.png',
+      'https://placehold.co/600x415.png',
+      'https://placehold.co/600x416.png',
+      'https://placehold.co/600x417.png',
     ],
     attributes: {
       'Height': "6'2\"",
@@ -320,7 +321,7 @@ export const featuredProfiles: Profile[] = [
     password: 'password123',
     age: 23,
     location: 'Sheffield, UK',
-    imageUrl: 'https://placehold.co/608x750.png',
+    imageUrl: 'https://placehold.co/600x758.png',
     hint: 'woman nature',
     role: 'baby',
     online: false,
@@ -329,8 +330,8 @@ export const featuredProfiles: Profile[] = [
     wants: ['Friendship', 'Casual', 'Long-term'],
     interests: ['Fitness', 'Cooking', 'Travel', 'Reading'],
     gallery: [
-      'https://placehold.co/618x400.png',
-      'https://placehold.co/619x400.png',
+      'https://placehold.co/600x418.png',
+      'https://placehold.co/600x419.png',
     ],
     attributes: {
       'Height': "5'6\"",
@@ -351,7 +352,7 @@ export const featuredProfiles: Profile[] = [
     password: 'password123',
     age: 45,
     location: 'Cardiff, UK',
-    imageUrl: 'https://placehold.co/609x750.png',
+    imageUrl: 'https://placehold.co/600x759.png',
     hint: 'man suit',
     role: 'daddy',
     online: true,
@@ -360,7 +361,7 @@ export const featuredProfiles: Profile[] = [
     wants: ['Long-term', 'Mentorship'],
     interests: ['Sports', 'Music', 'Wine Tasting', 'Reading'],
     gallery: [
-        'https://placehold.co/620x400.png'
+        'https://placehold.co/600x420.png'
     ],
     attributes: {
       'Height': "5'10\"",
@@ -381,7 +382,7 @@ export const featuredProfiles: Profile[] = [
     password: 'password123',
     age: 25,
     location: 'Belfast, UK',
-    imageUrl: 'https://placehold.co/610x750.png',
+    imageUrl: 'https://placehold.co/600x760.png',
     hint: 'woman smiling',
     role: 'baby',
     online: true,
@@ -390,9 +391,9 @@ export const featuredProfiles: Profile[] = [
     wants: ['Travel Partner', 'Friendship', 'Casual'],
     interests: ['Music', 'Art', 'Travel', 'Movies'],
     gallery: [
-      'https://placehold.co/621x400.png',
-      'https://placehold.co/622x400.png',
-      'https://placehold.co/623x400.png',
+      'https://placehold.co/600x421.png',
+      'https://placehold.co/600x422.png',
+      'https://placehold.co/600x423.png',
     ],
     attributes: {
       'Height': "5'7\"",
@@ -413,7 +414,7 @@ export const featuredProfiles: Profile[] = [
     password: 'password123',
     age: 55,
     location: 'Southampton, UK',
-    imageUrl: 'https://placehold.co/611x750.png',
+    imageUrl: 'https://placehold.co/600x761.png',
     hint: 'man outdoor',
     role: 'daddy',
     online: false,
@@ -422,8 +423,8 @@ export const featuredProfiles: Profile[] = [
     wants: ['Casual', 'Travel Partner', 'No Strings Attached'],
     interests: ['Sports', 'Travel', 'Fine Dining', 'Reading'],
     gallery: [
-      'https://placehold.co/624x400.png',
-      'https://placehold.co/625x400.png',
+      'https://placehold.co/600x424.png',
+      'https://placehold.co/600x425.png',
     ],
     attributes: {
       'Height': "5'9\"",
@@ -444,7 +445,7 @@ export const featuredProfiles: Profile[] = [
     password: 'password',
     age: 50,
     location: 'Manchester, UK',
-    imageUrl: 'https://placehold.co/612x750.png',
+    imageUrl: 'https://placehold.co/600x762.png',
     hint: 'man portrait',
     role: 'daddy',
     online: false,
