@@ -6,8 +6,6 @@ import { Alegreya, Inter } from 'next/font/google';
 import { cn } from '@/lib/utils';
 import { ThemeProvider } from '@/components/theme-provider';
 import { Footer } from '@/components/layout/footer';
-import { MessageSimulator } from '@/components/message-simulator';
-import { SocialActivitySimulator } from '@/components/social-activity-simulator';
 import { ClientOnly } from '@/components/client-only';
 import { CookieBanner } from '@/components/cookie-banner';
 
@@ -61,8 +59,6 @@ export default function RootLayout({
           </div>
           <ClientOnly>
             <Toaster />
-            <MessageSimulator />
-            <SocialActivitySimulator />
             <CookieBanner />
           </ClientOnly>
         </ThemeProvider>
