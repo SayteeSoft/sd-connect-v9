@@ -84,6 +84,11 @@ export function ChatClient({ initialConversations, currentUser, initialSelectedP
     setIsClient(true);
   }, []);
 
+  // Sync state with props to ensure data is fresh
+  useEffect(() => {
+    setConversations(initialConversations);
+  }, [initialConversations]);
+
   const selectedConversation = conversations.find(
     (c) => c.id === selectedConversationId
   );
