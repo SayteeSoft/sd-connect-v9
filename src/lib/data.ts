@@ -143,6 +143,7 @@ export async function updateProfile(updatedProfile: Profile): Promise<boolean> {
     });
     if (!response.ok) throw new Error('Failed to update profile');
     window.dispatchEvent(new Event('authChanged'));
+    window.dispatchEvent(new Event('profileUpdated'));
     return true;
   } catch (error) {
     console.error('updateProfile error:', error);

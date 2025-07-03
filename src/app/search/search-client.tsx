@@ -1,7 +1,7 @@
 
 'use client';
 
-import React, { useState, useMemo, useEffect } from 'react';
+import React, { useState, useMemo, useEffect, useCallback } from 'react';
 import type { Profile } from '@/lib/data';
 import { getProfiles } from '@/lib/data';
 import { Card, CardHeader, CardTitle, CardContent, CardFooter } from '@/components/ui/card';
@@ -50,14 +50,23 @@ export function SearchClient() {
   const [uiFilters, setUiFilters] = useState(defaultFilters);
   const [appliedFilters, setAppliedFilters] = useState(defaultFilters);
   
-  useEffect(() => {
+  const fetchAllProfiles = useCallback(() => {
     if (!isAuthLoading) {
+      setIsDataLoading(true);
       getProfiles().then(profilesData => {
         setProfiles(profilesData);
         setIsDataLoading(false);
       });
     }
   }, [isAuthLoading]);
+  
+  useEffect(() => {
+    fetchAllProfiles();
+    window.addEventListener('profileUpdated', fetchAllProfiles);
+    return () => {
+      window.removeEventListener('profileUpdated', fetchAllProfiles);
+    };
+  }, [fetchAllProfiles]);
   
   const handleClearFilters = () => {
     setUiFilters(defaultFilters);

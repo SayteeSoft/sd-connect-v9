@@ -1,7 +1,7 @@
 
 'use client';
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import type { Profile } from "@/lib/data";
 import { getProfiles } from "@/lib/data";
 import { ProfileCard } from "@/components/profile-card";
@@ -13,7 +13,8 @@ export function FeaturedProfiles() {
   const { user: loggedInUser, isLoading, isLoggedIn } = useAuth();
   const [isDataLoading, setIsDataLoading] = useState(true);
 
-  useEffect(() => {
+  const fetchFeaturedProfiles = useCallback(() => {
+    setIsDataLoading(true);
     getProfiles().then(profilesData => {
         if (Array.isArray(profilesData)) {
             setProfiles(profilesData);
@@ -21,6 +22,14 @@ export function FeaturedProfiles() {
         setIsDataLoading(false);
     })
   }, []);
+
+  useEffect(() => {
+    fetchFeaturedProfiles();
+    window.addEventListener('profileUpdated', fetchFeaturedProfiles);
+    return () => {
+      window.removeEventListener('profileUpdated', fetchFeaturedProfiles);
+    };
+  }, [fetchFeaturedProfiles]);
 
   const isComponentLoading = isLoading || isDataLoading;
 

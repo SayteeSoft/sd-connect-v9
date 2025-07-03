@@ -1,7 +1,7 @@
 
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import type { Profile } from '@/lib/data';
 import { getProfiles } from '@/lib/data';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -85,7 +85,8 @@ export function MatchesTabs() {
   const [viewed, setViewed] = useState<Profile[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
-  useEffect(() => {
+  const fetchProfilesForTabs = useCallback(() => {
+    setIsLoading(true);
     getProfiles().then(allProfiles => {
       setFavorites(allProfiles.slice(0, 4));
       setVisitors(allProfiles.slice(4, 8));
@@ -93,6 +94,14 @@ export function MatchesTabs() {
       setIsLoading(false);
     });
   }, []);
+
+  useEffect(() => {
+    fetchProfilesForTabs();
+    window.addEventListener('profileUpdated', fetchProfilesForTabs);
+    return () => {
+      window.removeEventListener('profileUpdated', fetchProfilesForTabs);
+    };
+  }, [fetchProfilesForTabs]);
   
   const handleRemove = (profileId: number, listType: 'favorites' | 'visitors' | 'viewed') => {
     let profileName = '';
