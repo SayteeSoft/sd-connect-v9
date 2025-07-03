@@ -47,9 +47,7 @@
     --input: 220 10% 30%;
     --ring: 300 80% 80%;
   }
-}
 
-@layer base {
   * {
     @apply border-border;
   }
