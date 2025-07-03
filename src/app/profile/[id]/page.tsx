@@ -35,7 +35,6 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import imageCompression from 'browser-image-compression';
 import dynamic from 'next/dynamic';
 import { useAuth } from '@/hooks/use-auth';
 import { useFavorites, useBlocked } from '@/hooks/use-user-lists';
@@ -291,6 +290,7 @@ const ProfileEdit = ({ profile, onSave, onCancel }: { profile: Profile; onSave: 
                 useWebWorker: true,
             }
             try {
+                const imageCompression = (await import('browser-image-compression')).default;
                 const compressedFile = await imageCompression(file, options);
                 const reader = new FileReader();
                 reader.onloadend = () => {
@@ -348,6 +348,8 @@ const ProfileEdit = ({ profile, onSave, onCancel }: { profile: Profile; onSave: 
             maxWidthOrHeight: 800,
             useWebWorker: true,
         }
+
+        const imageCompression = (await import('browser-image-compression')).default;
 
         const newImagePromises = filesToProcess.map(async (file) => {
             try {
