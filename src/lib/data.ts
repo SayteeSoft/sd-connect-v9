@@ -77,7 +77,7 @@ const API_BASE_PATH = '/.netlify/functions';
  */
 export async function getProfiles(): Promise<Profile[]> {
   try {
-    const response = await fetch(`${API_BASE_PATH}/profiles`);
+    const response = await fetch(`${API_BASE_PATH}/profiles`, { cache: 'no-store' });
     if (!response.ok) throw new Error('Failed to fetch profiles');
     return await response.json();
   } catch (error) {
@@ -93,7 +93,7 @@ export async function getProfiles(): Promise<Profile[]> {
  */
 export async function getProfile(id: number): Promise<Profile | undefined> {
   try {
-    const response = await fetch(`${API_BASE_PATH}/profiles?id=${id}`);
+    const response = await fetch(`${API_BASE_PATH}/profiles?id=${id}`, { cache: 'no-store' });
     if (response.status === 404) return undefined;
     if (!response.ok) throw new Error(`Failed to fetch profile ${id}`);
     return await response.json();
@@ -176,7 +176,7 @@ export async function deleteProfile(profileId: number): Promise<boolean> {
  */
 export async function getConversations(): Promise<Conversation[]> {
     try {
-        const response = await fetch(`${API_BASE_PATH}/conversations`);
+        const response = await fetch(`${API_BASE_PATH}/conversations`, { cache: 'no-store' });
         if (!response.ok) throw new Error('Failed to fetch conversations');
         return await response.json();
     } catch (error) {
