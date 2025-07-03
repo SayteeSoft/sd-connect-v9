@@ -45,7 +45,7 @@ export const handler: Handler = async (event: HandlerEvent) => {
           password,
           age: 18,
           location: '',
-          imageUrl: role === 'baby' ? 'https://placehold.co/600x750.png' : 'https://placehold.co/600x750.png',
+          imageUrl: `https://placehold.co/600x${750 + newId}.png`,
           hint: role === 'baby' ? 'woman smiling' : 'man suit',
           role,
           online: true,
