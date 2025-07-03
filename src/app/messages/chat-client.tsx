@@ -1,7 +1,7 @@
 
 'use client';
 
-import React, { useState, useEffect, useRef, useMemo } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import type { Conversation, Message, Profile } from '@/lib/data';
 import { saveMessage } from '@/lib/data';
 import { cn } from '@/lib/utils';
@@ -94,7 +94,6 @@ export function ChatClient({ initialConversations, currentUser, initialSelectedP
     findConversationIdByProfileId(initialSelectedProfileId) || initialConversations.find(c => !blockedIds.includes(c.participant.id))?.id || null
   );
   const [newMessage, setNewMessage] = useState('');
-  const messagesEndRef = useRef<HTMLDivElement>(null);
   const [isClient, setIsClient] = useState(false);
 
 
@@ -129,16 +128,6 @@ export function ChatClient({ initialConversations, currentUser, initialSelectedP
   const selectedConversation = conversations.find(
     (c) => c.id === selectedConversationId
   );
-
-  const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  };
-
-  useEffect(() => {
-    if (selectedConversation?.messages) {
-      scrollToBottom();
-    }
-  }, [selectedConversation?.messages]);
   
   const handleSendMessage = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -481,7 +470,6 @@ export function ChatClient({ initialConversations, currentUser, initialSelectedP
                                 )}
                             </div>
                         ))}
-                        <div ref={messagesEndRef} />
                     </div>
                 </ScrollArea>
                 {loggedInUser?.role === 'daddy' &&
