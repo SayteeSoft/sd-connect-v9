@@ -109,12 +109,16 @@ export function ChatClient({ initialConversations, currentUser, initialSelectedP
     );
     setConversations(activeConversations);
     
-    // If current selected chat is now blocked/removed, select the first available one
-    if (selectedConversationId && !activeConversations.some(c => c.id === selectedConversationId)) {
+    // If a new chat was opened, make sure it's selected
+    const newChatId = findConversationIdByProfileId(initialSelectedProfileId);
+    if (newChatId) {
+        setSelectedConversationId(newChatId);
+    } else if (selectedConversationId && !activeConversations.some(c => c.id === selectedConversationId)) {
+        // If current selected chat is now blocked/removed, select the first available one
         setSelectedConversationId(activeConversations[0]?.id || null);
     }
 
-  }, [initialConversations, blockedIds, removedIds, selectedConversationId]);
+  }, [initialConversations, blockedIds, removedIds, selectedConversationId, initialSelectedProfileId]);
   
   const filteredConversations = useMemo(() => {
     if (!searchTerm.trim()) {
@@ -150,18 +154,21 @@ export function ChatClient({ initialConversations, currentUser, initialSelectedP
             text: response.message,
             timestamp: new Date().toISOString(),
           };
-          const success = await saveMessage(selectedConversationId, aiMessage);
-          if (success) {
-            setConversations((prev) =>
-              prev.map((convo) =>
-                convo.id === selectedConversationId
-                  ? {
-                      ...convo,
-                      messages: [...convo.messages, aiMessage],
-                    }
-                  : convo
-              )
-            );
+          // For AI messages in a new chat, we can't save them, just show them locally
+          if (selectedConversationId > 0) {
+            const success = await saveMessage(selectedConversationId, aiMessage);
+            if (success) {
+              setConversations((prev) =>
+                prev.map((convo) =>
+                  convo.id === selectedConversationId
+                    ? {
+                        ...convo,
+                        messages: [...convo.messages, aiMessage],
+                      }
+                    : convo
+                )
+              );
+            }
           }
         })
         .catch((err) => {
@@ -188,6 +195,11 @@ export function ChatClient({ initialConversations, currentUser, initialSelectedP
       )
     );
     setNewMessage('');
+
+    // If it's a new conversation (ID is negative), don't try to save to backend.
+    if (selectedConversationId < 0) {
+        return;
+    }
 
     try {
       // First, save the message to the server
@@ -303,12 +315,12 @@ export function ChatClient({ initialConversations, currentUser, initialSelectedP
                   <div className="flex justify-between items-center">
                     <h3 className="font-semibold truncate">{convo.participant.name}</h3>
                     <p className="text-xs text-muted-foreground whitespace-nowrap">
-                      {isClient ? formatTimestamp(convo.messages[convo.messages.length - 1].timestamp) : null}
+                      {isClient && convo.messages.length > 0 ? formatTimestamp(convo.messages[convo.messages.length - 1].timestamp) : null}
                     </p>
                   </div>
                   <div className="flex justify-between items-start">
                     <p className="text-sm text-muted-foreground truncate">
-                      {convo.messages[convo.messages.length - 1].text}
+                      {convo.messages.length > 0 ? convo.messages[convo.messages.length - 1].text : <i>No messages yet</i>}
                     </p>
                     {convo.unreadCount > 0 && (
                       <span className="ml-2 flex-shrink-0 text-xs bg-primary text-primary-foreground h-5 w-5 flex items-center justify-center rounded-full font-medium">

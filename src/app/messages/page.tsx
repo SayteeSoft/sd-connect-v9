@@ -5,7 +5,7 @@ import { useState, useEffect, Suspense, useCallback } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { Header } from '@/components/layout/header';
 import { ChatClient } from './chat-client';
-import { getConversations, getProfiles, type Conversation, type Profile } from '@/lib/data';
+import { getConversations, getProfiles, type Conversation, type Profile, type ConversationWithParticipantId } from '@/lib/data';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useAuth } from '@/hooks/use-auth';
 
@@ -69,8 +69,8 @@ function MessagesContent() {
 
             const profileMap = new Map(profiles.map(p => [p.id, p]));
 
-            const joinedConversations: Conversation[] = rawConversations
-                .map(rawConvo => {
+            let joinedConversations: Conversation[] = rawConversations
+                .map((rawConvo: ConversationWithParticipantId) => {
                     const participant = profileMap.get(rawConvo.participantId);
                     if (!participant) return null;
 
@@ -90,10 +90,25 @@ function MessagesContent() {
                     const lastMessageB = new Date(b.messages[b.messages.length - 1].timestamp).getTime();
                     return lastMessageB - lastMessageA;
                 });
-
+            
+            // If a chat is opened via URL and doesn't exist, create a placeholder
+            if (initialSelectedProfileId && !joinedConversations.some(c => c.participant.id === initialSelectedProfileId)) {
+                const participantProfile = profileMap.get(initialSelectedProfileId);
+                if (participantProfile) {
+                    const newConversation: Conversation = {
+                        id: initialSelectedProfileId * -1, // Use a negative, unique ID for placeholders
+                        participant: participantProfile,
+                        messages: [],
+                        unreadCount: 0,
+                    };
+                    // Add the new placeholder conversation to the top of the list
+                    joinedConversations = [newConversation, ...joinedConversations];
+                }
+            }
+            
             setConversations(joinedConversations);
         }
-    }, [isAuthLoading, currentUserProfile]);
+    }, [isAuthLoading, currentUserProfile, initialSelectedProfileId]);
     
     useEffect(() => {
         fetchAndJoinData();
