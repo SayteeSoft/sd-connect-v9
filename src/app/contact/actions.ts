@@ -23,8 +23,10 @@ export async function sendEmail(data: ContactFormInputs): Promise<{ success: boo
   const { name, email, subject, message } = parsedData.data;
   const adminEmail = 'saytee.software@gmail.com';
 
-  if (!process.env.EMAIL_SERVER_HOST) {
-    console.log("EMAIL_SERVER_HOST not found, simulating email success.");
+  // Check if credentials are set in environment variables
+  if (!process.env.GMAIL_USER || !process.env.GMAIL_APP_PASSWORD) {
+    console.log("Gmail credentials not found in .env, simulating email success.");
+    console.log("To send real emails, add GMAIL_USER and GMAIL_APP_PASSWORD to your .env file.");
     // Simulate network delay
     await new Promise(resolve => setTimeout(resolve, 1000));
     // Check for a specific test case to simulate an error
@@ -36,19 +38,17 @@ export async function sendEmail(data: ContactFormInputs): Promise<{ success: boo
   }
 
   const transporter = nodemailer.createTransport({
-    host: process.env.EMAIL_SERVER_HOST,
-    port: Number(process.env.EMAIL_SERVER_PORT),
-    secure: Number(process.env.EMAIL_SERVER_PORT) === 465, // true for 465, false for other ports
+    service: 'gmail', // Use the built-in Gmail service
     auth: {
-      user: process.env.EMAIL_SERVER_USER,
-      pass: process.env.EMAIL_SERVER_PASSWORD,
+      user: process.env.GMAIL_USER,
+      pass: process.env.GMAIL_APP_PASSWORD, // Use a Gmail App Password
     },
   });
 
   const mailOptions = {
-    from: `"${name}" <${process.env.EMAIL_FROM || email}>`,
+    from: `"${name}" <${process.env.GMAIL_USER}>`, // The 'from' must be the authenticated user
     to: adminEmail,
-    replyTo: email,
+    replyTo: email, // The user's actual email address
     subject: `New Contact Form Submission: ${subject}`,
     text: message,
     html: `
