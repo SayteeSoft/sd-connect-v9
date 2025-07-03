@@ -241,7 +241,7 @@ const ProfileView = ({ profile, onEdit, isOwnProfile, canEdit, onMessage, onFavo
   </div>
 )};
 
-const ProfileEdit = ({ profile, onSave, onCancel, isSaving }: { profile: Profile; onSave: (p: Profile) => void; onCancel: () => void; isSaving: boolean; }) => {
+const ProfileEdit = ({ profile, onSave, onCancel }: { profile: Profile; onSave: (p: Profile) => void; onCancel: () => void; }) => {
     const [editedProfile, setEditedProfile] = useState(profile);
     const profileImageInputRef = useRef<HTMLInputElement>(null);
     const galleryImageInputRef = useRef<HTMLInputElement>(null);
@@ -437,11 +437,10 @@ const ProfileEdit = ({ profile, onSave, onCancel, isSaving }: { profile: Profile
                                 </p>
                             </div>
                             <div className="flex space-x-2 pt-4">
-                                <Button size="lg" className="flex-1" onClick={handleSave} disabled={isSaving}>
-                                    {isSaving ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
-                                    {isSaving ? 'Saving...' : 'Save Profile'}
+                                <Button size="lg" className="flex-1" onClick={handleSave}>
+                                    Save Profile
                                 </Button>
-                                <Button size="lg" variant="outline" className="flex-1" onClick={onCancel} disabled={isSaving}>
+                                <Button size="lg" variant="outline" className="flex-1" onClick={onCancel}>
                                     Cancel
                                 </Button>
                             </div>
@@ -457,7 +456,7 @@ const ProfileEdit = ({ profile, onSave, onCancel, isSaving }: { profile: Profile
                         <CardContent>
                             <Textarea 
                                 name="bio"
-                                value={editedProfile.bio} 
+                                value={editedProfile.bio || ''} 
                                 onChange={handleChange}
                                 className="min-h-[120px]" 
                                 placeholder="Tell us about yourself..."
@@ -617,7 +616,6 @@ export default function ProfilePage() {
   const [isEditMode, setIsEditMode] = useState(false);
   const [profileData, setProfileData] = useState<Profile | undefined>();
   const [isLoadingData, setIsLoadingData] = useState(true);
-  const [isSaving, setIsSaving] = useState(false);
   const [isGalleryOpen, setIsGalleryOpen] = useState(false);
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
   const { toast, dismiss } = useToast();
@@ -727,28 +725,36 @@ export default function ProfilePage() {
   };
   
   const handleSaveProfile = async (updatedProfile: Profile) => {
-    setIsSaving(true);
+    const originalProfile = { ...profileData! };
+
+    // Optimistically update the UI
+    setProfileData(updatedProfile);
+    setIsEditMode(false);
+    
+    if (searchParams.get('edit')) {
+      router.replace(`/profile/${profileId}`, { scroll: false });
+    }
+
+    // Attempt to save to the backend
     const success = await updateProfile(updatedProfile);
 
     if (success) {
-      setProfileData(updatedProfile);
-      setIsEditMode(false);
       toast({
         title: "Profile Saved",
         description: "Your changes have been saved successfully.",
       });
-      if (searchParams.get('edit')) {
-        router.replace(`/profile/${profileId}`, { scroll: false });
-      }
     } else {
+      // Revert UI on failure
+      setProfileData(originalProfile);
+      setIsEditMode(true);
       toast({
         variant: "destructive",
         title: "Save Failed",
-        description: "Your changes could not be saved. Please check your connection and try again.",
+        description: "Your changes could not be saved. Please try again.",
       });
     }
-    setIsSaving(false);
   };
+
 
   const handleCancelEdit = () => {
     setIsEditMode(false);
@@ -804,7 +810,6 @@ export default function ProfilePage() {
             profile={profileData} 
             onSave={handleSaveProfile} 
             onCancel={handleCancelEdit} 
-            isSaving={isSaving}
           />
         ) : (
           <ProfileView 
