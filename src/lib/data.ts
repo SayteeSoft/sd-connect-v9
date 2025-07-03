@@ -1,4 +1,3 @@
-
 // This file now acts as a client-side SDK for interacting with the backend API.
 // It no longer contains direct data or localStorage logic.
 
@@ -77,7 +76,7 @@ const API_BASE_PATH = '/.netlify/functions';
  */
 export async function getProfiles(): Promise<Profile[]> {
   try {
-    const response = await fetch(`${API_BASE_PATH}/profiles`, { cache: 'no-store' });
+    const response = await fetch(`${API_BASE_PATH}/profiles?_=${new Date().getTime()}`);
     if (!response.ok) throw new Error('Failed to fetch profiles');
     return await response.json();
   } catch (error) {
@@ -93,7 +92,7 @@ export async function getProfiles(): Promise<Profile[]> {
  */
 export async function getProfile(id: number): Promise<Profile | undefined> {
   try {
-    const response = await fetch(`${API_BASE_PATH}/profiles?id=${id}`, { cache: 'no-store' });
+    const response = await fetch(`${API_BASE_PATH}/profiles?id=${id}&_=${new Date().getTime()}`);
     if (response.status === 404) return undefined;
     if (!response.ok) throw new Error(`Failed to fetch profile ${id}`);
     return await response.json();
@@ -176,7 +175,7 @@ export async function deleteProfile(profileId: number): Promise<boolean> {
  */
 export async function getConversations(): Promise<Conversation[]> {
     try {
-        const response = await fetch(`${API_BASE_PATH}/conversations`, { cache: 'no-store' });
+        const response = await fetch(`${API_BASE_PATH}/conversations?_=${new Date().getTime()}`);
         if (!response.ok) throw new Error('Failed to fetch conversations');
         return await response.json();
     } catch (error) {
