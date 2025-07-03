@@ -261,8 +261,8 @@ export const featuredProfiles: Profile[] = [
     password: 'password123',
     age: 21,
     location: 'Leeds, UK',
-    imageUrl: 'https://placehold.co/606x606.png',
-    hint: 'woman library books',
+    imageUrl: 'https://placehold.co/706x706.png',
+    hint: 'woman poetry',
     role: 'baby',
     online: true,
     verified: true,
@@ -505,6 +505,3 @@ export const rawConversationsData = [
       ]
   },
 ];
-
-
-    
