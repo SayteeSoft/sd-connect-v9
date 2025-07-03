@@ -41,6 +41,17 @@ import { useRouter } from 'next/navigation';
 import { triggerCreditMessage } from './actions';
 import type { CreditMessageOutput } from '@/ai/flows/credit-message-flow';
 import { ScrollArea } from '@/components/ui/scroll-area';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 
 const formatTimestamp = (timestamp: string) => {
   const date = new Date(timestamp);
@@ -70,6 +81,7 @@ export function ChatClient({ initialConversations, currentUser, initialSelectedP
   
   const [conversations, setConversations] = useState(initialConversations);
   const [removedIds, setRemovedIds] = useState<number[]>([]);
+  const [favoritedIds, setFavoritedIds] = useState<number[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedConversationId, setSelectedConversationId] = useState<number | null>(
     findConversationIdByProfileId(initialSelectedProfileId) || initialConversations[0]?.id || null
@@ -212,9 +224,15 @@ export function ChatClient({ initialConversations, currentUser, initialSelectedP
   };
 
   const handleFavorite = (profile: Profile) => {
+    const isCurrentlyFavorited = favoritedIds.includes(profile.id);
+    setFavoritedIds(prev => 
+      isCurrentlyFavorited
+        ? prev.filter(id => id !== profile.id) 
+        : [...prev, profile.id]
+    );
     toast({
-      title: 'Added to Favorites',
-      description: `${profile.name} has been added to your favorites list.`,
+      title: isCurrentlyFavorited ? 'Removed from Favorites' : 'Added to Favorites',
+      description: `${profile.name} has been ${isCurrentlyFavorited ? 'removed from your' : 'added to your'} favorites list.`,
     });
   };
 
@@ -256,6 +274,7 @@ export function ChatClient({ initialConversations, currentUser, initialSelectedP
     });
   };
 
+  const isFavorited = selectedConversation && favoritedIds.includes(selectedConversation.participant.id);
 
   return (
     <div className="flex h-full w-full bg-background">
@@ -357,19 +376,59 @@ export function ChatClient({ initialConversations, currentUser, initialSelectedP
                       </Button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end">
-                      <DropdownMenuItem onSelect={() => handleFavorite(selectedConversation.participant)}>
-                        <Heart className="mr-2 h-4 w-4" />
-                        <span>Favorite</span>
+                       <DropdownMenuItem onSelect={() => handleFavorite(selectedConversation.participant)}>
+                        <Heart className={cn("mr-2 h-4 w-4", isFavorited && "fill-pink-500 text-pink-500")} />
+                        <span>{isFavorited ? 'Unfavorite' : 'Favorite'}</span>
                       </DropdownMenuItem>
-                      <DropdownMenuItem onSelect={handleDeleteChat}>
-                        <Trash2 className="mr-2 h-4 w-4" />
-                        <span>Delete Chat</span>
-                      </DropdownMenuItem>
+
+                      <AlertDialog>
+                        <AlertDialogTrigger asChild>
+                           <DropdownMenuItem onSelect={(e) => e.preventDefault()} className="w-full cursor-pointer">
+                            <Trash2 className="mr-2 h-4 w-4" />
+                            <span>Delete Chat</span>
+                          </DropdownMenuItem>
+                        </AlertDialogTrigger>
+                        <AlertDialogContent>
+                          <AlertDialogHeader>
+                            <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+                            <AlertDialogDescription>
+                              This will delete your conversation with {selectedConversation.participant.name}. This action cannot be undone.
+                            </AlertDialogDescription>
+                          </AlertDialogHeader>
+                          <AlertDialogFooter>
+                            <AlertDialogCancel>Cancel</AlertDialogCancel>
+                            <AlertDialogAction onClick={handleDeleteChat} className="bg-destructive hover:bg-destructive/90">
+                              Delete
+                            </AlertDialogAction>
+                          </AlertDialogFooter>
+                        </AlertDialogContent>
+                      </AlertDialog>
+                      
                       <DropdownMenuSeparator />
-                      <DropdownMenuItem onSelect={() => handleBlockUser()} className="text-destructive focus:text-destructive focus:bg-destructive/10">
-                        <Ban className="mr-2 h-4 w-4" />
-                        <span>Block User</span>
-                      </DropdownMenuItem>
+
+                      <AlertDialog>
+                        <AlertDialogTrigger asChild>
+                          <DropdownMenuItem onSelect={(e) => e.preventDefault()} className="w-full cursor-pointer text-destructive focus:text-destructive focus:bg-destructive/10">
+                            <Ban className="mr-2 h-4 w-4" />
+                            <span>Block User</span>
+                          </DropdownMenuItem>
+                        </AlertDialogTrigger>
+                        <AlertDialogContent>
+                            <AlertDialogHeader>
+                                <AlertDialogTitle>Are you sure you want to block this user?</AlertDialogTitle>
+                                <AlertDialogDescription>
+                                    You will no longer see messages from {selectedConversation.participant.name} and they will not be able to contact you.
+                                </AlertDialogDescription>
+                            </AlertDialogHeader>
+                            <AlertDialogFooter>
+                                <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                <AlertDialogAction onClick={handleBlockUser} className="bg-destructive hover:bg-destructive/90">
+                                    Block
+                                </AlertDialogAction>
+                            </AlertDialogFooter>
+                        </AlertDialogContent>
+                      </AlertDialog>
+
                     </DropdownMenuContent>
                   </DropdownMenu>
                 </TooltipProvider>
