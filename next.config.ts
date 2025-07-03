@@ -14,9 +14,6 @@ const nextConfig: NextConfig = {
     return [];
   },
   /* config options here */
-  experimental: {
-    
-  },
   images: {
     remotePatterns: [
       {
