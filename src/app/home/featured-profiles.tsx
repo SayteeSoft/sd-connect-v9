@@ -1,24 +1,45 @@
 
 'use client';
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import type { Profile } from "@/lib/data";
 import { getProfiles } from "@/lib/data";
 import { ProfileCard } from "@/components/profile-card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useAuth } from "@/hooks/use-auth";
+import { useBlocked } from "@/hooks/use-user-lists";
 
 export function FeaturedProfiles() {
   const [profiles, setProfiles] = useState<Profile[]>([]);
   const { user: loggedInUser, isLoading, isLoggedIn } = useAuth();
   const [isDataLoading, setIsDataLoading] = useState(true);
+  const { list: blockedIds } = useBlocked();
 
-  useEffect(() => {
+  const fetchFeaturedProfiles = useCallback(() => {
+    setIsDataLoading(true);
     getProfiles().then(profilesData => {
-        setProfiles(profilesData);
+        if (Array.isArray(profilesData)) {
+            setProfiles(profilesData);
+        }
         setIsDataLoading(false);
     })
   }, []);
+
+  useEffect(() => {
+    fetchFeaturedProfiles();
+    window.addEventListener('profileUpdated', fetchFeaturedProfiles);
+    // Listen for block list changes to re-filter
+    window.addEventListener('storage', (e) => {
+        if (e.key === 'sugarconnect_blocked') {
+            fetchFeaturedProfiles();
+        }
+    });
+
+    return () => {
+      window.removeEventListener('profileUpdated', fetchFeaturedProfiles);
+      window.removeEventListener('storage', fetchFeaturedProfiles);
+    };
+  }, [fetchFeaturedProfiles]);
 
   const isComponentLoading = isLoading || isDataLoading;
 
@@ -26,6 +47,9 @@ export function FeaturedProfiles() {
     .filter(profile => {
       // Don't show the admin account on the homepage
       if (profile.id === 1) return false;
+
+      // Filter out blocked users
+      if (blockedIds.includes(profile.id)) return false;
       
       if (loggedInUser) {
         // Don't show the user their own profile on the homepage

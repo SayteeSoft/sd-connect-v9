@@ -17,6 +17,7 @@ import { MoreHorizontal, MessageSquare, Trash2, Heart } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { useToast } from "@/hooks/use-toast";
+import { useFavorites } from "@/hooks/use-user-lists";
 
 interface ProfileCardProps {
   profile: Profile;
@@ -27,47 +28,20 @@ interface ProfileCardProps {
 
 export function ProfileCard({ profile, onRemove, loggedInUser, isLoggedIn = true }: ProfileCardProps) {
   const router = useRouter();
-  const { toast, dismiss } = useToast();
+  const { toast } = useToast();
+  const { isItemInList, toggleItem: toggleFavorite } = useFavorites();
   const canChat = loggedInUser && loggedInUser.role !== profile.role;
+  const isFavorited = isItemInList(profile.id);
 
   const handleChat = () => {
     router.push(`/messages?chatWith=${profile.id}`);
   };
 
   const handleFavorite = () => {
-    const { id: toastId } = toast({
-      duration: 10000,
-      className: 'p-4',
-      children: (
-        <div className="flex items-start gap-4 w-full">
-          <Avatar className="h-12 w-12">
-            <AvatarImage src={profile.imageUrl ?? 'https://placehold.co/100x100.png'} alt={profile.name} data-ai-hint={profile.hint} />
-            <AvatarFallback>{profile.name.charAt(0)}</AvatarFallback>
-          </Avatar>
-          <div className="flex-grow">
-            <p className="font-semibold text-base">Message {profile.name}</p>
-            <p className="text-sm text-muted-foreground mt-1">Introduce yourself and get to know your favorite.</p>
-            <div className="mt-4 flex gap-2">
-              <Button
-                size="sm"
-                onClick={() => {
-                  router.push(`/messages?chatWith=${profile.id}`);
-                  dismiss(toastId);
-                }}
-              >
-                Message
-              </Button>
-              <Button
-                size="sm"
-                variant="outline"
-                onClick={() => dismiss(toastId)}
-              >
-                Not Now
-              </Button>
-            </div>
-          </div>
-        </div>
-      ),
+    toggleFavorite(profile.id);
+    toast({
+      title: !isFavorited ? 'Added to Favorites' : 'Removed from Favorites',
+      description: `${profile.name} has been updated in your favorites.`,
     });
   };
 
@@ -115,8 +89,8 @@ export function ProfileCard({ profile, onRemove, loggedInUser, isLoggedIn = true
                     </DropdownMenuItem>
                   )}
                   <DropdownMenuItem onSelect={handleFavorite}>
-                    <Heart className="mr-2 h-4 w-4" />
-                    <span>Favorite</span>
+                    <Heart className={cn("mr-2 h-4 w-4", isFavorited && "text-pink-500 fill-pink-500")} />
+                    <span>{isFavorited ? 'Unfavorite' : 'Favorite'}</span>
                   </DropdownMenuItem>
                   {onRemove && (
                     <DropdownMenuItem onSelect={handleRemove} className="text-destructive focus:text-destructive focus:bg-destructive/10">

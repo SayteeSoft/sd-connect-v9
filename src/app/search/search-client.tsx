@@ -15,6 +15,7 @@ import { ProfileCard } from '@/components/profile-card';
 import { Filter, Sparkles, Wifi, Image as ImageIcon } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useAuth } from '@/hooks/use-auth';
+import { useBlocked } from '@/hooks/use-user-lists';
 
 const formatHeight = (cm: number) => {
   if (cm === 0) return "N/A";
@@ -46,6 +47,7 @@ export function SearchClient() {
   const [profiles, setProfiles] = useState<Profile[]>([]);
   const { user: loggedInUser, isLoading: isAuthLoading } = useAuth();
   const [isDataLoading, setIsDataLoading] = useState(true);
+  const { list: blockedIds } = useBlocked();
   
   const [uiFilters, setUiFilters] = useState(defaultFilters);
   const [appliedFilters, setAppliedFilters] = useState(defaultFilters);
@@ -63,8 +65,15 @@ export function SearchClient() {
   useEffect(() => {
     fetchAllProfiles();
     window.addEventListener('profileUpdated', fetchAllProfiles);
+     // Listen for block list changes to re-filter
+    window.addEventListener('storage', (e) => {
+        if (e.key === 'sugarconnect_blocked') {
+            fetchAllProfiles();
+        }
+    });
     return () => {
       window.removeEventListener('profileUpdated', fetchAllProfiles);
+      window.removeEventListener('storage', fetchAllProfiles);
     };
   }, [fetchAllProfiles]);
   
@@ -80,6 +89,9 @@ export function SearchClient() {
   const filteredProfiles = useMemo(() => {
     return profiles.filter(profile => {
       const profileHeightCm = parseHeight(profile.attributes?.Height);
+      
+      // Filter out blocked users first
+      if (blockedIds.includes(profile.id)) return false;
 
       // Filter by user criteria
       if (appliedFilters.isOnline && !profile.online) return false;
@@ -102,7 +114,7 @@ export function SearchClient() {
 
       return true;
     });
-  }, [profiles, appliedFilters, loggedInUser]);
+  }, [profiles, appliedFilters, loggedInUser, blockedIds]);
 
   const isLoading = isAuthLoading || isDataLoading;
 

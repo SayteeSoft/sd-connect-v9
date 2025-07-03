@@ -38,6 +38,10 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import imageCompression from 'browser-image-compression';
 import dynamic from 'next/dynamic';
 import { useAuth } from '@/hooks/use-auth';
+import { useFavorites, useBlocked } from '@/hooks/use-user-lists';
+import { cn } from '@/lib/utils';
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
+
 
 const GalleryModal = dynamic(() => import('@/components/gallery-modal').then(mod => mod.GalleryModal), {
   ssr: false,
@@ -49,7 +53,7 @@ const GalleryModal = dynamic(() => import('@/components/gallery-modal').then(mod
 });
 
 
-const ProfileView = ({ profile, onEdit, isOwnProfile, canEdit, onMessage, onFavorite, onReport, onBlock, loggedInUser, isAdmin, onOpenGallery }: { 
+const ProfileView = ({ profile, onEdit, isOwnProfile, canEdit, onMessage, onFavorite, onReport, onBlock, isFavorited, loggedInUser, isAdmin, onOpenGallery }: { 
   profile: Profile; 
   onEdit: () => void; 
   isOwnProfile: boolean; 
@@ -58,6 +62,7 @@ const ProfileView = ({ profile, onEdit, isOwnProfile, canEdit, onMessage, onFavo
   onFavorite: (profile: Profile) => void;
   onReport: (profileName: string) => void;
   onBlock: (profileId: number, profileName: string) => void;
+  isFavorited: boolean;
   loggedInUser?: Profile;
   isAdmin: boolean;
   onOpenGallery: (index: number) => void;
@@ -124,12 +129,12 @@ const ProfileView = ({ profile, onEdit, isOwnProfile, canEdit, onMessage, onFavo
                 <Tooltip>
                   <TooltipTrigger asChild>
                     <Button variant="ghost" size="icon" onClick={() => onFavorite(profile)}>
-                      <Heart className="h-5 w-5 text-muted-foreground" />
+                      <Heart className={cn("h-5 w-5 text-muted-foreground", isFavorited && "fill-pink-500 text-pink-500")} />
                       <span className="sr-only">Add to Favorites</span>
                     </Button>
                   </TooltipTrigger>
                   <TooltipContent>
-                    <p>Add to Favorites</p>
+                    <p>{isFavorited ? 'Remove from Favorites' : 'Add to Favorites'}</p>
                   </TooltipContent>
                 </Tooltip>
                 {canMessage && (
@@ -156,17 +161,33 @@ const ProfileView = ({ profile, onEdit, isOwnProfile, canEdit, onMessage, onFavo
                     <p>Report Profile</p>
                   </TooltipContent>
                 </Tooltip>
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <Button variant="ghost" size="icon" onClick={() => onBlock(profile.id, profile.name)}>
-                      <Ban className="h-5 w-5 text-muted-foreground" />
-                      <span className="sr-only">Block User</span>
-                    </Button>
-                  </TooltipTrigger>
-                  <TooltipContent>
-                    <p>Block User</p>
-                  </TooltipContent>
-                </Tooltip>
+                 <AlertDialog>
+                  <AlertDialogTrigger asChild>
+                    <Tooltip>
+                        <TooltipTrigger asChild>
+                             <Button variant="ghost" size="icon">
+                                <Ban className="h-5 w-5 text-muted-foreground" />
+                                <span className="sr-only">Block User</span>
+                            </Button>
+                        </TooltipTrigger>
+                         <TooltipContent>
+                            <p>Block User</p>
+                        </TooltipContent>
+                    </Tooltip>
+                  </AlertDialogTrigger>
+                  <AlertDialogContent>
+                    <AlertDialogHeader>
+                      <AlertDialogTitle>Block {profile.name}?</AlertDialogTitle>
+                      <AlertDialogDescription>
+                        They won't be able to see your profile or message you. This action is permanent.
+                      </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                      <AlertDialogCancel>Cancel</AlertDialogCancel>
+                      <AlertDialogAction onClick={() => onBlock(profile.id, profile.name)} className="bg-destructive hover:bg-destructive/90">Block</AlertDialogAction>
+                    </AlertDialogFooter>
+                  </AlertDialogContent>
+                </AlertDialog>
               </div>
             </TooltipProvider>
           )}
@@ -254,7 +275,7 @@ const ProfileEdit = ({ profile, onSave, onCancel }: { profile: Profile; onSave: 
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
         const { name, value } = e.target;
-        setEditedProfile(prev => ({...prev, [name]: name === 'age' ? parseInt(value, 10) : value}));
+        setEditedProfile(prev => ({...prev, [name]: name === 'age' ? (value === '' ? '' : parseInt(value, 10)) : value}));
     };
 
     const handleProfileImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -381,12 +402,10 @@ const ProfileEdit = ({ profile, onSave, onCancel }: { profile: Profile; onSave: 
     const handleSave = async () => {
         setIsSubmitting(true);
         await onSave(editedProfile);
-        // On failure, the parent component will revert the state, and this component will re-render.
-        // The isSubmitting state will be reset because of the re-render.
-        // We set it to false here to handle the case where the parent component's logic might change
-        // and not cause a re-render on failure. This is a safe fallback.
         setIsSubmitting(false);
     };
+    
+    const ageValue = editedProfile.age === null || isNaN(editedProfile.age) ? '' : editedProfile.age;
 
     return (
         <>
@@ -531,7 +550,7 @@ const ProfileEdit = ({ profile, onSave, onCancel }: { profile: Profile; onSave: 
                             <dl className="grid grid-cols-2 gap-x-4 gap-y-4">
                                 <div className="space-y-1">
                                     <Label htmlFor="age">Age</Label>
-                                    <Input id="age" name="age" type="number" value={editedProfile.age || ''} onChange={handleChange} />
+                                    <Input id="age" name="age" type="number" value={ageValue} onChange={handleChange} />
                                 </div>
                                 <div className="space-y-1">
                                     <Label htmlFor="attr-Height">Height</Label>
@@ -626,10 +645,12 @@ export default function ProfilePage() {
   const [isLoadingData, setIsLoadingData] = useState(true);
   const [isGalleryOpen, setIsGalleryOpen] = useState(false);
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
-  const { toast, dismiss } = useToast();
+  const { toast } = useToast();
   const router = useRouter();
   const params = useParams<{ id: string }>();
   const { user: loggedInUser, isLoading: isAuthLoading, isLoggedIn } = useAuth();
+  const { isItemInList, toggleItem: toggleFavorite } = useFavorites();
+  const { addItem: blockUser } = useBlocked();
   const justSaved = useRef(false);
   
   const profileId = parseInt(params.id, 10);
@@ -685,39 +706,11 @@ export default function ProfilePage() {
   };
 
   const handleFavorite = (profile: Profile) => {
-    const { id: toastId } = toast({
-      duration: 10000,
-      className: 'p-4',
-      children: (
-        <div className="flex items-start gap-4 w-full">
-          <Avatar className="h-12 w-12">
-            <AvatarImage src={profile.imageUrl ?? 'https://placehold.co/100x100.png'} alt={profile.name} data-ai-hint={profile.hint} />
-            <AvatarFallback>{profile.name.charAt(0)}</AvatarFallback>
-          </Avatar>
-          <div className="flex-grow">
-            <p className="font-semibold text-base">Message {profile.name}</p>
-            <p className="text-sm text-muted-foreground mt-1">Introduce yourself and get to know your favorite.</p>
-            <div className="mt-4 flex gap-2">
-              <Button
-                size="sm"
-                onClick={() => {
-                  router.push(`/messages?chatWith=${profile.id}`);
-                  dismiss(toastId);
-                }}
-              >
-                Message
-              </Button>
-              <Button
-                size="sm"
-                variant="outline"
-                onClick={() => dismiss(toastId)}
-              >
-                Not Now
-              </Button>
-            </div>
-          </div>
-        </div>
-      ),
+    const isCurrentlyFavorited = isItemInList(profile.id);
+    toggleFavorite(profile.id);
+    toast({
+      title: isCurrentlyFavorited ? 'Removed from Favorites' : 'Added to Favorites',
+      description: `${profile.name} has been updated in your favorites list.`,
     });
   };
 
@@ -728,8 +721,8 @@ export default function ProfilePage() {
     });
   };
   
-  const handleBlock = async (profileId: number, profileName: string) => {
-    await deleteProfile(profileId);
+  const handleBlock = (profileId: number, profileName: string) => {
+    blockUser(profileId);
     toast({
       variant: 'destructive',
       title: 'User Blocked',
@@ -740,11 +733,7 @@ export default function ProfilePage() {
   
   const handleSaveProfile = async (updatedProfile: Profile) => {
     const originalProfile = { ...profileData! };
-
-    // Set flag to avoid re-fetch from useEffect
     justSaved.current = true;
-
-    // Optimistically update UI for a seamless experience
     setProfileData(updatedProfile);
     setIsEditMode(false);
     
@@ -752,7 +741,6 @@ export default function ProfilePage() {
       router.replace(`/profile/${profileId}`, { scroll: false });
     }
 
-    // Attempt to save to the backend in the background
     const success = await updateProfile(updatedProfile);
 
     if (success) {
@@ -761,7 +749,6 @@ export default function ProfilePage() {
         description: "Your changes have been saved successfully.",
       });
     } else {
-      // Revert UI on failure
       setProfileData(originalProfile);
       setIsEditMode(true);
       toast({
@@ -772,13 +759,11 @@ export default function ProfilePage() {
     }
   };
 
-
   const handleCancelEdit = () => {
     setIsEditMode(false);
     if (searchParams.get('edit')) {
       router.replace(`/profile/${profileId}`, { scroll: false });
     }
-    // Re-fetch the original profile data to discard any local state changes in the edit form
     getProfile(profileId).then(setProfileData);
   };
 
@@ -817,6 +802,7 @@ export default function ProfilePage() {
   const isOwnProfile = profileData.id === loggedInUser?.id;
   const isAdmin = loggedInUser?.id === 1;
   const canEdit = isOwnProfile || isAdmin;
+  const isFavorited = isItemInList(profileData.id);
 
   return (
     <>
@@ -838,6 +824,7 @@ export default function ProfilePage() {
             onFavorite={handleFavorite}
             onReport={handleReport}
             onBlock={handleBlock}
+            isFavorited={isFavorited}
             loggedInUser={loggedInUser}
             isAdmin={isAdmin}
             onOpenGallery={openGallery}
@@ -855,4 +842,3 @@ export default function ProfilePage() {
     </>
   );
 }
-

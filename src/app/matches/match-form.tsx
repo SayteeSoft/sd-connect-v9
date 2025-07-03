@@ -13,6 +13,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/hooks/use-auth';
 import { Skeleton } from '@/components/ui/skeleton';
+import { useFavorites } from '@/hooks/use-user-lists';
 
 const ProfileListItem = ({ profile, onRemove, loggedInUser }: { profile: Profile; onRemove: (profileId: number) => void; loggedInUser?: Profile; }) => {
   const router = useRouter();
@@ -84,6 +85,7 @@ const ProfilesList = ({ profiles, onRemove, loggedInUser }: { profiles: Profile[
 
 export function MatchesTabs() {
   const { toast } = useToast();
+  const { list: favoritedIds, removeItem: removeFavorite } = useFavorites();
   const [favorites, setFavorites] = useState<Profile[]>([]);
   const [visitors, setVisitors] = useState<Profile[]>([]);
   const [viewed, setViewed] = useState<Profile[]>([]);
@@ -103,14 +105,17 @@ export function MatchesTabs() {
 
                 return true;
             }
-
-            setFavorites(allProfiles.slice(0, 4).filter(filterLogic));
+            
+            // Populate favorites from the persistent list
+            setFavorites(allProfiles.filter(p => favoritedIds.includes(p.id) && filterLogic(p)));
+            
+            // For demo purposes, visitors and viewed are still slices of the main list
             setVisitors(allProfiles.slice(4, 8).filter(filterLogic));
             setViewed(allProfiles.slice(8, 12).filter(filterLogic));
             setIsDataLoading(false);
         });
     }
-  }, [isAuthLoading, loggedInUser]);
+  }, [isAuthLoading, loggedInUser, favoritedIds]);
 
   useEffect(() => {
       fetchMatches();
@@ -125,7 +130,7 @@ export function MatchesTabs() {
     
     if (listType === 'favorites') {
       profileName = favorites.find(p => p.id === profileId)?.name || 'Profile';
-      setFavorites(prev => prev.filter(p => p.id !== profileId));
+      removeFavorite(profileId); // This updates the persistent list and triggers a re-render
     } else if (listType === 'visitors') {
       profileName = visitors.find(p => p.id === profileId)?.name || 'Profile';
       setVisitors(prev => prev.filter(p => p.id !== profileId));

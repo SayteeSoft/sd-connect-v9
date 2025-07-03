@@ -52,6 +52,7 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
+import { useFavorites, useBlocked } from '@/hooks/use-user-lists';
 
 const formatTimestamp = (timestamp: string) => {
   const date = new Date(timestamp);
@@ -71,6 +72,13 @@ interface ChatClientProps {
 }
 
 export function ChatClient({ initialConversations, currentUser, initialSelectedProfileId }: ChatClientProps) {
+  const { toast } = useToast();
+  const router = useRouter();
+  const { user: loggedInUser, credits, spendCredits } = useAuth();
+  
+  const { list: favoritedIds, toggleItem: toggleFavorite, isItemInList } = useFavorites();
+  const { list: blockedIds, addItem: blockUser } = useBlocked();
+
   const findConversationIdByProfileId = (profileId?: number): number | null => {
     if (!profileId) return null;
     const conversation = initialConversations.find(
@@ -80,28 +88,34 @@ export function ChatClient({ initialConversations, currentUser, initialSelectedP
   };
   
   const [conversations, setConversations] = useState(initialConversations);
-  const [removedIds, setRemovedIds] = useState<number[]>([]);
-  const [favoritedIds, setFavoritedIds] = useState<number[]>([]);
+  const [removedIds, setRemovedIds] = useState<number[]>([]); // For session-only hiding
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedConversationId, setSelectedConversationId] = useState<number | null>(
-    findConversationIdByProfileId(initialSelectedProfileId) || initialConversations[0]?.id || null
+    findConversationIdByProfileId(initialSelectedProfileId) || initialConversations.find(c => !blockedIds.includes(c.participant.id))?.id || null
   );
   const [newMessage, setNewMessage] = useState('');
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const [isClient, setIsClient] = useState(false);
-  const { toast } = useToast();
-  const router = useRouter();
-  const { user: loggedInUser, credits, spendCredits } = useAuth();
 
 
   useEffect(() => {
     setIsClient(true);
   }, []);
 
-  // Sync state with props, but respect removed conversations
+  // Sync state with props, filtering out blocked/removed users
   useEffect(() => {
-    setConversations(initialConversations.filter(c => !removedIds.includes(c.id)));
-  }, [initialConversations, removedIds]);
+    const activeConversations = initialConversations.filter(c => 
+        !blockedIds.includes(c.participant.id) && 
+        !removedIds.includes(c.id)
+    );
+    setConversations(activeConversations);
+    
+    // If current selected chat is now blocked/removed, select the first available one
+    if (selectedConversationId && !activeConversations.some(c => c.id === selectedConversationId)) {
+        setSelectedConversationId(activeConversations[0]?.id || null);
+    }
+
+  }, [initialConversations, blockedIds, removedIds, selectedConversationId]);
   
   const filteredConversations = useMemo(() => {
     if (!searchTerm.trim()) {
@@ -224,12 +238,8 @@ export function ChatClient({ initialConversations, currentUser, initialSelectedP
   };
 
   const handleFavorite = (profile: Profile) => {
-    const isCurrentlyFavorited = favoritedIds.includes(profile.id);
-    setFavoritedIds(prev => 
-      isCurrentlyFavorited
-        ? prev.filter(id => id !== profile.id) 
-        : [...prev, profile.id]
-    );
+    const isCurrentlyFavorited = isItemInList(profile.id);
+    toggleFavorite(profile.id);
     toast({
       title: isCurrentlyFavorited ? 'Removed from Favorites' : 'Added to Favorites',
       description: `${profile.name} has been ${isCurrentlyFavorited ? 'removed from your' : 'added to your'} favorites list.`,
@@ -241,40 +251,31 @@ export function ChatClient({ initialConversations, currentUser, initialSelectedP
     const convoToDelete = conversations.find(c => c.id === selectedConversationId);
     if (!convoToDelete) return;
     
-    // Select the next available conversation
-    const remaining = filteredConversations.filter(c => c.id !== selectedConversationId);
-    setSelectedConversationId(remaining[0]?.id || null);
-
-    // Add to removed list, which will trigger re-render via useEffect
+    // Add to session-only removed list
     setRemovedIds(prev => [...prev, selectedConversationId]);
     
     toast({
       title: 'Chat Deleted',
-      description: `Your conversation with ${convoToDelete.participant.name} has been deleted.`,
+      description: `Your conversation with ${convoToDelete.participant.name} has been deleted for this session.`,
       variant: 'destructive',
     });
   };
 
   const handleBlockUser = () => {
-    if (!selectedConversationId) return;
-    const convoToBlock = conversations.find(c => c.id === selectedConversationId);
-    if (!convoToBlock) return;
+    if (!selectedConversation) return;
+    const profileToBlock = selectedConversation.participant;
     
-    // Select the next available conversation
-    const remaining = filteredConversations.filter(c => c.id !== selectedConversationId);
-    setSelectedConversationId(remaining[0]?.id || null);
-
-    // Add to removed list, which will trigger re-render via useEffect
-    setRemovedIds(prev => [...prev, selectedConversationId]);
+    // Persistently block the user
+    blockUser(profileToBlock.id);
     
     toast({
       title: 'User Blocked',
-      description: `You have blocked ${convoToBlock.participant.name}. You will no longer see their messages.`,
+      description: `You have blocked ${profileToBlock.name}. You will no longer see them.`,
       variant: 'destructive',
     });
   };
 
-  const isFavorited = selectedConversation && favoritedIds.includes(selectedConversation.participant.id);
+  const isCurrentlyFavorited = selectedConversation ? isItemInList(selectedConversation.participant.id) : false;
 
   return (
     <div className="flex h-full w-full bg-background">
@@ -377,8 +378,8 @@ export function ChatClient({ initialConversations, currentUser, initialSelectedP
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end">
                        <DropdownMenuItem onSelect={() => handleFavorite(selectedConversation.participant)}>
-                        <Heart className={cn("mr-2 h-4 w-4", isFavorited && "fill-pink-500 text-pink-500")} />
-                        <span>{isFavorited ? 'Unfavorite' : 'Favorite'}</span>
+                        <Heart className={cn("mr-2 h-4 w-4", isCurrentlyFavorited && "fill-pink-500 text-pink-500")} />
+                        <span>{isCurrentlyFavorited ? 'Unfavorite' : 'Favorite'}</span>
                       </DropdownMenuItem>
 
                       <AlertDialog>
@@ -392,7 +393,7 @@ export function ChatClient({ initialConversations, currentUser, initialSelectedP
                           <AlertDialogHeader>
                             <AlertDialogTitle>Are you sure?</AlertDialogTitle>
                             <AlertDialogDescription>
-                              This will delete your conversation with {selectedConversation.participant.name}. This action cannot be undone.
+                              This will hide your conversation with {selectedConversation.participant.name} for this session. It will reappear if you refresh the page.
                             </AlertDialogDescription>
                           </AlertDialogHeader>
                           <AlertDialogFooter>
@@ -417,7 +418,7 @@ export function ChatClient({ initialConversations, currentUser, initialSelectedP
                             <AlertDialogHeader>
                                 <AlertDialogTitle>Are you sure you want to block this user?</AlertDialogTitle>
                                 <AlertDialogDescription>
-                                    You will no longer see messages from {selectedConversation.participant.name} and they will not be able to contact you.
+                                    You will no longer see messages or profile from {selectedConversation.participant.name}. This action is permanent.
                                 </AlertDialogDescription>
                             </AlertDialogHeader>
                             <AlertDialogFooter>
