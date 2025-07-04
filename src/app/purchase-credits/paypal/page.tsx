@@ -27,10 +27,10 @@ function PayPalPaymentContent() {
   const [isProcessing, setIsProcessing] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const { resolvedTheme } = useTheme();
-  const [isClient, setIsClient] = useState(false);
+  const [isMounted, setIsMounted] = useState(false);
 
   useEffect(() => {
-    setIsClient(true);
+    setIsMounted(true);
   }, []);
 
   const packageId = searchParams.get('packageId');
@@ -150,27 +150,29 @@ function PayPalPaymentContent() {
                     <Loader2 className="h-12 w-12 animate-spin text-primary" />
                     <p className="text-muted-foreground">Processing your payment...</p>
                 </div>
+            ) : !isMounted || !resolvedTheme ? (
+                <div className="flex flex-col items-center justify-center space-y-4 h-[150px]">
+                  <Loader2 className="h-12 w-12 animate-spin text-primary" />
+                  <p className="text-muted-foreground">Loading payment options...</p>
+                </div>
             ) : (
-                isClient && (
-                    <PayPalScriptProvider options={{ clientId: paypalClientId, currency: "GBP", intent: "capture" }}>
-                        {error && <p className="text-destructive text-sm mb-4">{error}</p>}
-                        <PayPalButtons
-                            style={{ 
-                                layout: "vertical", 
-                                shape: "rect", 
-                                label: "pay", 
-                                height: 48,
-                                color: resolvedTheme === 'dark' ? 'silver' : 'gold' 
-                            }}
-                            key={resolvedTheme}
-                            forceReRender={[resolvedTheme]}
-                            createOrder={createOrder}
-                            onApprove={onApprove}
-                            onError={onError}
-                            disabled={isProcessing}
-                        />
-                    </PayPalScriptProvider>
-                )
+              <PayPalScriptProvider options={{ clientId: paypalClientId, currency: "GBP", intent: "capture" }}>
+                  {error && <p className="text-destructive text-sm mb-4">{error}</p>}
+                  <PayPalButtons
+                      key={resolvedTheme}
+                      style={{ 
+                          layout: "vertical", 
+                          shape: "rect", 
+                          label: "pay", 
+                          height: 48,
+                          color: resolvedTheme === 'dark' ? 'silver' : 'gold' 
+                      }}
+                      createOrder={createOrder}
+                      onApprove={onApprove}
+                      onError={onError}
+                      disabled={isProcessing}
+                  />
+              </PayPalScriptProvider>
             )}
           </CardContent>
         </Card>
