@@ -1,7 +1,6 @@
 'use client';
 
-import React, { createContext, useState, useContext, type ReactNode } from 'react';
-import { Loader2 } from 'lucide-react';
+import React, { createContext, useState, useContext, type ReactNode, useEffect } from 'react';
 
 // Import pre-translated content
 import enContent from '@/lib/content/en.json';
@@ -10,7 +9,7 @@ import frContent from '@/lib/content/fr.json';
 import deContent from '@/lib/content/de.json';
 
 
-type Language = 'en' | 'es' | 'fr' | 'de'; // English, Spanish, French, German
+export type Language = 'en' | 'es' | 'fr' | 'de'; // English, Spanish, French, German
 type LanguageLabel = 'English' | 'Spanish' | 'French' | 'German';
 
 export const languages: { code: Language; label: LanguageLabel }[] = [
@@ -31,7 +30,6 @@ interface LanguageContextType {
     language: Language;
     setLanguage: (lang: Language) => void;
     content: any; // The structure of the content JSON
-    isTranslating: boolean; // Kept for compatibility, but will always be false
 }
 
 const LanguageContext = createContext<LanguageContextType | undefined>(undefined);
@@ -40,14 +38,31 @@ export const LanguageProvider = ({ children }: { children: ReactNode }) => {
     const [language, setLanguageState] = useState<Language>('en');
     const [content, setContent] = useState<any>(enContent);
 
+    useEffect(() => {
+        // This runs on the client and sets the language from localStorage on initial load.
+        const storedLang = localStorage.getItem('sugarconnect_language') as Language | null;
+        if (storedLang && languages.some(l => l.code === storedLang)) {
+            setLanguageState(storedLang);
+            setContent(contentMap[storedLang]);
+        }
+    }, []);
+
     const setLanguage = (lang: Language) => {
-        if (lang === language) return;
-        setLanguageState(lang);
-        setContent(contentMap[lang]);
+        if (!languages.some(l => l.code === lang)) return;
+        
+        try {
+            // Persist the new language choice to localStorage.
+            localStorage.setItem('sugarconnect_language', lang);
+            // Update the state to re-render the application with the new content.
+            setLanguageState(lang);
+            setContent(contentMap[lang]);
+        } catch (error) {
+            console.error("Failed to set language in localStorage", error);
+        }
     };
 
     return (
-        <LanguageContext.Provider value={{ language, setLanguage, content, isTranslating: false }}>
+        <LanguageContext.Provider value={{ language, setLanguage, content }}>
             {children}
         </LanguageContext.Provider>
     );

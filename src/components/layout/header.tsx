@@ -7,17 +7,11 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuLabel,
-  DropdownMenuPortal,
-  DropdownMenuRadioGroup,
-  DropdownMenuRadioItem,
   DropdownMenuSeparator,
-  DropdownMenuSub,
-  DropdownMenuSubContent,
-  DropdownMenuSubTrigger,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { User, LogOut, Settings, LogIn, Coins, Heart, Menu, Cog } from "lucide-react";
+import { User, LogOut, Settings, LogIn, Coins, Heart, Menu } from "lucide-react";
 import { ThemeSwitcher } from "../theme-switcher";
 import { useRouter, usePathname } from "next/navigation";
 import { useAuth } from "@/hooks/use-auth";
@@ -25,11 +19,9 @@ import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Sheet, SheetClose, SheetContent, SheetTrigger } from "@/components/ui/sheet";
-import { useLanguage, languages } from "@/context/language-context";
 
 export function Header() {
   const { isLoggedIn, user, isLoading, logout, credits } = useAuth();
-  const { language, setLanguage } = useLanguage();
   const router = useRouter();
   const pathname = usePathname();
 
@@ -207,38 +199,6 @@ export function Header() {
                 </DropdownMenuContent>
               </DropdownMenu>
 
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    className="text-foreground/60 hover:bg-transparent hover:text-primary active:bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0"
-                  >
-                    <Cog className="h-[1.2rem] w-[1.2rem]" />
-                    <span className="sr-only">Settings</span>
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="w-48">
-                  <DropdownMenuLabel>Settings</DropdownMenuLabel>
-                  <DropdownMenuSub>
-                    <DropdownMenuSubTrigger>
-                        <span>Language</span>
-                    </DropdownMenuSubTrigger>
-                    <DropdownMenuPortal>
-                        <DropdownMenuSubContent>
-                             <DropdownMenuRadioGroup value={language} onValueChange={(value) => setLanguage(value as any)}>
-                                {languages.map((lang) => (
-                                    <DropdownMenuRadioItem key={lang.code} value={lang.code}>
-                                        {lang.label}
-                                    </DropdownMenuRadioItem>
-                                ))}
-                            </DropdownMenuRadioGroup>
-                        </DropdownMenuSubContent>
-                    </DropdownMenuPortal>
-                  </DropdownMenuSub>
-                </DropdownMenuContent>
-              </DropdownMenu>
-              
               <ThemeSwitcher />
             </>
           )}

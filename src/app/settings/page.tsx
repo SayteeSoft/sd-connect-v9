@@ -14,7 +14,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Separator } from '@/components/ui/separator';
 import { useToast } from '@/hooks/use-toast';
-import { Loader2, User, KeyRound, ShieldAlert } from 'lucide-react';
+import { Loader2, User, KeyRound, ShieldAlert, Languages } from 'lucide-react';
 import type { Profile } from '@/lib/data';
 import { updateProfile } from '@/lib/data';
 import {
@@ -29,6 +29,9 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { useAuth } from '@/hooks/use-auth';
+import { useLanguage, languages } from '@/context/language-context';
+import type { Language as LanguageCode } from '@/context/language-context';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
 // Schema for updating profile information
 const profileFormSchema = z.object({
@@ -54,8 +57,11 @@ export default function SettingsPage() {
   const router = useRouter();
   const { toast } = useToast();
   const { user: profile, isLoading, isLoggedIn, logout } = useAuth();
+  const { language, setLanguage } = useLanguage();
+  
   const [isSubmittingProfile, setIsSubmittingProfile] = useState(false);
   const [isSubmittingPassword, setIsSubmittingPassword] = useState(false);
+  const [pendingLanguage, setPendingLanguage] = useState<LanguageCode>(language);
 
   const profileForm = useForm<ProfileFormValues>({
     resolver: zodResolver(profileFormSchema),
@@ -75,6 +81,10 @@ export default function SettingsPage() {
       profileForm.reset({ name: profile.name, email: profile.email });
     }
   }, [router, profile, profileForm, isLoading, isLoggedIn]);
+  
+  useEffect(() => {
+    setPendingLanguage(language);
+  }, [language]);
 
   const onProfileSubmit = async (data: ProfileFormValues) => {
     if (!profile) return;
@@ -102,8 +112,6 @@ export default function SettingsPage() {
   const onPasswordSubmit = async (data: PasswordFormValues) => {
     setIsSubmittingPassword(true);
     
-    // In a real app, you would verify the currentPassword against the backend
-    // but the backend stores it in plain text, so we check against the auth context
     if (data.currentPassword !== profile?.password) {
         toast({
           variant: "destructive",
@@ -114,7 +122,6 @@ export default function SettingsPage() {
         return;
     }
 
-    // Update password via API
     if (profile) {
       const updatedProfileData: Profile = { ...profile, password: data.newPassword };
       const success = await updateProfile(updatedProfileData);
@@ -137,6 +144,14 @@ export default function SettingsPage() {
     setIsSubmittingPassword(false);
   };
   
+  const handleLanguageSave = () => {
+    setLanguage(pendingLanguage);
+    toast({
+      title: "Language Saved",
+      description: "Your language preference has been updated.",
+    });
+  };
+
   const handleDeleteAccount = () => {
     logout();
     toast({
@@ -170,7 +185,6 @@ export default function SettingsPage() {
                 </p>
             </div>
 
-          {/* Profile Settings Card */}
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2"><User className="h-5 w-5"/>Profile Information</CardTitle>
@@ -199,7 +213,6 @@ export default function SettingsPage() {
           
           <Separator />
 
-          {/* Password Settings Card */}
            <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2"><KeyRound className="h-5 w-5" />Change Password</CardTitle>
@@ -232,7 +245,33 @@ export default function SettingsPage() {
           
           <Separator />
           
-          {/* Delete Account Card */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2"><Languages className="h-5 w-5" />Language Settings</CardTitle>
+              <CardDescription>Choose your preferred language for the site.</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+                <div className="space-y-2">
+                    <Label htmlFor="language-select">Language</Label>
+                    <Select value={pendingLanguage} onValueChange={(value) => setPendingLanguage(value as LanguageCode)}>
+                        <SelectTrigger id="language-select" className="max-w-xs">
+                            <SelectValue placeholder="Select a language" />
+                        </SelectTrigger>
+                        <SelectContent>
+                            {languages.map((lang) => (
+                                <SelectItem key={lang.code} value={lang.code}>
+                                    {lang.label}
+                                </SelectItem>
+                            ))}
+                        </SelectContent>
+                    </Select>
+                </div>
+                <Button onClick={handleLanguageSave}>Save Language</Button>
+            </CardContent>
+          </Card>
+
+          <Separator />
+          
            <Card className="border-destructive">
             <CardHeader>
               <CardTitle className="flex items-center gap-2 text-destructive"><ShieldAlert className="h-5 w-5" />Danger Zone</CardTitle>
