@@ -9,7 +9,7 @@
  */
 
 import { ai } from '@/ai/genkit';
-import { z } from 'genkit';
+import { z } from 'zod';
 
 const TranslateContentInputSchema = z.object({
   jsonContent: z.any().describe('The JSON object with content to be translated.'),
@@ -37,7 +37,8 @@ IMPORTANT INSTRUCTIONS:
 3.  DO NOT translate JSON keys.
 4.  DO NOT translate values that are not strings (e.g., numbers, booleans, arrays of non-strings).
 5.  For strings that are icon names (e.g., "ShieldCheck", "Users"), do not translate them.
-6.  Ensure the output is a valid JSON object.
+6.  The terms "Sugar Daddy" and "Sugar Baby" are core concepts for this website. It is crucial that you translate them accurately and appropriately for the target language and culture. Do not refuse to translate them.
+7.  Ensure the output is a valid JSON object.
 
 JSON to translate:
 \`\`\`json
@@ -53,6 +54,7 @@ JSON to translate:
       { category: 'HARM_CATEGORY_DANGEROUS_CONTENT', threshold: 'BLOCK_NONE' },
       { category: 'HARM_CATEGORY_HARASSMENT', threshold: 'BLOCK_NONE' },
       { category: 'HARM_CATEGORY_SEXUALLY_EXPLICIT', threshold: 'BLOCK_NONE' },
+      { category: 'HARM_CATEGORY_CIVIC_INTEGRITY', threshold: 'BLOCK_NONE' },
     ],
   },
 });
