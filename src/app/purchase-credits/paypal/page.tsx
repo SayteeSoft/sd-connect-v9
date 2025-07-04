@@ -1,4 +1,3 @@
-
 'use client';
 
 import { useSearchParams, useRouter } from 'next/navigation';
@@ -7,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
 import { Loader2 } from 'lucide-react';
-import { useState, useMemo, Suspense, useEffect } from 'react';
+import { useState, useMemo, Suspense } from 'react';
 import { PayPalScriptProvider, PayPalButtons } from "@paypal/react-paypal-js";
 import type { OnApproveData, CreateOrderData } from "@paypal/paypal-js";
 import { useAuth } from '@/hooks/use-auth';
@@ -27,11 +26,6 @@ function PayPalPaymentContent() {
   const [isProcessing, setIsProcessing] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const { resolvedTheme } = useTheme();
-  const [isMounted, setIsMounted] = useState(false);
-
-  useEffect(() => {
-    setIsMounted(true);
-  }, []);
 
   const packageId = searchParams.get('packageId');
   const selectedPackage = useMemo(() => creditPackages.find(p => p.id === packageId), [packageId]);
@@ -150,7 +144,7 @@ function PayPalPaymentContent() {
                     <Loader2 className="h-12 w-12 animate-spin text-primary" />
                     <p className="text-muted-foreground">Processing your payment...</p>
                 </div>
-            ) : !isMounted || !resolvedTheme ? (
+            ) : !resolvedTheme ? (
                 <div className="flex flex-col items-center justify-center space-y-4 h-[150px]">
                   <Loader2 className="h-12 w-12 animate-spin text-primary" />
                   <p className="text-muted-foreground">Loading payment options...</p>
