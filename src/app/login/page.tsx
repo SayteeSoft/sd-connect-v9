@@ -20,8 +20,8 @@ import { useAuth } from "@/hooks/use-auth";
 
 
 export default function LoginPage() {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const [email, setEmail] = useState("larry.saytee@email.com");
+  const [password, setPassword] = useState("password");
   const [error, setError] = useState("");
   const router = useRouter();
   const { login, isLoggedIn, isLoading } = useAuth();
@@ -102,7 +102,6 @@ export default function LoginPage() {
                   required 
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  placeholder="••••••••"
                 />
               </div>
               <Button type="submit" className="w-full" disabled={isSubmitting}>
