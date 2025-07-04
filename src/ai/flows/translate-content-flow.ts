@@ -29,18 +29,18 @@ const prompt = ai.definePrompt({
   name: 'translateContentPrompt',
   input: { schema: TranslateContentInputSchema },
   output: { format: 'json' },
-  prompt: `You are an expert translator. Your task is to translate the string values within the provided JSON object to the specified target language.
+  prompt: `You are an expert translator. Your task is to translate all user-facing string values within the provided JSON object to {{{targetLanguage}}}.
 
-IMPORTANT INSTRUCTIONS:
-1.  Translate all user-facing strings to {{{targetLanguage}}}.
-2.  Maintain the EXACT same JSON structure, including all keys, nesting, and data types.
-3.  DO NOT translate JSON keys.
-4.  DO NOT translate values that are not strings (e.g., numbers, booleans, arrays of non-strings).
-5.  For strings that are icon names (e.g., "ShieldCheck", "Users"), do not translate them.
-6.  IMPORTANT: Do not translate the specific English phrases "Sugar Daddy" or "Sugar Baby". You must leave these phrases in English. Translate all other text.
-7.  Ensure the output is a valid JSON object.
+Follow these critical rules:
+- **Preserve Structure**: Your output MUST be a valid JSON object with the exact same structure, keys, and nesting as the input.
+- **Do Not Translate Keys**: You must not translate the JSON keys.
+- **Leave Specific Phrases Untranslated**: The English phrases "Sugar Daddy" and "Sugar Baby" are proper names for this site. You MUST leave them in English. Do not translate them.
+- **Translate All Other Text**: All other user-facing text must be translated accurately.
+- **Ignore Non-Text**: Do not translate numbers, booleans, or strings that are clearly identifiers (like icon names, e.g., 'ShieldCheck').
 
-JSON to translate:
+Return ONLY the translated JSON object, with no other text, explanations, or markdown formatting.
+
+Here is the JSON object to translate:
 \`\`\`json
 {{{jsonStringify jsonContent}}}
 \`\`\`
@@ -67,14 +67,16 @@ const translateContentFlow = ai.defineFlow(
   },
   async (input) => {
     const { output } = await prompt(input);
-    if (!output) {
+    
+    if (!output || typeof output !== 'string' || output.trim() === '') {
+      console.error("AI translation failed: The model returned an empty or invalid response.");
       throw new Error('AI translation failed to produce an output, likely due to safety filters.');
     }
     
     // The model might wrap the JSON in markdown or add explanatory text.
     // This is a robust way to extract the JSON object from the response string.
     let jsonString = output;
-    const jsonMatch = output.match(/\{[\s\S]*\}|\[[\s\S]*\]/);
+    const jsonMatch = output.match(/\{[\s\S]*\}/); // Look for the first complete JSON object
     if (jsonMatch && jsonMatch[0]) {
       jsonString = jsonMatch[0];
     }
@@ -82,10 +84,10 @@ const translateContentFlow = ai.defineFlow(
     try {
       return JSON.parse(jsonString.trim());
     } catch (e) {
-      console.error("Failed to parse AI translation response:", e);
+      console.error("Failed to parse AI translation response as JSON.", e);
       console.error("Raw AI output:", output);
       // Throw an error to be caught by the calling UI function
-      throw new Error('Failed to parse AI translation response.');
+      throw new Error('The AI returned a response, but it was not valid JSON.');
     }
   }
 );
