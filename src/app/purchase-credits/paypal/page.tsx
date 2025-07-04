@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useSearchParams, useRouter } from 'next/navigation';
@@ -6,7 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
 import { Loader2 } from 'lucide-react';
-import { useState, useMemo, Suspense } from 'react';
+import { useState, useMemo, Suspense, useEffect } from 'react';
 import { PayPalScriptProvider, PayPalButtons } from "@paypal/react-paypal-js";
 import type { OnApproveData, CreateOrderData } from "@paypal/paypal-js";
 import { useAuth } from '@/hooks/use-auth';
@@ -93,7 +94,7 @@ function PayPalPaymentContent() {
           <>
             <Header />
             <main className="flex-grow container mx-auto p-4 md:p-6 flex items-center justify-center">
-                <Card className="w-full max-w-md dark:bg-background">
+                <Card className="w-full max-w-md dark:bg-transparent dark:border-none dark:shadow-none">
                     <CardHeader>
                         <CardTitle>Invalid Package</CardTitle>
                     </CardHeader>
@@ -112,7 +113,7 @@ function PayPalPaymentContent() {
         <>
             <Header />
             <main className="flex-grow container mx-auto p-4 md:p-6 flex items-center justify-center">
-                <Card className="w-full max-w-md text-center dark:bg-background">
+                <Card className="w-full max-w-md text-center dark:bg-transparent dark:border-none dark:shadow-none">
                     <CardHeader>
                         <CardTitle>Configuration Error</CardTitle>
                     </CardHeader>
@@ -130,7 +131,7 @@ function PayPalPaymentContent() {
     <>
       <Header />
       <main className="flex-grow container mx-auto p-4 md:p-6 flex items-center justify-center">
-        <Card className="w-full max-w-md text-center dark:bg-background">
+        <Card className="w-full max-w-md text-center dark:bg-transparent dark:border-none dark:shadow-none">
           <CardHeader>
             <p className="font-bold text-5xl text-[#00457C] dark:text-white mx-auto"><i>PayPal</i></p>
             <CardTitle className="font-headline text-2xl pt-4">Complete Your Purchase</CardTitle>
