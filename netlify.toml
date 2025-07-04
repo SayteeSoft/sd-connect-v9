@@ -7,9 +7,3 @@
   directory = "netlify/functions"
   node_bundler = "esbuild"
   included_files = ["netlify/functions/utils/**"]
-
-[dev]
-  command = "next dev -p 9002"
-  targetPort = 9002
-  port = 8888
-  publish = ".next"
