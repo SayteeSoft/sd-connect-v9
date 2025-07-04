@@ -7,10 +7,11 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
 import { Loader2 } from 'lucide-react';
-import { useState, useMemo, Suspense } from 'react';
+import { useState, useMemo, Suspense, useEffect } from 'react';
 import { PayPalScriptProvider, PayPalButtons } from "@paypal/react-paypal-js";
 import type { OnApproveData, CreateOrderData } from "@paypal/paypal-js";
 import { useAuth } from '@/hooks/use-auth';
+import { useTheme } from 'next-themes';
 
 const creditPackages = [
   { id: 'pkg-1', credits: 100, price: 20 },
@@ -25,6 +26,12 @@ function PayPalPaymentContent() {
   const { user, addCredits } = useAuth();
   const [isProcessing, setIsProcessing] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const { resolvedTheme } = useTheme();
+  const [isClient, setIsClient] = useState(false);
+
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
 
   const packageId = searchParams.get('packageId');
   const selectedPackage = useMemo(() => creditPackages.find(p => p.id === packageId), [packageId]);
@@ -131,7 +138,7 @@ function PayPalPaymentContent() {
       <main className="flex-grow container mx-auto p-4 md:p-6 flex items-center justify-center">
         <Card className="w-full max-w-md text-center">
           <CardHeader>
-            <p className="font-bold text-5xl text-[#00457C] mx-auto"><i>PayPal</i></p>
+            <p className="font-bold text-5xl text-[#00457C] dark:text-white mx-auto"><i>PayPal</i></p>
             <CardTitle className="font-headline text-2xl pt-4">Complete Your Purchase</CardTitle>
             <CardDescription>
               You are purchasing {selectedPackage.credits} credits for £{selectedPackage.price}.00
@@ -144,16 +151,25 @@ function PayPalPaymentContent() {
                     <p className="text-muted-foreground">Processing your payment...</p>
                 </div>
             ) : (
-                <PayPalScriptProvider options={{ clientId: paypalClientId, currency: "GBP", intent: "capture" }}>
-                    {error && <p className="text-destructive text-sm mb-4">{error}</p>}
-                    <PayPalButtons
-                        style={{ layout: "vertical", shape: "rect", label: "pay", height: 48 }}
-                        createOrder={createOrder}
-                        onApprove={onApprove}
-                        onError={onError}
-                        disabled={isProcessing}
-                    />
-                </PayPalScriptProvider>
+                isClient && (
+                    <PayPalScriptProvider options={{ clientId: paypalClientId, currency: "GBP", intent: "capture" }}>
+                        {error && <p className="text-destructive text-sm mb-4">{error}</p>}
+                        <PayPalButtons
+                            style={{ 
+                                layout: "vertical", 
+                                shape: "rect", 
+                                label: "pay", 
+                                height: 48,
+                                color: resolvedTheme === 'dark' ? 'silver' : 'gold' 
+                            }}
+                            key={resolvedTheme}
+                            createOrder={createOrder}
+                            onApprove={onApprove}
+                            onError={onError}
+                            disabled={isProcessing}
+                        />
+                    </PayPalScriptProvider>
+                )
             )}
           </CardContent>
         </Card>
