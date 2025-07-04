@@ -25,7 +25,7 @@ export default {
         code: ['monospace'],
       },
       backgroundImage: {
-        'hero-bg': "url('https://web-developer.one/imgs/sugar-daddy-002.jpg')",
+        'hero-bg': "url('/sd-connect-background.jpg')",
       },
       colors: {
         background: 'hsl(var(--background))',
