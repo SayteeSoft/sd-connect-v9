@@ -1,3 +1,4 @@
+
 'use server';
 
 /**
@@ -46,6 +47,14 @@ JSON to translate:
   helpers: {
     jsonStringify: (context) => JSON.stringify(context, null, 2),
   },
+  config: {
+    safetySettings: [
+      { category: 'HARM_CATEGORY_HATE_SPEECH', threshold: 'BLOCK_NONE' },
+      { category: 'HARM_CATEGORY_DANGEROUS_CONTENT', threshold: 'BLOCK_NONE' },
+      { category: 'HARM_CATEGORY_HARASSMENT', threshold: 'BLOCK_NONE' },
+      { category: 'HARM_CATEGORY_SEXUALLY_EXPLICIT', threshold: 'BLOCK_NONE' },
+    ],
+  },
 });
 
 const translateContentFlow = ai.defineFlow(
@@ -57,17 +66,24 @@ const translateContentFlow = ai.defineFlow(
   async (input) => {
     const { output } = await prompt(input);
     if (!output) {
-      throw new Error('AI translation failed to produce an output.');
+      throw new Error('AI translation failed to produce an output, likely due to safety filters.');
     }
-    // The model might wrap the JSON in markdown, so we need to clean it.
+    
+    // The model might wrap the JSON in markdown or add explanatory text.
+    // This is a robust way to extract the JSON object from the response string.
+    let jsonString = output;
+    const jsonMatch = output.match(/\{[\s\S]*\}|\[[\s\S]*\]/);
+    if (jsonMatch && jsonMatch[0]) {
+      jsonString = jsonMatch[0];
+    }
+
     try {
-      const cleanedOutput = output.replace(/```json\n|```/g, '').trim();
-      return JSON.parse(cleanedOutput);
+      return JSON.parse(jsonString.trim());
     } catch (e) {
       console.error("Failed to parse AI translation response:", e);
       console.error("Raw AI output:", output);
-      // Fallback to the original content if parsing fails
-      return input.jsonContent;
+      // Throw an error to be caught by the calling UI function
+      throw new Error('Failed to parse AI translation response.');
     }
   }
 );
