@@ -1,4 +1,3 @@
-
 "use client";
 
 import Link from "next/link";
@@ -8,9 +7,13 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuLabel,
+  DropdownMenuPortal,
   DropdownMenuRadioGroup,
   DropdownMenuRadioItem,
   DropdownMenuSeparator,
+  DropdownMenuSub,
+  DropdownMenuSubContent,
+  DropdownMenuSubTrigger,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -206,24 +209,33 @@ export function Header() {
 
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                    <Button
-                        variant="ghost"
-                        size="icon"
-                        className="text-foreground/60 hover:bg-transparent hover:text-primary active:bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0"
-                    >
-                        <Cog className="h-[1.2rem] w-[1.2rem]" />
-                        <span className="sr-only">Settings</span>
-                    </Button>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="text-foreground/60 hover:bg-transparent hover:text-primary active:bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0"
+                  >
+                    <Cog className="h-[1.2rem] w-[1.2rem]" />
+                    <span className="sr-only">Settings</span>
+                  </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end" className="w-48">
-                    <DropdownMenuLabel>Language</DropdownMenuLabel>
-                    <DropdownMenuRadioGroup value={language} onValueChange={(value) => setLanguage(value as any)}>
-                        {languages.map((lang) => (
-                            <DropdownMenuRadioItem key={lang.code} value={lang.code}>
-                                {lang.label}
-                            </DropdownMenuRadioItem>
-                        ))}
-                    </DropdownMenuRadioGroup>
+                  <DropdownMenuLabel>Settings</DropdownMenuLabel>
+                  <DropdownMenuSub>
+                    <DropdownMenuSubTrigger>
+                        <span>Language</span>
+                    </DropdownMenuSubTrigger>
+                    <DropdownMenuPortal>
+                        <DropdownMenuSubContent>
+                             <DropdownMenuRadioGroup value={language} onValueChange={(value) => setLanguage(value as any)}>
+                                {languages.map((lang) => (
+                                    <DropdownMenuRadioItem key={lang.code} value={lang.code}>
+                                        {lang.label}
+                                    </DropdownMenuRadioItem>
+                                ))}
+                            </DropdownMenuRadioGroup>
+                        </DropdownMenuSubContent>
+                    </DropdownMenuPortal>
+                  </DropdownMenuSub>
                 </DropdownMenuContent>
               </DropdownMenu>
               
