@@ -57,7 +57,7 @@ export default function SettingsPage() {
   const router = useRouter();
   const { toast } = useToast();
   const { user: profile, isLoading, isLoggedIn, logout } = useAuth();
-  const { language, setLanguage } = useLanguage();
+  const { language, setLanguage, isTranslating } = useLanguage();
   
   const [isSubmittingProfile, setIsSubmittingProfile] = useState(false);
   const [isSubmittingPassword, setIsSubmittingPassword] = useState(false);
@@ -144,12 +144,20 @@ export default function SettingsPage() {
     setIsSubmittingPassword(false);
   };
   
-  const handleLanguageSave = () => {
-    setLanguage(pendingLanguage);
-    toast({
-      title: "Language Saved",
-      description: "Your language preference has been updated.",
-    });
+  const handleLanguageSave = async () => {
+    const success = await setLanguage(pendingLanguage);
+    if (success) {
+        toast({
+            title: "Language Saved",
+            description: "Your language preference has been updated.",
+        });
+    } else {
+        toast({
+            variant: "destructive",
+            title: "Translation Failed",
+            description: "Could not translate the content. Reverting to English.",
+        });
+    }
   };
 
   const handleDeleteAccount = () => {
@@ -266,7 +274,10 @@ export default function SettingsPage() {
                         </SelectContent>
                     </Select>
                 </div>
-                <Button onClick={handleLanguageSave}>Save Language</Button>
+                <Button onClick={handleLanguageSave} disabled={isTranslating}>
+                    {isTranslating && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                    Save Language
+                </Button>
             </CardContent>
           </Card>
 

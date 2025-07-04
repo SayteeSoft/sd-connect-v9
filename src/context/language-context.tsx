@@ -1,15 +1,10 @@
 'use client';
 
-import React, { createContext, useState, useContext, type ReactNode, useEffect } from 'react';
-
-// Import pre-translated content
+import React, { createContext, useState, useContext, type ReactNode, useEffect, useCallback } from 'react';
+import { translateContent } from '@/ai/flows/translate-content-flow';
 import enContent from '@/lib/content/en.json';
-import esContent from '@/lib/content/es.json';
-import frContent from '@/lib/content/fr.json';
-import deContent from '@/lib/content/de.json';
 
-
-export type Language = 'en' | 'es' | 'fr' | 'de'; // English, Spanish, French, German
+export type Language = 'en' | 'es' | 'fr' | 'de';
 type LanguageLabel = 'English' | 'Spanish' | 'French' | 'German';
 
 export const languages: { code: Language; label: LanguageLabel }[] = [
@@ -19,17 +14,11 @@ export const languages: { code: Language; label: LanguageLabel }[] = [
     { code: 'de', label: 'German' },
 ];
 
-const contentMap = {
-    en: enContent,
-    es: esContent,
-    fr: frContent,
-    de: deContent,
-};
-
 interface LanguageContextType {
     language: Language;
-    setLanguage: (lang: Language) => void;
-    content: any; // The structure of the content JSON
+    setLanguage: (lang: Language) => Promise<boolean>;
+    content: any;
+    isTranslating: boolean;
 }
 
 const LanguageContext = createContext<LanguageContextType | undefined>(undefined);
@@ -37,32 +26,73 @@ const LanguageContext = createContext<LanguageContextType | undefined>(undefined
 export const LanguageProvider = ({ children }: { children: ReactNode }) => {
     const [language, setLanguageState] = useState<Language>('en');
     const [content, setContent] = useState<any>(enContent);
+    const [isTranslating, setIsTranslating] = useState(false);
+    const [isMounted, setIsMounted] = useState(false);
 
     useEffect(() => {
-        // This runs on the client and sets the language from localStorage on initial load.
+        setIsMounted(true);
         const storedLang = localStorage.getItem('sugarconnect_language') as Language | null;
-        if (storedLang && languages.some(l => l.code === storedLang)) {
-            setLanguageState(storedLang);
-            setContent(contentMap[storedLang]);
+        if (storedLang && storedLang !== 'en' && languages.some(l => l.code === storedLang)) {
+            const cachedContent = sessionStorage.getItem(`sugarconnect_content_${storedLang}`);
+            if (cachedContent) {
+                setLanguageState(storedLang);
+                setContent(JSON.parse(cachedContent));
+            } else {
+                setLanguage(storedLang);
+            }
+        } else {
+             setLanguageState('en');
+             setContent(enContent);
         }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
-    const setLanguage = (lang: Language) => {
-        if (!languages.some(l => l.code === lang)) return;
-        
-        try {
-            // Persist the new language choice to localStorage.
+    const setLanguage = useCallback(async (lang: Language): Promise<boolean> => {
+        if (!isMounted || !languages.some(l => l.code === lang)) return false;
+
+        if (lang === 'en') {
             localStorage.setItem('sugarconnect_language', lang);
-            // Update the state to re-render the application with the new content.
             setLanguageState(lang);
-            setContent(contentMap[lang]);
-        } catch (error) {
-            console.error("Failed to set language in localStorage", error);
+            setContent(enContent);
+            return true;
         }
-    };
+
+        const cachedContent = sessionStorage.getItem(`sugarconnect_content_${lang}`);
+        if (cachedContent) {
+            localStorage.setItem('sugarconnect_language', lang);
+            setLanguageState(lang);
+            setContent(JSON.parse(cachedContent));
+            return true;
+        }
+
+        setIsTranslating(true);
+        try {
+            const targetLanguageLabel = languages.find(l => l.code === lang)?.label;
+            if (!targetLanguageLabel) throw new Error("Invalid language selected");
+
+            const translatedContent = await translateContent({
+                jsonContent: enContent,
+                targetLanguage: targetLanguageLabel,
+            });
+
+            sessionStorage.setItem(`sugarconnect_content_${lang}`, JSON.stringify(translatedContent));
+            localStorage.setItem('sugarconnect_language', lang);
+            setLanguageState(lang);
+            setContent(translatedContent);
+            return true;
+        } catch (error) {
+            console.error("AI Translation Error:", error);
+            setLanguageState('en');
+            setContent(enContent);
+            localStorage.setItem('sugarconnect_language', 'en');
+            return false;
+        } finally {
+            setIsTranslating(false);
+        }
+    }, [isMounted]);
 
     return (
-        <LanguageContext.Provider value={{ language, setLanguage, content }}>
+        <LanguageContext.Provider value={{ language, setLanguage, content, isTranslating }}>
             {children}
         </LanguageContext.Provider>
     );
