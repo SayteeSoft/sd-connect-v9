@@ -8,6 +8,7 @@ import { ThemeProvider } from '@/components/theme-provider';
 import { Footer } from '@/components/layout/footer';
 import { ClientOnly } from '@/components/client-only';
 import { CookieBanner } from '@/components/cookie-banner';
+import { LanguageProvider } from '@/context/language-context';
 
 export const metadata: Metadata = {
   title: 'SD Connect',
@@ -54,14 +55,16 @@ export default function RootLayout({
           defaultTheme="light"
           disableTransitionOnChange
         >
-          <div className="flex flex-col min-h-screen bg-background">
-            {children}
-            <Footer />
-          </div>
-          <ClientOnly>
-            <Toaster />
-            <CookieBanner />
-          </ClientOnly>
+          <LanguageProvider>
+            <div className="flex flex-col min-h-screen bg-background">
+              {children}
+              <Footer />
+            </div>
+            <ClientOnly>
+              <Toaster />
+              <CookieBanner />
+            </ClientOnly>
+          </LanguageProvider>
         </ThemeProvider>
       </body>
     </html>

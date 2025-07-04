@@ -1,4 +1,3 @@
-
 'use client';
 
 import { useState, useEffect } from "react";
@@ -14,7 +13,7 @@ import {
   CarouselPrevious,
 } from "@/components/ui/carousel";
 import { Skeleton } from "@/components/ui/skeleton";
-import siteContent from '@/lib/site-content.json';
+import { useLanguage } from "@/context/language-context";
 
 
 const formatRole = (role: 'baby' | 'daddy') => {
@@ -33,6 +32,7 @@ const extractQuoteFromBio = (bio?: string) => {
 export function Testimonials() {
   const [testimonials, setTestimonials] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const { content: siteContent } = useLanguage();
 
   useEffect(() => {
     getProfiles().then(allProfiles => {
@@ -53,12 +53,12 @@ export function Testimonials() {
     });
   }, []);
 
-  if (isLoading) {
+  if (isLoading || !siteContent) {
     return (
       <section className="bg-secondary py-12 md:pt-12 md:pb-20">
         <div className="container mx-auto px-4 md:px-6">
           <h2 className="mb-12 text-center font-headline text-3xl font-bold text-primary md:text-4xl">
-            {siteContent.testimonials.title}
+            What Our Members Say
           </h2>
           <div className="w-full max-w-sm sm:max-w-xl md:max-w-3xl lg:max-w-5xl mx-auto">
              <div className="flex gap-4">

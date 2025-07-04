@@ -1,12 +1,17 @@
+'use client';
 
 import { Header } from '@/components/layout/header';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Heart } from 'lucide-react';
 import Link from 'next/link';
-import siteContent from '@/lib/site-content.json';
+import { useLanguage } from '@/context/language-context';
 
 export default function AboutUsPage() {
+  const { content: siteContent } = useLanguage();
+  
+  if (!siteContent) return null; // Or a loading skeleton
+
   const { title, subtitle, mainParagraph, sections, cta } = siteContent.aboutPage;
 
   const SectionTitle = ({ children }: { children: React.ReactNode }) => (
@@ -35,11 +40,11 @@ export default function AboutUsPage() {
               {mainParagraph}
             </Paragraph>
 
-            {sections.map(section => (
+            {sections.map((section: any) => (
               <div key={section.title}>
                 <SectionTitle>{section.title}</SectionTitle>
                 {section.content && <Paragraph>{section.content}</Paragraph>}
-                {section.subsections && section.subsections.map(sub => (
+                {section.subsections && section.subsections.map((sub: any) => (
                    <div key={sub.title}>
                      <h3 className="font-semibold text-lg mt-4 mb-2">{sub.title}</h3>
                      <Paragraph>{sub.content}</Paragraph>

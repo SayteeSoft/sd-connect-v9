@@ -1,8 +1,7 @@
-
 'use client';
 
 import { ShieldCheck, Lock, LifeBuoy } from 'lucide-react';
-import siteContent from '@/lib/site-content.json';
+import { useLanguage } from '@/context/language-context';
 
 const iconMap: { [key: string]: React.ElementType } = {
   ShieldCheck,
@@ -10,9 +9,12 @@ const iconMap: { [key: string]: React.ElementType } = {
   LifeBuoy,
 };
 
-const { title, features } = siteContent.securityAndPrivacy;
-
 export function SecurityPrivacy() {
+  const { content: siteContent } = useLanguage();
+  if (!siteContent) return null;
+
+  const { title, features } = siteContent.securityAndPrivacy;
+
   return (
     <section className="bg-background py-12 md:pt-12 md:pb-20">
       <div className="container mx-auto px-4 md:px-6">
@@ -20,7 +22,7 @@ export function SecurityPrivacy() {
           {title}
         </h2>
         <div className="grid grid-cols-1 gap-8 text-center md:grid-cols-3">
-          {features.map((feature, index) => {
+          {features.map((feature: any, index: number) => {
             const Icon = iconMap[feature.icon];
             return (
               <div

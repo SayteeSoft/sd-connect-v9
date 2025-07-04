@@ -1,8 +1,7 @@
-
 'use client';
 
 import { CakeSlice, Users, HeartHandshake } from 'lucide-react';
-import siteContent from '@/lib/site-content.json';
+import { useLanguage } from '@/context/language-context';
 
 const iconMap: { [key: string]: React.ElementType } = {
   CakeSlice,
@@ -10,9 +9,12 @@ const iconMap: { [key: string]: React.ElementType } = {
   HeartHandshake,
 };
 
-const { title, stats } = siteContent.byTheNumbers;
-
 export function ByTheNumbers() {
+  const { content: siteContent } = useLanguage();
+  if (!siteContent) return null;
+
+  const { title, stats } = siteContent.byTheNumbers;
+
   return (
     <section className="bg-secondary py-12 md:pt-12 md:pb-20">
       <div className="container mx-auto px-4 md:px-6">
@@ -20,7 +22,7 @@ export function ByTheNumbers() {
           {title}
         </h2>
         <div className="grid grid-cols-1 gap-8 text-center md:grid-cols-3">
-          {stats.map((stat, index) => {
+          {stats.map((stat: any, index: number) => {
             const Icon = iconMap[stat.icon];
             return (
               <div

@@ -1,4 +1,3 @@
-
 'use client';
 
 import { Header } from '@/components/layout/header';
@@ -12,14 +11,17 @@ import {
 import { Search } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { useState } from 'react';
-import siteContent from '@/lib/site-content.json';
-
-const glossaryTerms = siteContent.glossary;
+import { useLanguage } from '@/context/language-context';
 
 export default function GlossaryPage() {
     const [searchTerm, setSearchTerm] = useState('');
+    const { content: siteContent } = useLanguage();
+    
+    if (!siteContent) return null; // or loading state
 
-    const filteredTerms = glossaryTerms.filter(item => 
+    const glossaryTerms = siteContent.glossary;
+
+    const filteredTerms = glossaryTerms.filter((item: any) => 
         item.term.toLowerCase().includes(searchTerm.toLowerCase()) ||
         item.definition.toLowerCase().includes(searchTerm.toLowerCase())
     );
@@ -46,7 +48,7 @@ export default function GlossaryPage() {
                 />
             </div>
             <Accordion type="single" collapsible className="w-full">
-              {filteredTerms.map((item, index) => (
+              {filteredTerms.map((item: any, index: number) => (
                 <AccordionItem key={index} value={`item-${index}`}>
                   <AccordionTrigger className="text-lg font-semibold hover:no-underline">
                     {item.term}

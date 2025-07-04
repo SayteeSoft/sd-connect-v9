@@ -1,4 +1,3 @@
-
 'use client';
 
 import { Header } from '@/components/layout/header';
@@ -12,14 +11,17 @@ import {
 import { Search } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { useState } from 'react';
-import siteContent from '@/lib/site-content.json';
-
-const faqItems = siteContent.faqs;
+import { useLanguage } from '@/context/language-context';
 
 export default function FaqsPage() {
     const [searchTerm, setSearchTerm] = useState('');
+    const { content: siteContent } = useLanguage();
 
-    const filteredFaqs = faqItems.filter(item =>
+    if (!siteContent) return null; // or loading state
+
+    const faqItems = siteContent.faqs;
+
+    const filteredFaqs = faqItems.filter((item: any) =>
         item.question.toLowerCase().includes(searchTerm.toLowerCase()) ||
         item.answer.toLowerCase().includes(searchTerm.toLowerCase())
     );
@@ -46,7 +48,7 @@ export default function FaqsPage() {
                 />
             </div>
             <Accordion type="single" collapsible className="w-full">
-              {filteredFaqs.map((item, index) => (
+              {filteredFaqs.map((item: any, index: number) => (
                 <AccordionItem key={index} value={`item-${index}`}>
                   <AccordionTrigger className="text-lg font-semibold text-left hover:no-underline">
                     {item.question}

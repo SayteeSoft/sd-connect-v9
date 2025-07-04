@@ -1,10 +1,12 @@
-
 'use client';
-import siteContent from '@/lib/site-content.json';
-
-const { title, paragraph } = siteContent.whatIsSugarRelationship;
+import { useLanguage } from '@/context/language-context';
 
 export function WhatIsSugarRelationship() {
+  const { content: siteContent } = useLanguage();
+  if (!siteContent) return null;
+
+  const { title, paragraph } = siteContent.whatIsSugarRelationship;
+
   return (
     <section className="bg-background py-12 md:pt-12 md:pb-20">
       <div className="container mx-auto px-4 md:px-6">
