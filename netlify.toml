@@ -3,12 +3,6 @@
   command = "npm run build"
   publish = ".next"
 
-[dev]
-  command = "next dev"
-  targetPort = 3000
-  port = 9002
-  publish = ".next"
-
 [functions]
   directory = "netlify/functions"
   node_bundler = "esbuild"
