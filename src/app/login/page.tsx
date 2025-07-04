@@ -1,4 +1,3 @@
-
 'use client';
 
 import { useState, useEffect } from "react";
@@ -21,8 +20,8 @@ import { useAuth } from "@/hooks/use-auth";
 
 
 export default function LoginPage() {
-  const [email, setEmail] = useState("saytee.software@gmail.com");
-  const [password, setPassword] = useState("12345");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const router = useRouter();
   const { login, isLoggedIn, isLoading } = useAuth();
@@ -89,7 +88,7 @@ export default function LoginPage() {
                 <Input
                   id="email"
                   type="email"
-                  placeholder="saytee.software@gmail.com"
+                  placeholder="you@example.com"
                   required
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
@@ -103,7 +102,7 @@ export default function LoginPage() {
                   required 
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  placeholder="12345"
+                  placeholder="••••••••"
                 />
               </div>
               <Button type="submit" className="w-full" disabled={isSubmitting}>
