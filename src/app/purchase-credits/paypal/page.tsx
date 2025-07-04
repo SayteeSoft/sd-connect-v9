@@ -163,6 +163,7 @@ function PayPalPaymentContent() {
                                 color: resolvedTheme === 'dark' ? 'silver' : 'gold' 
                             }}
                             key={resolvedTheme}
+                            forceReRender={[resolvedTheme]}
                             createOrder={createOrder}
                             onApprove={onApprove}
                             onError={onError}
