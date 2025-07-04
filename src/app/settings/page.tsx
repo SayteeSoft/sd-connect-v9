@@ -57,7 +57,7 @@ export default function SettingsPage() {
   const router = useRouter();
   const { toast } = useToast();
   const { user: profile, isLoading, isLoggedIn, logout } = useAuth();
-  const { language, setLanguage, isTranslating } = useLanguage();
+  const { language, setLanguage } = useLanguage();
   
   const [isSubmittingProfile, setIsSubmittingProfile] = useState(false);
   const [isSubmittingPassword, setIsSubmittingPassword] = useState(false);
@@ -144,8 +144,8 @@ export default function SettingsPage() {
     setIsSubmittingPassword(false);
   };
   
-  const handleLanguageSave = async () => {
-    const success = await setLanguage(pendingLanguage);
+  const handleLanguageSave = () => {
+    const success = setLanguage(pendingLanguage);
     if (success) {
         toast({
             title: "Language Saved",
@@ -154,8 +154,8 @@ export default function SettingsPage() {
     } else {
         toast({
             variant: "destructive",
-            title: "Translation Failed",
-            description: "Could not translate the content. Reverting to English.",
+            title: "Error",
+            description: "Could not set the selected language.",
         });
     }
   };
@@ -274,8 +274,7 @@ export default function SettingsPage() {
                         </SelectContent>
                     </Select>
                 </div>
-                <Button onClick={handleLanguageSave} disabled={isTranslating}>
-                    {isTranslating && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                <Button onClick={handleLanguageSave}>
                     Save Language
                 </Button>
             </CardContent>
