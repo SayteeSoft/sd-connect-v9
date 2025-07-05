@@ -132,7 +132,7 @@ export const featuredProfiles: Profile[] = [
     email: 'kateryna@gmail.com',
     password: 'password123',
     age: 22,
-    location: 'Italy, IT',
+    location: 'Rome, IT',
     imageUrl: '/default_Profiles/Kateryna_Gemini_Generated_Image(small)-001.jpg',
     hint: 'woman graduate city',
     role: 'baby',

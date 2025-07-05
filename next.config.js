@@ -23,7 +23,7 @@ const nextConfig = {
     return [
       {
         source: '/.netlify/functions/:path*',
-        destination: 'http://localhost:9999/.netlify/functions/:path*',
+        destination: 'http://localhost:9998/.netlify/functions/:path*',
       },
     ];
   },
