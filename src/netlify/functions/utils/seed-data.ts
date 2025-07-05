@@ -263,9 +263,9 @@ export const featuredProfiles: Profile[] = [
     wants: ['Long-term', 'Friendship', 'Mentorship'],
     interests: ['Reading', 'Cooking', 'Art', 'Travel'],
     gallery: [
-      '//default_Profiles/Vansessa_Gemini_Generated_Image(small)-002.jpg',
-      'Vansessa_Gemini_Generated_Image(small)-003.jpg',
-      'Vansessa_Gemini_Generated_Image(small)-004.jpg'
+      '/default_Profiles/Vansessa_Gemini_Generated_Image(small)-002.jpg',
+      '/default_Profiles/Vansessa_Gemini_Generated_Image(small)-003.jpg',
+      '/default_Profiles/Vansessa_Gemini_Generated_Image(small)-004.jpg'
     ],
     attributes: {
       'Height': "5'4\"",
