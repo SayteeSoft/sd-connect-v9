@@ -1,22 +1,13 @@
-
 'use client';
 
-import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 import { Button } from "@/components/ui/button";
 import { useAuth } from '@/hooks/use-auth';
 import { Heart } from "lucide-react";
 
 export function Hero() {
   const { isLoggedIn } = useAuth();
-  const router = useRouter();
-
-  const handleButtonClick = () => {
-    if (isLoggedIn) {
-      router.push('/matches');
-    } else {
-      router.push('/signup');
-    }
-  };
+  const destination = isLoggedIn ? '/matches' : '/signup';
 
   return (
     <section className="relative h-[664px] w-full bg-hero-bg bg-cover bg-center md:bg-fixed text-white">
@@ -30,27 +21,31 @@ export function Hero() {
           An exclusive platform for ambitious and attractive individuals
         </p>
         <div className="flex flex-col items-center space-y-4 sm:flex-row sm:space-x-4 sm:space-y-0">
-          <Button
-            onClick={handleButtonClick}
-            size="lg"
-            variant="secondary"
-            className="w-52 dark:bg-white dark:text-black dark:hover:bg-gray-200"
-          >
-            I'm a Sugar Baby
-          </Button>
-          <Button
-            onClick={handleButtonClick}
-            size="lg"
-            variant="secondary"
-            className="w-52 dark:bg-white dark:text-black dark:hover:bg-gray-200"
-          >
-            I'm a Sugar Daddy
-          </Button>
+          <Link href={destination}>
+            <Button
+              size="lg"
+              variant="secondary"
+              className="w-52 dark:bg-white dark:text-black dark:hover:bg-gray-200"
+            >
+              I'm a Sugar Baby
+            </Button>
+          </Link>
+          <Link href={destination}>
+            <Button
+              size="lg"
+              variant="secondary"
+              className="w-52 dark:bg-white dark:text-black dark:hover:bg-gray-200"
+            >
+              I'm a Sugar Daddy
+            </Button>
+          </Link>
         </div>
-        <Button onClick={handleButtonClick} size="lg" className="w-full max-w-xs text-lg">
-          <Heart className="mr-2 h-5 w-5" />
-          Find Your Match
-        </Button>
+        <Link href={destination}>
+          <Button size="lg" className="w-full max-w-xs text-lg">
+            <Heart className="mr-2 h-5 w-5" />
+            Find Your Match
+          </Button>
+        </Link>
       </div>
     </section>
   );

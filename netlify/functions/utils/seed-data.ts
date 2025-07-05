@@ -45,7 +45,7 @@ export const interestsOptions = [
 ];
 
 export const bodyTypeOptions = ['Slim', 'Athletic', 'Average', 'Curvy', 'A few extra pounds'];
-export const ethnicityOptions = ["Black/African Descent", "North/African Descent", "East Asian", "South Asian", "Hispanic/Latino", "Middle Eastern", "Native American/Indigenous", "White"];
+export const ethnicityOptions = ["Black/African Descent", "North/African Descent", "East Asian", "South Asian", "Hispanic/Latino", "Middle Eastern", "Native American/Indigenous", "White/Caucasian"];
 export const hairColorOptions = ["Brown", "Black", "Blonde", "Chestnut", "Grey", "Auburn", "Red"];
 export const eyeColorOptions = ["Blue", "Brown", "Green", "Grey", "Hazel"];
 export const smokerDrinkerOptions = ['Yes', 'Socially', 'Sometimes', 'No'];
@@ -80,19 +80,18 @@ export const featuredProfiles: Profile[] = [
     wants: ['Mentorship', 'Discreet', 'Long-term', 'Travel Partner'],
     interests: ['Art', 'Travel', 'Fine Dining', 'Theatre', 'Wine Tasting'],
     gallery: [
-      'https://placehold.co/600x400.png',
-      'https://placehold.co/600x400.png',
+      ''
     ],
     attributes: {
-      'Height': "6'1\"",
+      'Height': "6'0\"",
       'Body Type': 'Athletic',
-      'Ethnicity': 'White',
-      'Hair Color': 'Brown',
-      'Eye Color': 'Blue',
+      'Ethnicity': 'Black/African Descent',
+      'Hair Color': 'Black',
+      'Eye Color': 'Brown',
       'Smoker': 'No',
       'Drinker': 'Socially',
       'Piercings': 'No',
-      'Tattoos': 'Yes',
+      'Tattoos': 'No',
     },
   },
   {
@@ -102,7 +101,7 @@ export const featuredProfiles: Profile[] = [
     password: 'password123',
     age: 24,
     location: 'London, UK',
-    imageUrl: 'https://placehold.co/601x601.png',
+    imageUrl: '/default_Profiles/Darianna_Gemini_Generated_Image(small)-001.jpg',
     hint: 'woman art studio',
     role: 'baby',
     online: true,
@@ -111,17 +110,16 @@ export const featuredProfiles: Profile[] = [
     wants: ['Mentorship', 'Travel Partner', 'Casual'],
     interests: ['Art', 'Travel', 'Fine Dining', 'Movies'],
     gallery: [
-      'https://placehold.co/600x400.png',
-      'https://placehold.co/600x400.png',
-      'https://placehold.co/600x400.png',
-      'https://placehold.co/600x400.png'
+      '/default_Profiles/Darianna_Gemini_Generated_Image(small)-002.jpg',
+      '/default_Profiles/Darianna_Gemini_Generated_Image(small)-003.jpg',
+      '/default_Profiles/Darianna_Gemini_Generated_Image(small)-004.jpg'
     ],
     attributes: {
       'Height': "5'5\"",
       'Body Type': 'Slim',
-      'Ethnicity': 'White',
-      'Hair Color': 'Blonde',
-      'Eye Color': 'Blue',
+      'Ethnicity': 'Hispanic/Latino',
+      'Hair Color': 'Black',
+      'Eye Color': 'Brown',
       'Smoker': 'No',
       'Drinker': 'Sometimes',
       'Piercings': 'No',
@@ -134,8 +132,8 @@ export const featuredProfiles: Profile[] = [
     email: 'kateryna@gmail.com',
     password: 'password123',
     age: 22,
-    location: 'Birmingham, UK',
-    imageUrl: 'https://placehold.co/602x602.png',
+    location: 'Italy, IT',
+    imageUrl: '/default_Profiles/Kateryna_Gemini_Generated_Image(small)-001.jpg',
     hint: 'woman graduate city',
     role: 'baby',
     online: true,
@@ -144,20 +142,19 @@ export const featuredProfiles: Profile[] = [
     wants: ['Networking', 'Mentorship', 'Friendship'],
     interests: ['Music', 'Cooking', 'Fitness', 'Reading'],
     gallery: [
-      'https://placehold.co/600x400.png',
-      'https://placehold.co/600x400.png',
-      'https://placehold.co/600x400.png',
+      '/default_Profiles/Kateryna_Gemini_Generated_Image(small)-002.jpg',
+      '/default_Profiles/Kateryna_Gemini_Generated_Image(small)-003.jpg'
     ],
     attributes: {
       'Height': "5'7\"",
-      'Body Type': 'Athletic',
-      'Ethnicity': 'White',
-      'Hair Color': 'Brown',
-      'Eye Color': 'Hazel',
+      'Body Type': 'Average',
+      'Ethnicity': 'Hispanic/Latino',
+      'Hair Color': 'Blonde',
+      'Eye Color': 'Blue',
       'Smoker': 'Socially',
       'Drinker': 'Socially',
-      'Piercings': 'Yes',
-      'Tattoos': 'Yes',
+      'Piercings': 'No',
+      'Tattoos': 'No',
     },
   },
   {
@@ -167,7 +164,7 @@ export const featuredProfiles: Profile[] = [
     password: 'password123',
     age: 52,
     location: 'Glasgow, UK',
-    imageUrl: 'https://placehold.co/603x603.png',
+    imageUrl: '/default_Profiles/Male_Gemini_Generated_Image(small)-002.jpg',
     hint: 'portrait man',
     role: 'daddy',
     online: true,
@@ -176,10 +173,7 @@ export const featuredProfiles: Profile[] = [
     wants: ['Long-term', 'Travel Partner'],
     interests: ['Sports', 'Travel', 'Wine Tasting'],
     gallery: [
-      'https://placehold.co/600x400.png',
-      'https://placehold.co/600x400.png',
-      'https://placehold.co/600x400.png',
-      'https://placehold.co/600x400.png',
+      ''
     ],
     attributes: {
       'Height': "6'0\"",
@@ -200,7 +194,7 @@ export const featuredProfiles: Profile[] = [
     password: 'password123',
     age: 26,
     location: 'Liverpool, UK',
-    imageUrl: 'https://placehold.co/604x604.png',
+    imageUrl: '/default_Profiles/Male_Gemini_Generated_Image(small)-002.jpg',
     hint: 'woman fashion designer',
     role: 'baby',
     online: false,
@@ -209,8 +203,7 @@ export const featuredProfiles: Profile[] = [
     wants: ['Discreet', 'Casual', 'Travel Partner'],
     interests: ['Art', 'Theatre', 'Reading', 'Cooking'],
     gallery: [
-      'https://placehold.co/600x400.png',
-      'https://placehold.co/600x400.png'
+      ''
     ],
     attributes: {
       'Height': "5'8\"",
@@ -231,7 +224,7 @@ export const featuredProfiles: Profile[] = [
     password: 'password123',
     age: 38,
     location: 'Bristol, UK',
-    imageUrl: 'https://placehold.co/605x605.png',
+    imageUrl: '/default_Profiles/Male_Gemini_Generated_Image(small)-002.jpg',
     hint: 'portrait man',
     role: 'daddy',
     online: true,
@@ -240,7 +233,7 @@ export const featuredProfiles: Profile[] = [
     wants: ['Networking', 'No Strings Attached', 'Casual'],
     interests: ['Sports', 'Music', 'Movies', 'Reading'],
     gallery: [
-      'https://placehold.co/600x400.png'
+      ''
     ],
     attributes: {
       'Height': "5'11\"",
@@ -289,7 +282,7 @@ export const featuredProfiles: Profile[] = [
     password: 'password123',
     age: 49,
     location: 'Edinburgh, UK',
-    imageUrl: 'https://placehold.co/607x607.png',
+    imageUrl: '/default_Profiles/Male_Gemini_Generated_Image(small)-002.jpg',
     hint: 'portrait man',
     role: 'daddy',
     online: false,
@@ -298,9 +291,7 @@ export const featuredProfiles: Profile[] = [
     wants: ['Travel Partner', 'Discreet', 'Networking'],
     interests: ['Travel', 'Fine Dining', 'Theatre', 'Wine Tasting'],
     gallery: [
-      'https://placehold.co/600x400.png',
-      'https://placehold.co/600x400.png',
-      'https://placehold.co/600x400.png',
+      ''
     ],
     attributes: {
       'Height': "6'2\"",
@@ -352,7 +343,7 @@ export const featuredProfiles: Profile[] = [
     password: 'password123',
     age: 45,
     location: 'Cardiff, UK',
-    imageUrl: 'https://placehold.co/609x609.png',
+    imageUrl: '/default_Profiles/Male_Gemini_Generated_Image(small)-002.jpg',
     hint: 'man suit',
     role: 'daddy',
     online: true,
@@ -361,7 +352,7 @@ export const featuredProfiles: Profile[] = [
     wants: ['Long-term', 'Mentorship'],
     interests: ['Sports', 'Music', 'Wine Tasting', 'Reading'],
     gallery: [
-        'https://placehold.co/600x400.png'
+        ''
     ],
     attributes: {
       'Height': "5'10\"",
@@ -413,8 +404,8 @@ export const featuredProfiles: Profile[] = [
     email: 'george@gmail.com',
     password: 'password123',
     age: 55,
-    location: 'Southampton, UK',
-    imageUrl: 'https://placehold.co/611x611.png',
+    location: 'London, UK',
+    imageUrl: '/default_Profiles/Male_Gemini_Generated_Image(small)-002.jpg',
     hint: 'man outdoor',
     role: 'daddy',
     online: false,
@@ -423,8 +414,7 @@ export const featuredProfiles: Profile[] = [
     wants: ['Casual', 'Travel Partner', 'No Strings Attached'],
     interests: ['Sports', 'Travel', 'Fine Dining', 'Reading'],
     gallery: [
-      'https://placehold.co/600x400.png',
-      'https://placehold.co/600x400.png',
+      '',
     ],
     attributes: {
       'Height': "5'9\"",
@@ -443,9 +433,9 @@ export const featuredProfiles: Profile[] = [
     name: 'Larry',
     email: 'larry.saytee@email.com',
     password: 'password',
-    age: 50,
-    location: 'Manchester, UK',
-    imageUrl: 'https://placehold.co/612x612.png',
+    age: 49,
+    location: 'London, UK',
+    imageUrl: '/default_Profiles/Larry_IMG_4828(small)-001.jpg',
     hint: 'man portrait',
     role: 'daddy',
     online: false,
@@ -453,7 +443,9 @@ export const featuredProfiles: Profile[] = [
     bio: "Seasoned executive who enjoys mentoring and sharing life's experiences. Looking for a bright and engaging companion to enjoy fine dining and travel.",
     wants: ['Mentorship', 'Travel Partner'],
     interests: ['Fine Dining', 'Travel', 'Reading'],
-    gallery: [],
+    gallery: [
+      '/default_Profiles/Larry_IMG_4828(small)-002.jpg'
+    ],
     attributes: {
       'Height': "5'10\"",
       'Body Type': 'Average',
