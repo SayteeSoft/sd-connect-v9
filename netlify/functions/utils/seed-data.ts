@@ -193,8 +193,8 @@ export const featuredProfiles: Profile[] = [
     email: 'sofia@gmail.com',
     password: 'password123',
     age: 26,
-    location: 'Paris, FR',
-    imageUrl: '/default_Profiles/Male_Gemini_Generated_Image(small)-002.jpg',
+    location: 'Cartagena, CO',
+    imageUrl: '/default_Profiles/Sofia_Gemini_Generated_Image(small)-001.jpg',
     hint: 'woman fashion designer',
     role: 'baby',
     online: false,
@@ -203,7 +203,9 @@ export const featuredProfiles: Profile[] = [
     wants: ['Discreet', 'Casual', 'Travel Partner'],
     interests: ['Art', 'Theatre', 'Reading', 'Cooking'],
     gallery: [
-      ''
+      '/default_Profiles/Sofia_Gemini_Generated_Image(small)-002.jpg',
+      '/default_Profiles/Sofia_Gemini_Generated_Image(small)-003.jpg',
+      '/default_Profiles/Sofia_Gemini_Generated_Image(small)-004.jpg'
     ],
     attributes: {
       'Height': "5'8\"",
@@ -213,7 +215,7 @@ export const featuredProfiles: Profile[] = [
       'Eye Color': 'Brown',
       'Smoker': 'No',
       'Drinker': 'No',
-      'Piercings': 'Yes',
+      'Piercings': 'No',
       'Tattoos': 'No',
     },
   },
@@ -250,7 +252,7 @@ export const featuredProfiles: Profile[] = [
   {
     id: 7,
     name: 'Vanessa',
-    email: 'Vanessa@gmail.com',
+    email: 'vanessa@gmail.com',
     password: 'password123',
     age: 21,
     location: 'Franfurt, DE',
@@ -263,9 +265,8 @@ export const featuredProfiles: Profile[] = [
     wants: ['Long-term', 'Friendship', 'Mentorship'],
     interests: ['Reading', 'Cooking', 'Art', 'Travel'],
     gallery: [
-      '//default_Profiles/Vansessa_Gemini_Generated_Image(small)-002.jpg',
-      'Vansessa_Gemini_Generated_Image(small)-003.jpg',
-      'Vansessa_Gemini_Generated_Image(small)-004.jpg'
+      '/default_Profiles/Vansessa_Gemini_Generated_Image(small)-002.jpg',
+      '/default_Profiles/Vansessa_Gemini_Generated_Image(small)-003.jpg'
     ],
     attributes: {
       'Height': "5'4\"",
@@ -285,7 +286,7 @@ export const featuredProfiles: Profile[] = [
     email: 'richard@gmail.com',
     password: 'password123',
     age: 49,
-    location: 'Edinburgh, UK',
+    location: 'London, UK',
     imageUrl: '/default_Profiles/Male_Gemini_Generated_Image(small)-002.jpg',
     hint: 'portrait man',
     role: 'daddy',
@@ -316,7 +317,7 @@ export const featuredProfiles: Profile[] = [
     password: 'password123',
     age: 23,
     location: 'Sheffield, UK',
-    imageUrl: 'https://placehold.co/608x608.png',
+    imageUrl: '/default_Profiles/Female_Gemini_Generated_Image(small)-001.jpg',
     hint: 'woman nature',
     role: 'baby',
     online: false,
@@ -325,8 +326,7 @@ export const featuredProfiles: Profile[] = [
     wants: ['Friendship', 'Casual', 'Long-term'],
     interests: ['Fitness', 'Cooking', 'Travel', 'Reading'],
     gallery: [
-      'https://placehold.co/600x400.png',
-      'https://placehold.co/600x400.png',
+      ''
     ],
     attributes: {
       'Height': "5'6\"",
@@ -373,7 +373,7 @@ export const featuredProfiles: Profile[] = [
   {
     id: 11,
     name: 'Cecilia',
-    email: 'Cecilia@gmail.com',
+    email: 'cecilia@gmail.com',
     password: 'password123',
     age: 25,
     location: 'Rio, Brazil',
