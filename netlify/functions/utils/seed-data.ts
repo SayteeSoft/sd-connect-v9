@@ -71,7 +71,7 @@ export const featuredProfiles: Profile[] = [
     password: '12345',
     age: 49,
     location: 'London, UK',
-    imageUrl: 'https://placehold.co/600x600.png',
+    imageUrl: '/default_Profiles/Admin_Gemini_Generated_Image(small)-001.jpg',
     hint: 'portrait man',
     role: 'daddy',
     online: false,
