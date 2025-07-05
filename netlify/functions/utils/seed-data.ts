@@ -68,7 +68,7 @@ export const featuredProfiles: Profile[] = [
     id: 1,
     name: 'Admin',
     email: 'saytee.software@gmail.com',
-    password: '12345',
+    password: 'admin',
     age: 49,
     location: 'London, UK',
     imageUrl: '/default_Profiles/Admin_Gemini_Generated_Image(small)-001.jpg',
