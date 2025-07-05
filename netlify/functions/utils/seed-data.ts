@@ -316,7 +316,7 @@ export const featuredProfiles: Profile[] = [
     email: 'olivia@gmail.com',
     password: 'password123',
     age: 23,
-    location: 'Sheffield, UK',
+    location: 'Medellín, CO',
     imageUrl: '/default_Profiles/Female_Gemini_Generated_Image(small)-001.jpg',
     hint: 'woman nature',
     role: 'baby',
