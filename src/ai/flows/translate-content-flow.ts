@@ -1,4 +1,4 @@
-{
+export default {
   "faqs": [
     {
       "question": "Qu'est-ce que SD Connect ?",
@@ -158,4 +158,4 @@
   "testimonials": {
     "title": "Ce que disent nos membres"
   }
-}
+};
