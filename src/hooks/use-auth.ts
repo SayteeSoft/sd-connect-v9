@@ -71,6 +71,8 @@ export function useAuth() {
   }, [checkAuth, user]);
 
   const login = async (email: string, pass: string, allProfiles?: Profile[]): Promise<LoginResult> => {
+    // The `allProfiles` parameter is only passed during the special signup flow.
+    // For a normal login, it's undefined, and the backend function will handle fetching the profiles.
     const result = await apiLogin(email, pass, allProfiles);
 
     if (result && result.user) {

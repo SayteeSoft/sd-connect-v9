@@ -11,7 +11,7 @@ export const handler: Handler = async (event: HandlerEvent) => {
   }
 
   try {
-    const { email, password } = JSON.parse(event.body || '{}');
+    const { email, password, allProfiles } = JSON.parse(event.body || '{}');
 
     if (!email || !password) {
       return {
@@ -20,7 +20,10 @@ export const handler: Handler = async (event: HandlerEvent) => {
       };
     }
     
-    const profilesToSearch = await getProfilesFromStore();
+    // Use the profile list from the request body if it exists (for post-signup login),
+    // otherwise, fetch it from the store (for normal login).
+    // This makes the login process faster and more reliable.
+    const profilesToSearch = allProfiles || await getProfilesFromStore();
 
     const foundUser = profilesToSearch.find(
       (p: Profile) => p.email && p.email.toLowerCase() === email.toLowerCase() && p.password === password
