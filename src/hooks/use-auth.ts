@@ -5,7 +5,7 @@ import { useState, useEffect, useCallback } from 'react';
 import type { Profile } from '@/lib/data';
 import { getProfile, apiLogin, createProfile, updateCredits, getCredits } from '@/lib/data';
 
-type SignupResult = { user?: Profile; allProfiles?: Profile[]; error?: string };
+type SignupResult = { user?: Profile; error?: string };
 type LoginResult = Profile | null;
 
 export function useAuth() {
@@ -70,8 +70,8 @@ export function useAuth() {
     };
   }, [checkAuth, user]);
 
-  const login = async (email: string, pass: string, allProfiles?: Profile[]): Promise<LoginResult> => {
-    const result = await apiLogin(email, pass, allProfiles);
+  const login = async (email: string, pass: string): Promise<LoginResult> => {
+    const result = await apiLogin(email, pass);
 
     if (result && result.user) {
       localStorage.setItem('loggedInUserId', result.user.id.toString());
@@ -89,16 +89,17 @@ export function useAuth() {
   const signup = async (email: string, password: string, role: 'baby' | 'daddy'): Promise<SignupResult> => {
     const result = await createProfile(email, password, role);
 
-    if (result.error || !result.allProfiles) {
-      return { error: result.error || 'Failed to retrieve updated profile list after signup.' };
+    if (result.error || !result.user) {
+      return { error: result.error || 'Failed to create user.' };
     }
     
-    const loggedInUser = await login(email, password, result.allProfiles);
+    // After creating the profile, log the user in.
+    const loggedInUser = await login(email, password);
     if (loggedInUser) {
-      return { user: loggedInUser, allProfiles: result.allProfiles };
+      return { user: loggedInUser };
     }
     
-    return { error: 'Failed to log in after signing up.' };
+    return { error: 'Failed to log in after signing up. Please try logging in manually.' };
   };
 
   const spendCredits = async (amount: number) => {
