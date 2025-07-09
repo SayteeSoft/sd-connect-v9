@@ -1,14 +1,10 @@
 
 import type {Metadata} from 'next';
-import { Toaster } from "@/components/ui/toaster";
 import './globals.css';
 import { Alegreya, Inter } from 'next/font/google';
 import { cn } from '@/lib/utils';
-import { ThemeProvider } from '@/components/theme-provider';
-import { Footer } from '@/components/layout/footer';
-import { CookieBanner } from '@/components/cookie-banner';
-import { LanguageProvider } from '@/context/language-context';
-import { Simulators } from '@/components/simulators';
+import { ClientProviders } from '@/components/client-providers';
+
 
 export const metadata: Metadata = {
   title: 'SD Connect',
@@ -50,21 +46,9 @@ export default function RootLayout({
           fontAlegreya.variable
         )}
       >
-        <ThemeProvider
-          attribute="class"
-          defaultTheme="light"
-          disableTransitionOnChange
-        >
-          <LanguageProvider>
-            <div className="flex flex-col min-h-screen bg-background">
-              {children}
-              <Footer />
-            </div>
-            <Toaster />
-            <CookieBanner />
-            <Simulators />
-          </LanguageProvider>
-        </ThemeProvider>
+        <ClientProviders>
+            {children}
+        </ClientProviders>
       </body>
     </html>
   );
