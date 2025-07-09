@@ -123,9 +123,9 @@ export async function getProfile(id: number): Promise<Profile | undefined> {
  * @param {string} email - The new user's email.
  * @param {string} password - The new user's password.
  * @param {'baby' | 'daddy'} role - The new user's role.
- * @returns {Promise<Profile | { error: string }>} The new profile object or an error object.
+ * @returns {Promise<{ user: Profile, allProfiles: Profile[] } | { error: string }>} The new profile object and full profile list, or an error object.
  */
-export async function createProfile(email: string, password: string, role: 'baby' | 'daddy'): Promise<Profile | { error: string }> {
+export async function createProfile(email: string, password: string, role: 'baby' | 'daddy'): Promise<{ user: Profile, allProfiles: Profile[] } | { error: string }> {
   try {
     const response = await fetch(`${API_BASE_PATH}/profiles`, {
       method: 'POST',
@@ -226,12 +226,12 @@ export async function saveMessage(conversationId: number, message: Message): Pro
  * @param {string} password 
  * @returns {Promise<{ user: Profile } | null>} The user object or null.
  */
-export async function apiLogin(email: string, password: string): Promise<{ user: Profile } | null> {
+export async function apiLogin(email: string, password: string, allProfiles?: Profile[]): Promise<{ user: Profile } | null> {
     try {
         const response = await fetch(`${API_BASE_PATH}/auth`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ email, password }),
+            body: JSON.stringify({ email, password, allProfiles }),
         });
         if (!response.ok) return null;
         return await response.json();

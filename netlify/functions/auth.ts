@@ -11,7 +11,7 @@ export const handler: Handler = async (event: HandlerEvent) => {
   }
 
   try {
-    const { email, password } = JSON.parse(event.body || '{}');
+    const { email, password, allProfiles } = JSON.parse(event.body || '{}');
 
     if (!email || !password) {
       return {
@@ -19,9 +19,12 @@ export const handler: Handler = async (event: HandlerEvent) => {
         body: JSON.stringify({ error: 'Email and password are required' }),
       };
     }
+    
+    // If a fresh list of profiles is passed (e.g., right after signup), use it.
+    // Otherwise, fetch from the store.
+    const profilesToSearch = allProfiles || await getProfilesFromStore();
 
-    const profiles = await getProfilesFromStore();
-    const foundUser = profiles.find(
+    const foundUser = profilesToSearch.find(
       (p: Profile) => p.email && p.email.toLowerCase() === email.toLowerCase() && p.password === password
     );
 
