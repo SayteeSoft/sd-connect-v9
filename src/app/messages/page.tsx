@@ -5,7 +5,7 @@ import { useState, useEffect, Suspense, useCallback } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { Header } from '@/components/layout/header';
 import { ChatClient } from './chat-client';
-import { getConversations, getProfiles, type Conversation, type Profile, type ConversationWithParticipantId } from '@/lib/data';
+import { getConversations, getProfile, type Conversation, type Profile, type ConversationWithParticipantId } from '@/lib/data';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useAuth } from '@/hooks/use-auth';
 
@@ -61,39 +61,25 @@ function MessagesContent() {
 
     const fetchAndJoinData = useCallback(async () => {
         if (!isAuthLoading && currentUserProfile) {
-            // Fetch both conversations and profiles in parallel
-            const [rawConversations, profiles] = await Promise.all([
-                getConversations(),
-                getProfiles()
-            ]);
+            
+            // This now fetches conversations with profiles already joined on the backend.
+            let joinedConversations: Conversation[] = await getConversations();
 
-            const profileMap = new Map(profiles.map(p => [p.id, p]));
-
-            let joinedConversations: Conversation[] = rawConversations
-                .map((rawConvo: ConversationWithParticipantId) => {
-                    const participant = profileMap.get(rawConvo.participantId);
-                    if (!participant) return null;
-
-                    // Filter out conversations with users of the same role
-                    if (participant.role === currentUserProfile.role) return null;
-
-                    return {
-                        id: rawConvo.id,
-                        participant,
-                        messages: rawConvo.messages,
-                        unreadCount: rawConvo.unreadCount,
-                    };
-                })
-                .filter((c): c is Conversation => c !== null)
-                .sort((a, b) => { // Sort by most recent message
-                    const lastMessageA = new Date(a.messages[a.messages.length - 1].timestamp).getTime();
-                    const lastMessageB = new Date(b.messages[b.messages.length - 1].timestamp).getTime();
-                    return lastMessageB - lastMessageA;
-                });
+            // Filter out conversations with users of the same role
+            joinedConversations = joinedConversations.filter(convo => 
+                convo.participant.role !== currentUserProfile.role
+            );
+            
+            // Sort by most recent message
+            joinedConversations.sort((a, b) => {
+                const lastMessageA = a.messages.length > 0 ? new Date(a.messages[a.messages.length - 1].timestamp).getTime() : 0;
+                const lastMessageB = b.messages.length > 0 ? new Date(b.messages[b.messages.length - 1].timestamp).getTime() : 0;
+                return lastMessageB - lastMessageA;
+            });
             
             // If a chat is opened via URL and doesn't exist, create a placeholder
             if (initialSelectedProfileId && !joinedConversations.some(c => c.participant.id === initialSelectedProfileId)) {
-                const participantProfile = profileMap.get(initialSelectedProfileId);
+                const participantProfile = await getProfile(initialSelectedProfileId);
                 if (participantProfile) {
                     const newConversation: Conversation = {
                         id: initialSelectedProfileId * -1, // Use a negative, unique ID for placeholders

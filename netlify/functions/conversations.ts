@@ -1,18 +1,52 @@
+
 import type { Handler, HandlerEvent } from '@netlify/functions';
-import { getConversationsFromStore, saveConversationsToStore } from './utils/store';
-import type { Message } from './utils/seed-data';
+import { getConversationsFromStore, saveConversationsToStore, getProfilesFromStore } from './utils/store';
+import type { Message, Profile, Conversation } from './utils/seed-data';
+
+// The raw conversation format stored in the database
+type RawConversation = {
+    id: number;
+    participantId: number;
+    messages: Message[];
+    unreadCount: number;
+};
 
 export const handler: Handler = async (event: HandlerEvent) => {
     if (event.httpMethod === 'GET') {
         try {
-            // Return raw conversation data directly.
-            // The client will be responsible for joining profile data.
-            const rawConversations = await getConversationsFromStore();
+            // Fetch both conversations and profiles
+            const [rawConversations, profiles] = await Promise.all([
+                getConversationsFromStore(),
+                getProfilesFromStore()
+            ]);
+
+            // Create a map for quick profile lookups
+            const profileMap = new Map(profiles.map((p: Profile) => [p.id, p]));
+
+            // Join the participant profile into each conversation
+            const joinedConversations: Conversation[] = rawConversations
+                .map((rawConvo: RawConversation) => {
+                    const participant = profileMap.get(rawConvo.participantId);
+                    if (!participant) return null; // Skip if participant not found
+
+                    // Remove password before sending to client
+                    const { password, ...participantToReturn } = participant;
+
+                    return {
+                        id: rawConvo.id,
+                        participant: participantToReturn,
+                        messages: rawConvo.messages,
+                        unreadCount: rawConvo.unreadCount,
+                    };
+                })
+                .filter((c): c is Conversation => c !== null); // Filter out any nulls
+
             return {
                 statusCode: 200,
-                body: JSON.stringify(rawConversations),
+                body: JSON.stringify(joinedConversations),
             };
         } catch (error) {
+            console.error('Error fetching joined conversations:', error);
             return { statusCode: 500, body: JSON.stringify({ error: 'Failed to fetch conversations' }) };
         }
     }

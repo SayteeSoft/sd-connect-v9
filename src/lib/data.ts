@@ -1,5 +1,4 @@
 
-
 // This file now acts as a client-side SDK for interacting with the backend API.
 // It no longer contains direct data or localStorage logic.
 
@@ -187,10 +186,10 @@ export async function deleteProfile(profileId: number): Promise<boolean> {
 }
 
 /**
- * Fetches all conversations from the backend.
- * @returns {Promise<ConversationWithParticipantId[]>} An array of conversation objects with participant IDs.
+ * Fetches all conversations with participant data pre-joined from the backend.
+ * @returns {Promise<Conversation[]>} An array of fully-formed conversation objects.
  */
-export async function getConversations(): Promise<ConversationWithParticipantId[]> {
+export async function getConversations(): Promise<Conversation[]> {
     try {
         const response = await fetch(`${API_BASE_PATH}/conversations?_=${new Date().getTime()}`);
         if (!response.ok) throw new Error('Failed to fetch conversations');
