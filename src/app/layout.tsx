@@ -8,6 +8,7 @@ import { ThemeProvider } from '@/components/theme-provider';
 import { Footer } from '@/components/layout/footer';
 import { CookieBanner } from '@/components/cookie-banner';
 import { LanguageProvider } from '@/context/language-context';
+import { Simulators } from '@/components/simulators';
 
 export const metadata: Metadata = {
   title: 'SD Connect',
@@ -61,6 +62,7 @@ export default function RootLayout({
             </div>
             <Toaster />
             <CookieBanner />
+            <Simulators />
           </LanguageProvider>
         </ThemeProvider>
       </body>
