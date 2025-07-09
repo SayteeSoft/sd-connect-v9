@@ -6,7 +6,6 @@ import { Alegreya, Inter } from 'next/font/google';
 import { cn } from '@/lib/utils';
 import { ThemeProvider } from '@/components/theme-provider';
 import { Footer } from '@/components/layout/footer';
-import { ClientOnly } from '@/components/client-only';
 import { CookieBanner } from '@/components/cookie-banner';
 import { LanguageProvider } from '@/context/language-context';
 
@@ -60,10 +59,8 @@ export default function RootLayout({
               {children}
               <Footer />
             </div>
-            <ClientOnly>
-              <Toaster />
-              <CookieBanner />
-            </ClientOnly>
+            <Toaster />
+            <CookieBanner />
           </LanguageProvider>
         </ThemeProvider>
       </body>
