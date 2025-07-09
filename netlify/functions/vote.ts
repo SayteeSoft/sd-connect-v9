@@ -37,7 +37,7 @@ export const handler: Handler = async (event: HandlerEvent) => {
     // Add new vote
     targetProfile.votes.push({ voterId, choice });
 
-    // Increment count
+    // Increment count only if it's the first 'met' vote from anyone
     if (choice === 'met') {
       targetProfile.metCount = (targetProfile.metCount || 0) + 1;
     } else {

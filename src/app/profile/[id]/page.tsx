@@ -52,10 +52,11 @@ const GalleryModal = dynamic(() => import('@/components/gallery-modal').then(mod
   ),
 });
 
-const InteractionCard = ({ profile, onVote, hasVoted }: {
+const InteractionCard = ({ profile, onVote, hasVoted, hasMet }: {
     profile: Profile;
     onVote: (choice: 'met' | 'notMet') => void;
     hasVoted: boolean;
+    hasMet: boolean;
 }) => (
   <Card>
     <CardHeader>
@@ -67,7 +68,7 @@ const InteractionCard = ({ profile, onVote, hasVoted }: {
         We Met
         <Badge variant="secondary" className="absolute -top-2 -right-2">{profile.metCount || 0}</Badge>
       </Button>
-      <Button className="flex-1 relative" size="lg" variant="outline" disabled={hasVoted || (profile.metCount || 0) > 0} onClick={() => onVote('notMet')}>
+      <Button className="flex-1 relative" size="lg" variant="outline" disabled={hasVoted || hasMet || (profile.metCount || 0) > 0} onClick={() => onVote('notMet')}>
         Didn't Meet
         <Badge variant="outline" className="absolute -top-2 -right-2">{profile.notMetCount || 0}</Badge>
       </Button>
@@ -243,8 +244,6 @@ const ProfileView = ({ profile, onEdit, isOwnProfile, canEdit, onMessage, onFavo
         </CardContent>
       </Card>
       
-      {!isOwnProfile && <InteractionCard profile={profile} onVote={onVote} hasVoted={hasVoted} />}
-
       <Card>
         <CardHeader>
           <CardTitle>Wants & Interests</CardTitle>
@@ -284,6 +283,8 @@ const ProfileView = ({ profile, onEdit, isOwnProfile, canEdit, onMessage, onFavo
           )}
         </CardContent>
       </Card>
+      
+      {!isOwnProfile && <InteractionCard profile={profile} onVote={onVote} hasVoted={hasVoted} hasMet={hasMet} />}
 
       <Card>
         <CardHeader>
