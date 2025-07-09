@@ -87,15 +87,16 @@ export function useAuth() {
   };
 
   const signup = async (email: string, password: string, role: 'baby' | 'daddy'): Promise<SignupResult> => {
-    const result = await createProfile(email, password, role);
+    const creationResult = await createProfile(email, password, role);
 
-    if (result.error || !result.user) {
-      return { error: result.error || 'Failed to create user.' };
+    if (creationResult.error || !creationResult.user) {
+        return { error: creationResult.error || 'Failed to create user.' };
     }
     
+    // After successful creation, try to log the user in.
     const loggedInUser = await login(email, password);
     if (loggedInUser) {
-      return { user: loggedInUser };
+        return { user: loggedInUser };
     }
     
     return { error: 'Failed to log in after signing up. Please try logging in manually.' };

@@ -21,7 +21,7 @@ export const handler: Handler = async (event: HandlerEvent) => {
       };
     }
     
-    // Always fetch the latest profiles from the store to ensure reliability for all users.
+    // Always fetch the latest profiles from the store to ensure reliability.
     const profilesToSearch = await getProfilesFromStore();
 
     const foundUser = profilesToSearch.find(
