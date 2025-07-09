@@ -1,4 +1,3 @@
-
 // This file now acts as a client-side SDK for interacting with the backend API.
 // It no longer contains direct data or localStorage logic.
 
@@ -123,9 +122,9 @@ export async function getProfile(id: number): Promise<Profile | undefined> {
  * @param {string} email - The new user's email.
  * @param {string} password - The new user's password.
  * @param {'baby' | 'daddy'} role - The new user's role.
- * @returns {Promise<{ user: Profile } | { error: string }>} The new profile object or an error object.
+ * @returns {Promise<{ user: Profile, profiles: Profile[] } | { error: string }>} The new profile, all profiles, or an error.
  */
-export async function createProfile(email: string, password: string, role: 'baby' | 'daddy'): Promise<{ user: Profile } | { error: string }> {
+export async function createProfile(email: string, password: string, role: 'baby' | 'daddy'): Promise<{ user: Profile, profiles: Profile[] } | { error: string }> {
   try {
     const response = await fetch(`${API_BASE_PATH}/profiles`, {
       method: 'POST',
@@ -224,14 +223,15 @@ export async function saveMessage(conversationId: number, message: Message): Pro
  * Handles user login via the backend API.
  * @param {string} email 
  * @param {string} password 
+ * @param {Profile[]} [profiles] - Optional list of profiles to search within
  * @returns {Promise<{ user: Profile } | null>} The user object or null.
  */
-export async function apiLogin(email: string, password: string): Promise<{ user: Profile } | null> {
+export async function apiLogin(email: string, password: string, profiles?: Profile[]): Promise<{ user: Profile } | null> {
     try {
         const response = await fetch(`${API_BASE_PATH}/auth`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ email, password }),
+            body: JSON.stringify({ email, password, profiles }),
         });
         if (!response.ok) return null;
         return await response.json();

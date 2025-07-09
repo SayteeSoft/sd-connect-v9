@@ -1,4 +1,3 @@
-
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
@@ -73,8 +72,8 @@ export function useAuth() {
     };
   }, [checkAuth]);
 
-  const login = async (email: string, pass: string): Promise<LoginResult> => {
-    const result = await apiLogin(email, pass);
+  const login = async (email: string, pass: string, profiles?: Profile[]): Promise<LoginResult> => {
+    const result = await apiLogin(email, pass, profiles);
 
     if (result && result.user) {
       localStorage.setItem('loggedInUserId', result.user.id.toString());
@@ -92,12 +91,12 @@ export function useAuth() {
   const signup = async (email: string, password: string, role: 'baby' | 'daddy'): Promise<SignupResult> => {
     const creationResult = await createProfile(email, password, role);
 
-    if (creationResult.error || !creationResult.user) {
+    if (creationResult.error || !creationResult.user || !creationResult.profiles) {
         return { error: creationResult.error || 'Failed to create user.' };
     }
     
-    // After successful creation, log the user in.
-    const loggedInUser = await login(email, password);
+    // After successful creation, log the user in using the fresh user list
+    const loggedInUser = await login(email, password, creationResult.profiles);
     if (loggedInUser) {
         return { user: loggedInUser };
     }
