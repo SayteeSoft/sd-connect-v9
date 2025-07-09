@@ -1,3 +1,4 @@
+
 import type { Handler, HandlerEvent } from '@netlify/functions';
 import { getProfilesFromStore } from './utils/store';
 import type { Profile } from './utils/seed-data';

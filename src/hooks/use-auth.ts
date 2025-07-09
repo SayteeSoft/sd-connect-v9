@@ -70,8 +70,8 @@ export function useAuth() {
     };
   }, [checkAuth, user]);
 
-  const login = async (email: string, pass: string): Promise<LoginResult> => {
-    const result = await apiLogin(email, pass);
+  const login = async (email: string, pass: string, allProfiles?: Profile[]): Promise<LoginResult> => {
+    const result = await apiLogin(email, pass, allProfiles);
 
     if (result && result.user) {
       localStorage.setItem('loggedInUserId', result.user.id.toString());
@@ -89,11 +89,11 @@ export function useAuth() {
   const signup = async (email: string, password: string, role: 'baby' | 'daddy'): Promise<SignupResult> => {
     const result = await createProfile(email, password, role);
 
-    if (result.error) {
-      return { error: result.error };
+    if (result.error || !result.allProfiles) {
+      return { error: result.error || 'Failed to retrieve updated profile list after signup.' };
     }
     
-    const loggedInUser = await login(email, password);
+    const loggedInUser = await login(email, password, result.allProfiles);
     if (loggedInUser) {
       return { user: loggedInUser };
     }

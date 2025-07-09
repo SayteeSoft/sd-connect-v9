@@ -1,5 +1,6 @@
 
 
+
 import type { Handler, HandlerEvent } from '@netlify/functions';
 import { getProfilesFromStore, getProfileByIdFromStore, saveProfilesToStore, getNextId } from './utils/store';
 import type { Profile } from './utils/seed-data';
@@ -48,7 +49,7 @@ export const handler: Handler = async (event: HandlerEvent) => {
           password,
           age: 18,
           location: '',
-          imageUrl: `https://placehold.co/${599 + newId}x${599 + newId}.png`,
+          imageUrl: `https://placehold.co/${600 + newId}x${600 + newId}.png`,
           hint: role === 'baby' ? 'woman smiling' : 'man suit',
           role,
           online: true,
