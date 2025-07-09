@@ -15,7 +15,7 @@ export function useAuth() {
   const [isLoading, setIsLoading] = useState(true);
 
   const checkAuth = useCallback(async () => {
-    setIsLoading(true);
+    // No change in isLoading here to prevent flashes of loading state
     try {
         const loggedInUserId = localStorage.getItem('loggedInUserId');
         if (loggedInUserId) {
@@ -30,6 +30,7 @@ export function useAuth() {
                     setCredits(Infinity);
                 }
             } else {
+                // If user is not found, clear auth state
                 localStorage.removeItem('loggedInUserId');
                 setIsLoggedIn(false);
                 setUser(undefined);
@@ -54,9 +55,11 @@ export function useAuth() {
     checkAuth();
     
     const handleAuthChange = () => checkAuth();
+    
     const handleCreditsChanged = async () => {
-        if(user && user.role === 'daddy' && user.id !== 1) {
-            const newCredits = await getCredits(user.id);
+        const loggedInUserId = localStorage.getItem('loggedInUserId');
+        if(loggedInUserId) {
+            const newCredits = await getCredits(parseInt(loggedInUserId, 10));
             setCredits(newCredits);
         }
     };
@@ -68,14 +71,14 @@ export function useAuth() {
       window.removeEventListener('authChanged', handleAuthChange);
       window.removeEventListener('creditsChanged', handleCreditsChanged);
     };
-  }, [checkAuth, user]);
+  }, [checkAuth]);
 
   const login = async (email: string, pass: string): Promise<LoginResult> => {
     const result = await apiLogin(email, pass);
 
     if (result && result.user) {
       localStorage.setItem('loggedInUserId', result.user.id.toString());
-      window.dispatchEvent(new Event('authChanged'));
+      window.dispatchEvent(new Event('authChanged')); // Triggers re-check
       return result.user;
     }
     return null;
@@ -83,7 +86,7 @@ export function useAuth() {
 
   const logout = () => {
     localStorage.removeItem('loggedInUserId');
-    window.dispatchEvent(new Event('authChanged'));
+    window.dispatchEvent(new Event('authChanged')); // Triggers re-check
   };
 
   const signup = async (email: string, password: string, role: 'baby' | 'daddy'): Promise<SignupResult> => {
@@ -93,6 +96,7 @@ export function useAuth() {
         return { error: creationResult.error || 'Failed to create user.' };
     }
     
+    // After successful creation, log the user in.
     const loggedInUser = await login(email, password);
     if (loggedInUser) {
         return { user: loggedInUser };
