@@ -1,7 +1,7 @@
 
 'use client';
 
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useRef } from 'react';
 import type { Conversation, Message, Profile } from '@/lib/data';
 import { saveMessage } from '@/lib/data';
 import { cn } from '@/lib/utils';
@@ -80,6 +80,8 @@ export function ChatClient({ initialConversations, currentUser, initialSelectedP
   const { list: favoritedIds, toggleItem: toggleFavorite, isItemInList } = useFavorites();
   const { list: blockedIds, addItem: blockUser } = useBlocked();
 
+  const chatAreaRef = useRef<HTMLDivElement>(null);
+
   const findConversationIdByProfileId = (profileId?: number): number | null => {
     if (!profileId) return null;
     const conversation = initialConversations.find(
@@ -124,6 +126,14 @@ export function ChatClient({ initialConversations, currentUser, initialSelectedP
     }
 
   }, [initialConversations, blockedIds, removedIds, selectedConversationId, initialSelectedProfileId]);
+
+  useEffect(() => {
+    // Scroll to the bottom of the chat area when a new message is added or conversation changes
+    if (chatAreaRef.current) {
+        chatAreaRef.current.children[0].scrollTop = chatAreaRef.current.children[0].scrollHeight;
+    }
+  }, [selectedConversationId, conversations]);
+
   
   const filteredConversations = useMemo(() => {
     if (!searchTerm.trim()) {
@@ -457,8 +467,9 @@ export function ChatClient({ initialConversations, currentUser, initialSelectedP
             
             <div className="relative flex-grow overflow-auto">
                 <ScrollArea
+                    ref={chatAreaRef}
                     className={cn(
-                        'h-[600px] bg-secondary/40',
+                        'absolute inset-0 bg-secondary/40',
                         loggedInUser?.role === 'daddy' &&
                         loggedInUser.id !== 1 &&
                         credits <= 0 &&
@@ -550,7 +561,7 @@ export function ChatClient({ initialConversations, currentUser, initialSelectedP
                         className="flex-grow"
                         disabled={loggedInUser?.role === 'daddy' && loggedInUser.id !== 1 && credits <= 0}
                     />
-                    <Button type="submit" size="icon" disabled={!newMessage.trim() || (loggedInUser?.role === 'daddy' && loggedInUser.id !== 1 && credits <= 0)}>
+                    <Button type="submit" size="icon" disabled={!newMessage.trim()}>
                         <SendHorizonal />
                         <span className="sr-only">Send</span>
                     </Button>

@@ -54,12 +54,21 @@ export function useAuth() {
     checkAuth();
     
     const handleAuthChange = () => checkAuth();
+    const handleCreditsChanged = async () => {
+        if(user && user.role === 'daddy' && user.id !== 1) {
+            const newCredits = await getCredits(user.id);
+            setCredits(newCredits);
+        }
+    };
 
     window.addEventListener('authChanged', handleAuthChange);
+    window.addEventListener('creditsChanged', handleCreditsChanged);
+    
     return () => {
       window.removeEventListener('authChanged', handleAuthChange);
+      window.removeEventListener('creditsChanged', handleCreditsChanged);
     };
-  }, [checkAuth]);
+  }, [checkAuth, user]);
 
   const login = async (email: string, pass: string, allProfiles?: Profile[]): Promise<LoginResult> => {
     const result = await apiLogin(email, pass, allProfiles);
@@ -106,6 +115,7 @@ export function useAuth() {
     if (user?.role === 'daddy' && user.id !== 1) {
         const newCredits = await updateCredits(user.id, amount, 'add');
         setCredits(newCredits);
+        window.dispatchEvent(new Event('creditsChanged'));
     }
   };
 

@@ -59,14 +59,15 @@ function PayPalPaymentContent() {
     setIsProcessing(true);
     setError(null);
     return actions.order.capture().then(async (details: any) => {
-      toast({
-        title: 'Purchase Successful!',
-        description: `You have successfully purchased ${selectedPackage?.credits} credits via PayPal.`,
-      });
       
       if (user?.role === 'daddy' && selectedPackage) {
           await addCredits(selectedPackage.credits);
       }
+
+      toast({
+        title: 'Purchase Successful!',
+        description: `You have successfully purchased ${selectedPackage?.credits} credits.`,
+      });
       
       const redirectUrl = searchParams.get('redirect');
       const chatWith = searchParams.get('chatWith');

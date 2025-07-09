@@ -279,7 +279,8 @@ export async function updateCredits(userId: number, amount: number, action: 'add
     } catch (error) {
         console.error('updateCredits error:', error);
         // Fallback to a safe value
-        return 0;
+        const currentCredits = await getCredits(userId);
+        return currentCredits;
     }
 }
 
