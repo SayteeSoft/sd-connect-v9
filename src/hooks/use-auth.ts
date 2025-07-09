@@ -70,8 +70,8 @@ export function useAuth() {
     };
   }, [checkAuth, user]);
 
-  const login = async (email: string, pass: string, allProfiles?: Profile[]): Promise<LoginResult> => {
-    const result = await apiLogin(email, pass, allProfiles);
+  const login = async (email: string, pass: string): Promise<LoginResult> => {
+    const result = await apiLogin(email, pass);
 
     if (result && result.user) {
       localStorage.setItem('loggedInUserId', result.user.id.toString());
@@ -93,8 +93,7 @@ export function useAuth() {
       return { error: result.error || 'Failed to create user.' };
     }
     
-    // After creating the profile, log the user in using the complete, updated list of profiles
-    const loggedInUser = await login(email, password, result.allProfiles);
+    const loggedInUser = await login(email, password);
     if (loggedInUser) {
       return { user: loggedInUser };
     }

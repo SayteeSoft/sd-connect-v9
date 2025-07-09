@@ -1,7 +1,4 @@
 
-
-
-
 import type { Handler, HandlerEvent } from '@netlify/functions';
 import { getProfilesFromStore, getProfileByIdFromStore, saveProfilesToStore, getNextId } from './utils/store';
 import type { Profile } from './utils/seed-data';
@@ -69,8 +66,9 @@ export const handler: Handler = async (event: HandlerEvent) => {
         await saveProfilesToStore(updatedProfiles);
         
         const { password: p, ...userToReturn } = newProfile;
-        // Return both the new user and the complete updated list of profiles
-        return { statusCode: 201, body: JSON.stringify({ user: userToReturn, allProfiles: updatedProfiles }) };
+        
+        // Return just the new user object
+        return { statusCode: 201, body: JSON.stringify({ user: userToReturn }) };
       } catch (error) {
         return { statusCode: 500, body: JSON.stringify({ error: 'Failed to create profile' }) };
       }
