@@ -93,7 +93,6 @@ export function useAuth() {
         return { error: creationResult.error || 'Failed to create user.' };
     }
     
-    // After successful creation, try to log the user in.
     const loggedInUser = await login(email, password);
     if (loggedInUser) {
         return { user: loggedInUser };
