@@ -5,7 +5,7 @@ import { useState, useEffect, useCallback } from 'react';
 import type { Profile } from '@/lib/data';
 import { getProfile, apiLogin, createProfile, updateCredits, getCredits } from '@/lib/data';
 
-type SignupResult = { user?: Profile; error?: string };
+type SignupResult = { user?: Profile; allProfiles?: Profile[]; error?: string };
 type LoginResult = Profile | null;
 
 export function useAuth() {
@@ -95,7 +95,7 @@ export function useAuth() {
     
     const loggedInUser = await login(email, password, result.allProfiles);
     if (loggedInUser) {
-      return { user: loggedInUser };
+      return { user: loggedInUser, allProfiles: result.allProfiles };
     }
     
     return { error: 'Failed to log in after signing up.' };
