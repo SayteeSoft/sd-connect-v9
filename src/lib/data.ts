@@ -1,3 +1,4 @@
+
 // This file now acts as a client-side SDK for interacting with the backend API.
 // It no longer contains direct data or localStorage logic.
 
@@ -20,6 +21,12 @@ export type Profile = {
   attributes?: {
     [key: string]: string;
   };
+  metCount?: number;
+  notMetCount?: number;
+  votes?: {
+    voterId: number;
+    choice: 'met' | 'notMet';
+  }[];
 };
 
 export type Message = {
@@ -274,4 +281,29 @@ export async function updateCredits(userId: number, amount: number, action: 'add
         // Fallback to a safe value
         return 0;
     }
+}
+
+/**
+ * Submits a vote for a user profile.
+ * @param {number} voterId - The ID of the user casting the vote.
+ * @param {number} targetId - The ID of the user profile being voted on.
+ * @param {'met' | 'notMet'} choice - The vote choice.
+ * @returns {Promise<Profile | { error: string }>} The updated profile or an error object.
+ */
+export async function castVote(voterId: number, targetId: number, choice: 'met' | 'notMet'): Promise<Profile | { error: string }> {
+  try {
+    const response = await fetch(`${API_BASE_PATH}/vote`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ voterId, targetId, choice }),
+    });
+    const data = await response.json();
+    if (!response.ok) {
+        return { error: data.error || 'Failed to cast vote.' };
+    }
+    return data;
+  } catch (error) {
+    console.error('castVote error:', error);
+    return { error: 'An unexpected error occurred.' };
+  }
 }

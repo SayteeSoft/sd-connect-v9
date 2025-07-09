@@ -1,13 +1,13 @@
 
 'use client';
 
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useMemo } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter, useParams, useSearchParams } from 'next/navigation';
-import { getProfile, updateProfile, type Profile, wantsOptions, interestsOptions, attributeKeys, deleteProfile, bodyTypeOptions, ethnicityOptions, hairColorOptions, eyeColorOptions, smokerDrinkerOptions } from '@/lib/data';
+import { getProfile, updateProfile, type Profile, wantsOptions, interestsOptions, attributeKeys, deleteProfile, bodyTypeOptions, ethnicityOptions, hairColorOptions, eyeColorOptions, smokerDrinkerOptions, castVote } from '@/lib/data';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Header } from '@/components/layout/header';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -22,6 +22,7 @@ import {
   Ban,
   MessageSquare,
   Check,
+  Star,
 } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -51,8 +52,32 @@ const GalleryModal = dynamic(() => import('@/components/gallery-modal').then(mod
   ),
 });
 
+const InteractionCard = ({ profile, onVote, hasVoted }: { 
+    profile: Profile; 
+    onVote: (choice: 'met' | 'notMet') => void;
+    hasVoted: boolean;
+}) => (
+  <Card>
+    <CardHeader>
+      <CardTitle>Interactions</CardTitle>
+      <CardDescription>Have you met {profile.name} in person?</CardDescription>
+    </CardHeader>
+    <CardContent className="flex gap-4">
+      <Button className="flex-1 relative" size="lg" disabled={hasVoted} onClick={() => onVote('met')}>
+        We Met
+        <Badge variant="secondary" className="absolute -top-2 -right-2">{profile.metCount || 0}</Badge>
+      </Button>
+      <Button className="flex-1 relative" size="lg" variant="outline" disabled={hasVoted} onClick={() => onVote('notMet')}>
+        Didn't Meet
+        <Badge variant="outline" className="absolute -top-2 -right-2">{profile.notMetCount || 0}</Badge>
+      </Button>
+    </CardContent>
+    {hasVoted && <CardFooter className="pt-4"><p className="text-sm text-muted-foreground italic">You have already submitted your feedback for this profile.</p></CardFooter>}
+  </Card>
+);
 
-const ProfileView = ({ profile, onEdit, isOwnProfile, canEdit, onMessage, onFavorite, onReport, onBlock, isFavorited, loggedInUser, isAdmin, onOpenGallery }: { 
+
+const ProfileView = ({ profile, onEdit, isOwnProfile, canEdit, onMessage, onFavorite, onReport, onBlock, onVote, hasVoted, isFavorited, loggedInUser, isAdmin, onOpenGallery }: { 
   profile: Profile; 
   onEdit: () => void; 
   isOwnProfile: boolean; 
@@ -61,6 +86,8 @@ const ProfileView = ({ profile, onEdit, isOwnProfile, canEdit, onMessage, onFavo
   onFavorite: (profile: Profile) => void;
   onReport: (profileName: string) => void;
   onBlock: (profileId: number, profileName: string) => void;
+  onVote: (choice: 'met' | 'notMet') => void;
+  hasVoted: boolean;
   isFavorited: boolean;
   loggedInUser?: Profile;
   isAdmin: boolean;
@@ -97,7 +124,21 @@ const ProfileView = ({ profile, onEdit, isOwnProfile, canEdit, onMessage, onFavo
         </div>
         <CardContent className="p-6 space-y-4">
            <div>
-            <h1 className="text-3xl font-bold font-headline">{profile.name}</h1>
+            <h1 className="text-3xl font-bold font-headline flex items-center gap-2">
+                {profile.name}
+                {profile.metCount && profile.metCount > 5 && (
+                    <TooltipProvider>
+                    <Tooltip>
+                        <TooltipTrigger>
+                        <Star className="h-6 w-6 text-yellow-400 fill-yellow-400" />
+                        </TooltipTrigger>
+                        <TooltipContent>
+                        <p>Highly Rated Member</p>
+                        </TooltipContent>
+                    </Tooltip>
+                    </TooltipProvider>
+                )}
+            </h1>
             <div className="flex items-center gap-4 mt-2">
                 <Badge variant={profile.role === 'daddy' ? 'secondary' : 'outline'}>
                     {profile.role === 'daddy' ? 'Sugar Daddy' : 'Sugar Baby'}
@@ -196,6 +237,8 @@ const ProfileView = ({ profile, onEdit, isOwnProfile, canEdit, onMessage, onFavo
         </CardContent>
       </Card>
       
+      {!isOwnProfile && <InteractionCard profile={profile} onVote={onVote} hasVoted={hasVoted} />}
+
       <Card>
         <CardHeader>
           <CardTitle>Wants & Interests</CardTitle>
@@ -658,6 +701,11 @@ export default function ProfilePage() {
   const profileId = parseInt(params.id, 10);
   const allImages = [profileData?.imageUrl, ...(profileData?.gallery || [])].filter((url): url is string => !!url);
 
+  const hasVoted = useMemo(() => {
+    if (!loggedInUser || !profileData?.votes) return false;
+    return profileData.votes.some(v => v.voterId === loggedInUser.id);
+  }, [loggedInUser, profileData]);
+
   useEffect(() => {
     if (justSaved.current) {
       justSaved.current = false;
@@ -731,6 +779,26 @@ export default function ProfilePage() {
       description: `You have blocked ${profileName}. You will no longer see their profile or receive messages from them.`,
     });
     router.push('/search');
+  };
+
+  const handleVote = async (choice: 'met' | 'notMet') => {
+    if (!loggedInUser || !profileData || hasVoted) return;
+
+    const updatedProfile = await castVote(loggedInUser.id, profileData.id, choice);
+
+    if ('error' in updatedProfile) {
+        toast({
+            variant: "destructive",
+            title: "Vote Failed",
+            description: updatedProfile.error,
+        });
+    } else {
+        setProfileData(updatedProfile); // Update state with the returned profile
+        toast({
+            title: "Vote Recorded",
+            description: "Thank you for your feedback!",
+        });
+    }
   };
   
   const handleSaveProfile = async (updatedProfile: Profile) => {
@@ -826,6 +894,8 @@ export default function ProfilePage() {
             onFavorite={handleFavorite}
             onReport={handleReport}
             onBlock={handleBlock}
+            onVote={handleVote}
+            hasVoted={hasVoted}
             isFavorited={isFavorited}
             loggedInUser={loggedInUser}
             isAdmin={isAdmin}

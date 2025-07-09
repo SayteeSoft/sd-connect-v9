@@ -57,6 +57,9 @@ export const handler: Handler = async (event: HandlerEvent) => {
           interests: [],
           gallery: [],
           attributes: {},
+          metCount: 0,
+          notMetCount: 0,
+          votes: [],
         };
 
         const updatedProfiles = [...profiles, newProfile];

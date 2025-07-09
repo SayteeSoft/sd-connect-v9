@@ -18,6 +18,12 @@ export type Profile = {
   attributes?: {
     [key: string]: string;
   };
+  metCount?: number;
+  notMetCount?: number;
+  votes?: {
+    voterId: number;
+    choice: 'met' | 'notMet';
+  }[];
 };
 
 export type Message = {
@@ -79,9 +85,7 @@ export const featuredProfiles: Profile[] = [
     bio: "I'm a successful entrepreneur with a passion for the finer things in life. I enjoy mentoring ambitious individuals and exploring the world. Looking for a genuine connection with someone who is intelligent, driven, and has a great sense of humor.",
     wants: ['Mentorship', 'Discreet', 'Long-term', 'Travel Partner'],
     interests: ['Art', 'Travel', 'Fine Dining', 'Theatre', 'Wine Tasting'],
-    gallery: [
-      ''
-    ],
+    gallery: [],
     attributes: {
       'Height': "6'0\"",
       'Body Type': 'Athletic',
@@ -93,6 +97,9 @@ export const featuredProfiles: Profile[] = [
       'Piercings': 'No',
       'Tattoos': 'No',
     },
+    metCount: 10,
+    notMetCount: 1,
+    votes: [],
   },
   {
     id: 2,
@@ -125,6 +132,9 @@ export const featuredProfiles: Profile[] = [
       'Piercings': 'No',
       'Tattoos': 'No',
     },
+    metCount: 8,
+    notMetCount: 0,
+    votes: [],
   },
   {
     id: 3,
@@ -156,6 +166,9 @@ export const featuredProfiles: Profile[] = [
       'Piercings': 'No',
       'Tattoos': 'No',
     },
+    metCount: 2,
+    notMetCount: 0,
+    votes: [],
   },
   {
     id: 4,
@@ -186,6 +199,9 @@ export const featuredProfiles: Profile[] = [
       'Piercings': 'No',
       'Tattoos': 'No',
     },
+    metCount: 6,
+    notMetCount: 1,
+    votes: [],
   },
   {
     id: 5,
@@ -218,6 +234,9 @@ export const featuredProfiles: Profile[] = [
       'Piercings': 'No',
       'Tattoos': 'No',
     },
+    metCount: 4,
+    notMetCount: 0,
+    votes: [],
   },
   {
     id: 6,
@@ -248,6 +267,9 @@ export const featuredProfiles: Profile[] = [
       'Piercings': 'No',
       'Tattoos': 'No',
     },
+    metCount: 1,
+    notMetCount: 2,
+    votes: [],
   },
   {
     id: 7,
@@ -279,6 +301,9 @@ export const featuredProfiles: Profile[] = [
       'Piercings': 'No',
       'Tattoos': 'No',
     },
+    metCount: 0,
+    notMetCount: 0,
+    votes: [],
   },
   {
     id: 8,
@@ -309,6 +334,9 @@ export const featuredProfiles: Profile[] = [
       'Piercings': 'No',
       'Tattoos': 'No',
     },
+    metCount: 3,
+    notMetCount: 0,
+    votes: [],
   },
   {
     id: 9,
@@ -339,6 +367,9 @@ export const featuredProfiles: Profile[] = [
       'Piercings': 'Yes',
       'Tattoos': 'Yes',
     },
+    metCount: 0,
+    notMetCount: 0,
+    votes: [],
   },
   {
     id: 10,
@@ -369,6 +400,9 @@ export const featuredProfiles: Profile[] = [
       'Piercings': 'No',
       'Tattoos': 'No',
     },
+    metCount: 1,
+    notMetCount: 0,
+    votes: [],
   },
   {
     id: 11,
@@ -399,6 +433,9 @@ export const featuredProfiles: Profile[] = [
       'Piercings': 'No',
       'Tattoos': 'Yes',
     },
+    metCount: 0,
+    notMetCount: 0,
+    votes: [],
   },
   {
     id: 12,
@@ -429,6 +466,9 @@ export const featuredProfiles: Profile[] = [
       'Piercings': 'No',
       'Tattoos': 'Yes',
     },
+    metCount: 2,
+    notMetCount: 1,
+    votes: [],
   },
   {
     id: 13,
@@ -459,6 +499,9 @@ export const featuredProfiles: Profile[] = [
       'Piercings': 'No',
       'Tattoos': 'No',
     },
+    metCount: 0,
+    notMetCount: 0,
+    votes: [],
   },
 ];
 

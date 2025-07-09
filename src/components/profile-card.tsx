@@ -13,7 +13,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
-import { MoreHorizontal, MessageSquare, Trash2, Heart } from "lucide-react";
+import { MoreHorizontal, MessageSquare, Trash2, Heart, Star } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { useToast } from "@/hooks/use-toast";
@@ -105,8 +105,11 @@ export function ProfileCard({ profile, onRemove, loggedInUser, isLoggedIn = true
 
           <div className="absolute bottom-0 left-0 p-4 text-white">
             <div className="flex items-center gap-2">
-              <h3 className="font-headline text-xl font-bold">
+              <h3 className="font-headline text-xl font-bold flex items-center gap-1.5">
                 {profile.name}, {profile.age}
+                {isLoggedIn && profile.metCount && profile.metCount > 5 && (
+                  <Star className="h-4 w-4 text-yellow-400 fill-yellow-400" />
+                )}
               </h3>
               {profile.online && isLoggedIn && (
                 <div className="h-2.5 w-2.5 rounded-full bg-green-500" />
