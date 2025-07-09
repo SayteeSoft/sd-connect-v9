@@ -77,7 +77,7 @@ const InteractionCard = ({ profile, onVote, hasVoted }: {
 );
 
 
-const ProfileView = ({ profile, onEdit, isOwnProfile, canEdit, onMessage, onFavorite, onReport, onBlock, onVote, hasVoted, isFavorited, loggedInUser, isAdmin, onOpenGallery }: { 
+const ProfileView = ({ profile, onEdit, isOwnProfile, canEdit, onMessage, onFavorite, onReport, onBlock, onVote, hasVoted, hasMet, isFavorited, loggedInUser, isAdmin, onOpenGallery }: { 
   profile: Profile; 
   onEdit: () => void; 
   isOwnProfile: boolean; 
@@ -88,6 +88,7 @@ const ProfileView = ({ profile, onEdit, isOwnProfile, canEdit, onMessage, onFavo
   onBlock: (profileId: number, profileName: string) => void;
   onVote: (choice: 'met' | 'notMet') => void;
   hasVoted: boolean;
+  hasMet: boolean;
   isFavorited: boolean;
   loggedInUser?: Profile;
   isAdmin: boolean;
@@ -147,7 +148,12 @@ const ProfileView = ({ profile, onEdit, isOwnProfile, canEdit, onMessage, onFavo
             <p className="text-muted-foreground text-lg mt-1">{profile.location}</p>
             <div className="flex items-center gap-2 text-muted-foreground mt-2">
               <Mail className="h-4 w-4" />
-              <span className="text-sm">{profile.email}</span>
+              <span className={cn(
+                "text-sm",
+                !isOwnProfile && !isAdmin && !hasMet && "blur-sm select-none"
+              )}>
+                {profile.email}
+              </span>
             </div>
           </div>
           <div className="flex flex-col space-y-2">
@@ -701,10 +707,13 @@ export default function ProfilePage() {
   const profileId = parseInt(params.id, 10);
   const allImages = [profileData?.imageUrl, ...(profileData?.gallery || [])].filter((url): url is string => !!url);
 
-  const hasVoted = useMemo(() => {
-    if (!loggedInUser || !profileData?.votes) return false;
-    return profileData.votes.some(v => v.voterId === loggedInUser.id);
+  const voteChoice = useMemo(() => {
+    if (!loggedInUser || !profileData?.votes) return null;
+    return profileData.votes.find(v => v.voterId === loggedInUser.id)?.choice || null;
   }, [loggedInUser, profileData]);
+
+  const hasVoted = !!voteChoice;
+  const hasMet = voteChoice === 'met';
 
   useEffect(() => {
     if (justSaved.current) {
@@ -896,6 +905,7 @@ export default function ProfilePage() {
             onBlock={handleBlock}
             onVote={handleVote}
             hasVoted={hasVoted}
+            hasMet={hasMet}
             isFavorited={isFavorited}
             loggedInUser={loggedInUser}
             isAdmin={isAdmin}
