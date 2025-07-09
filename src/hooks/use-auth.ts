@@ -70,10 +70,8 @@ export function useAuth() {
     };
   }, [checkAuth, user]);
 
-  const login = async (email: string, pass: string, allProfiles?: Profile[]): Promise<LoginResult> => {
-    // The `allProfiles` parameter is only passed during the special signup flow.
-    // For a normal login, it's undefined, and the backend function will handle fetching the profiles.
-    const result = await apiLogin(email, pass, allProfiles);
+  const login = async (email: string, pass: string): Promise<LoginResult> => {
+    const result = await apiLogin(email, pass);
 
     if (result && result.user) {
       localStorage.setItem('loggedInUserId', result.user.id.toString());
@@ -95,8 +93,7 @@ export function useAuth() {
       return { error: result.error };
     }
     
-    // Pass the fresh list of all profiles (including the new one) to the login function.
-    const loggedInUser = await login(email, password, result.allProfiles);
+    const loggedInUser = await login(email, password);
     if (loggedInUser) {
       return { user: loggedInUser };
     }
