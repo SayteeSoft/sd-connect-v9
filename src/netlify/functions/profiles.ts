@@ -1,7 +1,7 @@
 
 import type { Handler, HandlerEvent } from '@netlify/functions';
-import { getProfilesFromStore, getProfileByIdFromStore, saveProfilesToStore, getNextId } from '@/netlify/functions/utils/store';
-import type { Profile } from '@/netlify/functions/utils/seed-data';
+import { getProfilesFromStore, getProfileByIdFromStore, saveProfilesToStore, getNextId } from './utils/store';
+import type { Profile } from './utils/seed-data';
 
 export const handler: Handler = async (event: HandlerEvent) => {
   const id = event.queryStringParameters?.id;

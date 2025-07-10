@@ -1,7 +1,7 @@
 
 import type { Handler, HandlerEvent } from '@netlify/functions';
-import { getConversationsFromStore, saveConversationsToStore, getProfilesFromStore } from '@/netlify/functions/utils/store';
-import type { Message, Profile, Conversation } from '@/netlify/functions/utils/seed-data';
+import { getConversationsFromStore, saveConversationsToStore, getProfilesFromStore } from './utils/store';
+import type { Message, Profile, Conversation } from './utils/seed-data';
 
 // The raw conversation format stored in the database
 type RawConversation = {

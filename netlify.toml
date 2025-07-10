@@ -4,7 +4,7 @@
   publish = ".next"
 
 [functions]
-  directory = "netlify/functions"
+  directory = "src/netlify/functions"
   node_bundler = "esbuild"
 
 [dev]
