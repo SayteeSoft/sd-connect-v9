@@ -20,30 +20,22 @@ const isNetlifyLinked = () => !!process.env.NETLIFY_SITE_ID;
 
 const logWarning = () => {
     // This warning is only logged once per session to avoid spamming the console.
-    console.warn('Netlify Blob Store not available. Falling back to a temporary in-memory store. Run `netlify link` to connect to a live blob store for persistent data during local development.');
-}
-
-const getStoreSafe = (name: string) => {
-    try {
-        return getStore(name);
-    } catch (error) {
-        logWarning();
-        return null;
+    if (!(global as any).hasLoggedNetlifyWarning) {
+        console.warn('Netlify Blob Store not available. Falling back to a temporary in-memory store. Run `netlify link` to connect to a live blob store for persistent data during local development.');
+        (global as any).hasLoggedNetlifyWarning = true;
     }
 }
-
 
 // ====== PROFILES ======
 
 export const getProfilesFromStore = async (): Promise<Profile[]> => {
     if (!isNetlifyLinked()) {
-        if (!localProfilesCache) {
-            logWarning();
-            // Use structuredClone to ensure the original seed data is never mutated
+        logWarning();
+        if (localProfilesCache === null) {
             localProfilesCache = structuredClone(featuredProfiles);
         }
         // Return a clone to prevent mutation of the cache
-        return structuredClone(localProfilesCache!);
+        return structuredClone(localProfilesCache);
     }
 
     const store = getStore(PROFILES_STORE_NAME);
@@ -51,7 +43,7 @@ export const getProfilesFromStore = async (): Promise<Profile[]> => {
     if (!profiles) {
         console.log('Seeding profiles data to Netlify Blobs...');
         await store.setJSON(PROFILES_KEY, featuredProfiles);
-        profiles = featuredProfiles;
+        profiles = structuredClone(featuredProfiles);
     }
     return profiles || [];
 };
@@ -63,6 +55,7 @@ export const getProfileByIdFromStore = async (id: number): Promise<Profile | und
 
 export const saveProfilesToStore = async (data: Profile[]): Promise<void> => {
     if (!isNetlifyLinked()) {
+        logWarning();
         // Create a deep copy to ensure the cache is not pointing to a mutated object
         localProfilesCache = structuredClone(data);
         return;
@@ -80,10 +73,11 @@ export const getNextId = async (profiles: Profile[]): Promise<number> => {
 
 export const getConversationsFromStore = async (): Promise<any[]> => {
     if (!isNetlifyLinked()) {
-        if (!localConversationsCache) {
+        logWarning();
+        if (localConversationsCache === null) {
             localConversationsCache = structuredClone(rawConversationsData);
         }
-        return structuredClone(localConversationsCache!);
+        return structuredClone(localConversationsCache);
     }
 
     const store = getStore(CONVERSATIONS_STORE_NAME);
@@ -91,13 +85,14 @@ export const getConversationsFromStore = async (): Promise<any[]> => {
     if (!conversations) {
         console.log('Seeding conversations data to Netlify Blobs...');
         await store.setJSON(CONVERSATIONS_KEY, rawConversationsData);
-        conversations = rawConversationsData;
+        conversations = structuredClone(rawConversationsData);
     }
     return conversations || [];
 };
 
 export const saveConversationsToStore = async (data: any[]): Promise<void> => {
     if (!isNetlifyLinked()) {
+        logWarning();
         localConversationsCache = structuredClone(data);
         return;
     }
@@ -109,6 +104,7 @@ export const saveConversationsToStore = async (data: any[]): Promise<void> => {
 
 export const getCreditsForUser = async (userId: number): Promise<number> => {
     if (!isNetlifyLinked()) {
+        logWarning();
         if (!localCreditsCache.has(userId)) {
              // Give new daddies 10 credits on first check
             localCreditsCache.set(userId, 10);
@@ -128,6 +124,7 @@ export const getCreditsForUser = async (userId: number): Promise<number> => {
 
 export const setCreditsForUser = async (userId: number, amount: number): Promise<void> => {
     if (!isNetlifyLinked()) {
+        logWarning();
         localCreditsCache.set(userId, amount);
         return;
     }
