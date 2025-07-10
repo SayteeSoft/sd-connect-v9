@@ -23,7 +23,7 @@ export const handler: Handler = async (event: HandlerEvent) => {
     
     // If a list of profiles is passed from the client (e.g., after signup), use it.
     // Otherwise, always fetch the latest from the store to ensure reliability.
-    const profilesToSearch: Profile[] = profiles || await getProfilesFromStore();
+    const profilesToSearch: Profile[] = profiles || (await getProfilesFromStore());
 
     const foundUser = profilesToSearch.find(
       (p: Profile) => p.email && p.email.toLowerCase() === email.toLowerCase() && p.password === password
