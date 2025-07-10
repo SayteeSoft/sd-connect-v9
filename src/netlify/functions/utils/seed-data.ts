@@ -150,9 +150,7 @@ export const featuredProfiles: Profile[] = [
     bio: 'Investor and lover of the great outdoors. I spend my weekends hiking and my weekdays closing deals. I appreciate honesty and a good sense of humor. Ready to spoil the right person.',
     wants: ['Long-term', 'Travel Partner'],
     interests: ['Sports', 'Travel', 'Wine Tasting'],
-    gallery: [
-      ''
-    ],
+    gallery: [],
     attributes: {
       'Height': "6'0\"",
       'Body Type': 'Average',
@@ -218,9 +216,7 @@ export const featuredProfiles: Profile[] = [
     bio: 'Tech CEO who works hard and plays harder. I enjoy sailing, trying new tech, and intellectual conversations. Seeking a bright, witty companion for dates and possibly more.',
     wants: ['Networking', 'No Strings Attached', 'Casual'],
     interests: ['Sports', 'Music', 'Movies', 'Reading'],
-    gallery: [
-      ''
-    ],
+    gallery: [],
     attributes: {
       'Height': "5'11\"",
       'Body Type': 'Athletic',
@@ -285,9 +281,7 @@ export const featuredProfiles: Profile[] = [
     bio: 'Architect with an appreciation for design, history, and good whiskey. I\'m looking for an elegant and intelligent young woman to accompany me to to social events and on travels.',
     wants: ['Travel Partner', 'Discreet', 'Networking'],
     interests: ['Travel', 'Fine Dining', 'Theatre', 'Wine Tasting'],
-    gallery: [
-      ''
-    ],
+    gallery: [],
     attributes: {
       'Height': "6'2\"",
       'Body Type': 'Slim',
@@ -318,9 +312,7 @@ export const featuredProfiles: Profile[] = [
     bio: 'Yoga instructor and nature lover. I find peace in the outdoors and joy in healthy living. Seeking a grounded, successful partner who values wellness and authenticity.',
     wants: ['Friendship', 'Casual', 'Long-term'],
     interests: ['Fitness', 'Cooking', 'Travel', 'Reading'],
-    gallery: [
-      ''
-    ],
+    gallery: [],
     attributes: {
       'Height': "5'6\"",
       'Body Type': 'Athletic',
@@ -351,9 +343,7 @@ export const featuredProfiles: Profile[] = [
     bio: 'Lawyer with a sharp mind and a generous heart. When I\'m not in the courtroom, I enjoy rugby, classical music, and fine wine. Looking for a bright, ambitious partner to share my success with.',
     wants: ['Long-term', 'Mentorship'],
     interests: ['Sports', 'Music', 'Wine Tasting', 'Reading'],
-    gallery: [
-        ''
-    ],
+    gallery: [],
     attributes: {
       'Height': "5'10\"",
       'Body Type': 'Average',
@@ -384,9 +374,7 @@ export const featuredProfiles: Profile[] = [
     bio: 'Musician and free spirit. My life is filled with melodies, travel, and laughter. I\'m searching for a patron and partner who appreciates the arts and has a zest for life.',
     wants: ['Travel Partner', 'Friendship', 'Casual'],
     interests: ['Music', 'Art', 'Travel', 'Movies'],
-    gallery: [
-      '',
-    ],
+    gallery: [],
     attributes: {
       'Height': "5'7\"",
       'Body Type': 'Slim',
@@ -417,9 +405,7 @@ export const featuredProfiles: Profile[] = [
     bio: 'Retired naval officer, now enjoying a life of leisure. I spend my time sailing, golfing, and enjoying good company. Looking for a cheerful and easygoing companion for dinners, events, and travel.',
     wants: ['Casual', 'Travel Partner', 'No Strings Attached'],
     interests: ['Sports', 'Travel', 'Fine Dining', 'Reading'],
-    gallery: [
-      '',
-    ],
+    gallery: [],
     attributes: {
       'Height': "5'9\"",
       'Body Type': 'Average',
