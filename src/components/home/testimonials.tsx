@@ -1,7 +1,6 @@
+
 'use client';
 
-import { useState, useEffect } from "react";
-import { getProfiles } from "@/lib/data";
 import { Card, CardContent } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Star } from "lucide-react";
@@ -12,64 +11,53 @@ import {
   CarouselNext,
   CarouselPrevious,
 } from "@/components/ui/carousel";
-import { Skeleton } from "@/components/ui/skeleton";
 import { useLanguage } from "@/context/language-context";
 
 
-const formatRole = (role: 'baby' | 'daddy') => {
-  return role === 'baby' ? 'Sugar Baby' : 'Sugar Daddy';
-};
-
-const extractQuoteFromBio = (bio?: string) => {
-  if (!bio) {
-    return "This user has a fantastic profile. I'm excited to connect with them and see where things go!";
-  }
-  const firstSentence = bio.match(/[^.!?]+[.!?]/);
-  return firstSentence ? firstSentence[0] : `"${bio.slice(0, 150)}..."`;
-};
+const testimonials = [
+    {
+        quote: "I found a genuine connection here that I never expected. The platform is discreet, easy to use, and full of interesting people. Highly recommended!",
+        name: "Jessica",
+        role: "Sugar Baby",
+        avatar: "https://placehold.co/100x100.png",
+        hint: "woman smiling",
+    },
+    {
+        quote: "As a busy professional, I don't have time for traditional dating. SD Connect allowed me to be upfront about my needs and find a wonderful partner who complements my life perfectly.",
+        name: "Mark",
+        role: "Sugar Daddy",
+        avatar: "https://placehold.co/100x100.png",
+        hint: "man suit",
+    },
+    {
+        quote: "This site changed my life. I met a mentor who not only supports my goals but also challenges me to be better. It's more than just an arrangement; it's a true partnership.",
+        name: "Sophia",
+        role: "Sugar Baby",
+        avatar: "https://placehold.co/100x100.png",
+        hint: "woman graduate",
+    },
+    {
+        quote: "The quality of profiles on SD Connect is unmatched. I've been on other sites, and none compare to the level of ambitious and intelligent individuals I've met here.",
+        name: "David",
+        role: "Sugar Daddy",
+        avatar: "https://placehold.co/100x100.png",
+        hint: "man outdoor",
+    },
+    {
+        quote: "I was hesitant at first, but the community is so respectful and focused on transparency. It made me feel safe and empowered to find what I was looking for.",
+        name: "Emily",
+        role: "Sugar Baby",
+        avatar: "https://placehold.co/100x100.png",
+        hint: "woman professional",
+    }
+];
 
 
 export function Testimonials() {
-  const [testimonials, setTestimonials] = useState<any[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
   const { content: siteContent } = useLanguage();
-
-  useEffect(() => {
-    getProfiles().then(allProfiles => {
-        if (Array.isArray(allProfiles)) {
-            const testimonialProfiles = allProfiles.filter(p => p.id !== 1).slice(0, 5);
-            
-            const generatedTestimonials = testimonialProfiles.map(profile => ({
-              quote: extractQuoteFromBio(profile.bio),
-              name: profile.name,
-              role: formatRole(profile.role),
-              avatar: profile.imageUrl,
-              hint: profile.hint,
-            }));
-
-            setTestimonials(generatedTestimonials);
-        }
-        setIsLoading(false);
-    });
-  }, []);
-
-  if (isLoading || !siteContent) {
-    return (
-      <section className="bg-secondary py-12 md:pt-12 md:pb-20">
-        <div className="container mx-auto px-4 md:px-6">
-          <h2 className="mb-12 text-center font-headline text-3xl font-bold text-primary md:text-4xl">
-            What Our Members Say
-          </h2>
-          <div className="w-full max-w-sm sm:max-w-xl md:max-w-3xl lg:max-w-5xl mx-auto">
-             <div className="flex gap-4">
-              <Skeleton className="h-56 w-full basis-full md:basis-1/2 lg:basis-1/3" />
-              <Skeleton className="h-56 w-full basis-full hidden md:block md:basis-1/2 lg:basis-1/3" />
-              <Skeleton className="h-56 w-full basis-full hidden lg:block lg:basis-1/3" />
-            </div>
-          </div>
-        </div>
-      </section>
-    );
+  
+  if (!siteContent) {
+    return null;
   }
   
   return (
