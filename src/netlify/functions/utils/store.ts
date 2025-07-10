@@ -20,20 +20,21 @@ const isNetlifyLinked = () => !!process.env.NETLIFY_SITE_ID;
 
 const logWarning = () => {
     // This warning is only logged once per session to avoid spamming the console.
-    if (isNetlifyLinked()) return;
+    if (isNetlifyLinked() || (global as any).__has_warned_blob_fallback) return;
     console.warn('Netlify Blob Store not available. Falling back to a temporary in-memory store. Run `netlify link` to connect to a live blob store for persistent data during local development.');
+    (global as any).__has_warned_blob_fallback = true;
 }
 
 // ====== PROFILES ======
 
 export const getProfilesFromStore = async (): Promise<Profile[]> => {
     if (!isNetlifyLinked()) {
+        logWarning();
         if (!localProfilesCache) {
-            logWarning();
-            // Use structuredClone for a deep copy that preserves all properties, including passwords.
+            // Seed the cache only once
             localProfilesCache = structuredClone(featuredProfiles);
         }
-        // Return a clone to prevent mutation across function calls
+        // Always return a fresh clone to prevent mutation across function calls
         return structuredClone(localProfilesCache!);
     }
 
