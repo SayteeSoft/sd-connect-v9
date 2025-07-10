@@ -1,7 +1,7 @@
 
 'use client';
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useMemo, useCallback } from "react";
 import type { Profile } from "@/lib/data";
 import { getProfiles } from "@/lib/data";
 import { ProfileCard } from "@/components/profile-card";
@@ -14,7 +14,7 @@ const featuredDaddyIds = [4, 6, 8, 10]; // e.g., Mark, James, Richard, William
 
 export function FeaturedProfiles() {
   const [profiles, setProfiles] = useState<Profile[]>([]);
-  const { user: loggedInUser, isLoading, isLoggedIn } = useAuth();
+  const { user: loggedInUser, isLoading: isAuthLoading, isLoggedIn } = useAuth();
   const [isDataLoading, setIsDataLoading] = useState(true);
 
   const fetchAllProfiles = useCallback(() => {
@@ -24,7 +24,7 @@ export function FeaturedProfiles() {
             setProfiles(profilesData);
         }
         setIsDataLoading(false);
-    })
+    });
   }, []);
 
   useEffect(() => {
@@ -35,29 +35,34 @@ export function FeaturedProfiles() {
     };
   }, [fetchAllProfiles]);
 
-  const isComponentLoading = isLoading || isDataLoading;
+  const isComponentLoading = isAuthLoading || isDataLoading;
 
-  const displayedProfiles = isComponentLoading ? [] : profiles
-    .filter(profile => {
-      if (loggedInUser) {
-        // If logged in as a 'daddy', show featured 'babies'.
-        if (loggedInUser.role === 'daddy') {
-            return featuredBabyIds.includes(profile.id);
-        }
-        // If logged in as a 'baby', show featured 'daddies'.
-        if (loggedInUser.role === 'baby') {
-            return featuredDaddyIds.includes(profile.id);
-        }
+  const displayedProfiles = useMemo(() => {
+    if (isComponentLoading) return [];
+
+    let relevantIds: number[];
+
+    if (isLoggedIn && loggedInUser) {
+      // If logged in as a 'daddy', show featured 'babies'.
+      if (loggedInUser.role === 'daddy') {
+        relevantIds = featuredBabyIds;
       }
-      
-      // If logged out, only show featured 'baby' profiles.
-      return featuredBabyIds.includes(profile.id);
-    })
-    // Ensure the order is consistent with the defined IDs
-    .sort((a, b) => {
-        const relevantIds = loggedInUser?.role === 'baby' ? featuredDaddyIds : featuredBabyIds;
-        return relevantIds.indexOf(a.id) - relevantIds.indexOf(b.id);
-    });
+      // If logged in as a 'baby', show featured 'daddies'.
+      else {
+        relevantIds = featuredDaddyIds;
+      }
+    } else {
+      // If logged out, default to showing featured 'baby' profiles.
+      relevantIds = featuredBabyIds;
+    }
+    
+    return profiles
+      .filter(profile => relevantIds.includes(profile.id))
+      // Ensure the order is consistent with the defined IDs
+      .sort((a, b) => relevantIds.indexOf(a.id) - relevantIds.indexOf(b.id));
+
+  }, [isComponentLoading, isLoggedIn, loggedInUser, profiles]);
+
 
   return (
     <section className="bg-background py-12 md:pt-12 md:pb-20">
