@@ -55,7 +55,7 @@ export const ethnicityOptions = ["Black/African Descent", "North/African Descent
 export const hairColorOptions = ["Brown", "Black", "Blonde", "Chestnut", "Grey", "Auburn", "Red"];
 export const eyeColorOptions = ["Blue", "Brown", "Green", "Grey", "Hazel"];
 export const smokerDrinkerOptions = ['Yes', 'Socially', 'Sometimes', 'No'];
-export const yesNoOptions = [{value: 'Yes', label: 'Yes'}, {value: 'No', 'label': 'No'}];
+export const yesNoOptions = [{value: 'Yes', label: 'Yes'}, {value: 'No', label: 'No'}];
 
 export const attributeKeys = [
   'Height',
