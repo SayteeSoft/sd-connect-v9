@@ -51,7 +51,7 @@ export const handler: Handler = async (event: HandlerEvent) => {
         targetProfile.notMetCount = (targetProfile.notMetCount || 1) - 1;
         targetProfile.metCount = (targetProfile.metCount || 0) + 1;
       } else {
-        // If they try to vote 'notMet' again, do nothing.
+        // If they try to vote 'notMet' again, do nothing but return the profile.
          const { password, ...profileToReturn } = targetProfile;
          return { statusCode: 200, body: JSON.stringify(profileToReturn) };
       }

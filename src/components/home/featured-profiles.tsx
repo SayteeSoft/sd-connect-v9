@@ -14,7 +14,7 @@ const featuredDaddyIds = [4, 6, 8, 10]; // Mark, James, Richard, William
 
 export function FeaturedProfiles() {
   const [profiles, setProfiles] = useState<Profile[]>([]);
-  const { user: loggedInUser, isLoading: isAuthLoading } = useAuth();
+  const { user: loggedInUser, isLoading: isAuthLoading, isLoggedIn } = useAuth();
   const [isDataLoading, setIsDataLoading] = useState(true);
 
   const fetchAllProfiles = useCallback(() => {
@@ -36,17 +36,17 @@ export function FeaturedProfiles() {
   }, [fetchAllProfiles]);
 
   const displayedProfiles = useMemo(() => {
-    if (isAuthLoading || !profiles.length) {
+    if (!profiles.length) {
       return [];
     }
   
     let relevantIds: number[];
 
+    // If a user is logged in and their role is 'baby', show 'daddies'
     if (loggedInUser?.role === 'baby') {
-      // If logged in as a 'baby', show featured 'daddies'.
       relevantIds = featuredDaddyIds;
     } else {
-      // Default to showing 'babies' if logged out, or if logged in as a 'daddy'.
+      // Default to showing 'babies' for logged-out users or for logged-in 'daddies'
       relevantIds = featuredBabyIds;
     }
     
@@ -55,7 +55,7 @@ export function FeaturedProfiles() {
       // Ensure the order is consistent with the defined IDs
       .sort((a, b) => relevantIds.indexOf(a.id) - relevantIds.indexOf(b.id));
 
-  }, [isAuthLoading, loggedInUser, profiles]);
+  }, [loggedInUser, profiles]);
 
   const isComponentLoading = isAuthLoading || isDataLoading;
 
@@ -72,7 +72,7 @@ export function FeaturedProfiles() {
             ))
           ) : (
             displayedProfiles.map((profile) => (
-              <ProfileCard key={profile.id} profile={profile} loggedInUser={loggedInUser} isLoggedIn={!!loggedInUser} />
+              <ProfileCard key={profile.id} profile={profile} loggedInUser={loggedInUser} isLoggedIn={isLoggedIn} />
             ))
           )}
         </div>
