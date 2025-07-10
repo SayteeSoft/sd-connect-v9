@@ -1,11 +1,10 @@
-
 {
   "name": "nextn",
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "concurrently --names \"netlify,next\" -c \"bgBlue.bold,bgGreen.bold\" \"npm:dev:netlify\" \"npm:dev:next\"",
-    "dev:next": "wait-on tcp:9998 && next dev --port 9002",
+    "dev": "concurrently \"npm:dev:netlify\" \"npm:dev:next\"",
+    "dev:next": "wait-on tcp:9998 && next dev -p 9002",
     "dev:netlify": "netlify functions:serve --port=9998",
     "genkit:dev": "genkit start -- tsx src/ai/dev.ts",
     "genkit:watch": "genkit start -- tsx --watch src/ai/dev.ts",

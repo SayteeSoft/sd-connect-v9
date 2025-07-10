@@ -1,21 +1,5 @@
 
-import type { Profile as ProfileType } from './types';
-export type Profile = ProfileType;
-// export type Profile = any;
-
-export type Message = {
-  id: number;
-  senderId: number; // Corresponds to a Profile ID
-  text: string;
-  timestamp: string; // ISO string for simplicity
-};
-
-export type Conversation = {
-  id: number;
-  participant: Profile;
-  messages: Message[];
-  unreadCount: number;
-};
+import type { Profile } from './types';
 
 export const wantsOptions = [
   'Mentorship', 'Discreet', 'Long-term', 'Travel Partner', 

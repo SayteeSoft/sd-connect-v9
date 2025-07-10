@@ -18,25 +18,24 @@ const localCreditsCache = new Map<number, number>();
 // This environment variable is set by `netlify dev` when a site is linked.
 const isNetlifyLinked = () => !!process.env.NETLIFY_SITE_ID;
 
-const logWarning = () => {
-    // This warning is only logged once per session to avoid spamming the console.
-    if ((global as any).__has_warned_blob_fallback) return;
-    if (!isNetlifyLinked()) {
+const getStoreSafe = (name: string) => {
+    try {
+        return getStore(name);
+    } catch (error) {
+        // This warning is only logged once per session to avoid spamming the console.
         console.warn('Netlify Blob Store not available. Falling back to a temporary in-memory store. Run `netlify link` to connect to a live blob store for persistent data during local development.');
-        (global as any).__has_warned_blob_fallback = true;
+        return null;
     }
 }
+
 
 // ====== PROFILES ======
 
 export const getProfilesFromStore = async (): Promise<Profile[]> => {
     if (!isNetlifyLinked()) {
-        logWarning();
         if (!localProfilesCache) {
-            // Seed the cache only once
-            localProfilesCache = featuredProfiles;
+            localProfilesCache = structuredClone(featuredProfiles);
         }
-        // Always return a fresh clone to prevent mutation across function calls
         return structuredClone(localProfilesCache);
     }
 
@@ -45,7 +44,7 @@ export const getProfilesFromStore = async (): Promise<Profile[]> => {
     if (!profiles) {
         console.log('Seeding profiles data to Netlify Blobs...');
         await store.setJSON(PROFILES_KEY, featuredProfiles);
-        profiles = featuredProfiles;
+        profiles = structuredClone(featuredProfiles);
     }
     return profiles || [];
 };
@@ -57,8 +56,6 @@ export const getProfileByIdFromStore = async (id: number): Promise<Profile | und
 
 export const saveProfilesToStore = async (data: Profile[]): Promise<void> => {
     if (!isNetlifyLinked()) {
-        // Here we ensure the cache is a fresh clone of the new data,
-        // rather than modifying the original object in memory.
         localProfilesCache = structuredClone(data);
         return;
     }
@@ -75,11 +72,10 @@ export const getNextId = async (profiles: Profile[]): Promise<number> => {
 
 export const getConversationsFromStore = async (): Promise<any[]> => {
     if (!isNetlifyLinked()) {
-        logWarning();
         if (!localConversationsCache) {
             localConversationsCache = structuredClone(rawConversationsData);
         }
-        return structuredClone(localConversationsCache!);
+        return structuredClone(localConversationsCache);
     }
 
     const store = getStore(CONVERSATIONS_STORE_NAME);
@@ -87,7 +83,7 @@ export const getConversationsFromStore = async (): Promise<any[]> => {
     if (!conversations) {
         console.log('Seeding conversations data to Netlify Blobs...');
         await store.setJSON(CONVERSATIONS_KEY, rawConversationsData);
-        conversations = rawConversationsData;
+        conversations = structuredClone(rawConversationsData);
     }
     return conversations || [];
 };
@@ -105,7 +101,6 @@ export const saveConversationsToStore = async (data: any[]): Promise<void> => {
 
 export const getCreditsForUser = async (userId: number): Promise<number> => {
     if (!isNetlifyLinked()) {
-        logWarning();
         if (!localCreditsCache.has(userId)) {
              // Give new daddies 10 credits on first check
             localCreditsCache.set(userId, 10);

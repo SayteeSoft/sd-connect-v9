@@ -1,7 +1,7 @@
 
 import type { Handler, HandlerEvent } from '@netlify/functions';
 import { getProfilesFromStore, saveProfilesToStore } from './utils/store';
-import type { Profile } from './utils/types';
+import type { Profile } from './utils/seed-data';
 
 type Vote = {
   voterId: number;
@@ -20,7 +20,7 @@ export const handler: Handler = async (event: HandlerEvent) => {
       return { statusCode: 400, body: JSON.stringify({ error: 'Missing required fields: voterId, targetId, choice' }) };
     }
 
-    const profiles: Profile[] = await getProfilesFromStore();
+    const profiles = await getProfilesFromStore();
     const targetProfileIndex = profiles.findIndex((p: Profile) => p.id === targetId);
 
     if (targetProfileIndex === -1) {
@@ -52,8 +52,7 @@ export const handler: Handler = async (event: HandlerEvent) => {
         targetProfile.metCount = (targetProfile.metCount || 0) + 1;
       } else {
         // If they try to vote 'notMet' again, do nothing.
-         const { password, ...profileToReturn } = targetProfile;
-         return { statusCode: 200, body: JSON.stringify(profileToReturn) };
+         return { statusCode: 200, body: JSON.stringify(targetProfile) };
       }
 
     } else {
