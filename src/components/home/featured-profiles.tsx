@@ -14,7 +14,7 @@ const featuredDaddyIds = [4, 6, 8, 10]; // Mark, James, Richard, William
 
 export function FeaturedProfiles() {
   const [profiles, setProfiles] = useState<Profile[]>([]);
-  const { user: loggedInUser, isLoading: isAuthLoading, isLoggedIn } = useAuth();
+  const { user: loggedInUser, isLoading: isAuthLoading } = useAuth();
   const [isDataLoading, setIsDataLoading] = useState(true);
 
   const fetchAllProfiles = useCallback(() => {
@@ -35,28 +35,19 @@ export function FeaturedProfiles() {
     };
   }, [fetchAllProfiles]);
 
-  const isComponentLoading = isAuthLoading || isDataLoading;
-
   const displayedProfiles = useMemo(() => {
-    if (!profiles.length) return [];
-
+    if (isAuthLoading || !profiles.length) {
+      return [];
+    }
+  
     let relevantIds: number[];
 
-    if (!isLoggedIn) {
-      // If logged out, default to showing featured 'baby' profiles.
-      relevantIds = featuredBabyIds;
-    } else if (loggedInUser) {
-      // If logged in as a 'daddy', show featured 'babies'.
-      if (loggedInUser.role === 'daddy') {
-        relevantIds = featuredBabyIds;
-      }
+    if (loggedInUser?.role === 'baby') {
       // If logged in as a 'baby', show featured 'daddies'.
-      else {
-        relevantIds = featuredDaddyIds;
-      }
+      relevantIds = featuredDaddyIds;
     } else {
-        // Fallback for when isLoggedIn is false, or user object isn't available yet
-        relevantIds = featuredBabyIds;
+      // Default to showing 'babies' if logged out, or if logged in as a 'daddy'.
+      relevantIds = featuredBabyIds;
     }
     
     return profiles
@@ -64,8 +55,9 @@ export function FeaturedProfiles() {
       // Ensure the order is consistent with the defined IDs
       .sort((a, b) => relevantIds.indexOf(a.id) - relevantIds.indexOf(b.id));
 
-  }, [isLoggedIn, loggedInUser, profiles]);
+  }, [isAuthLoading, loggedInUser, profiles]);
 
+  const isComponentLoading = isAuthLoading || isDataLoading;
 
   return (
     <section className="bg-background py-12 md:pt-12 md:pb-20">
@@ -80,7 +72,7 @@ export function FeaturedProfiles() {
             ))
           ) : (
             displayedProfiles.map((profile) => (
-              <ProfileCard key={profile.id} profile={profile} loggedInUser={loggedInUser} isLoggedIn={isLoggedIn} />
+              <ProfileCard key={profile.id} profile={profile} loggedInUser={loggedInUser} isLoggedIn={!!loggedInUser} />
             ))
           )}
         </div>
