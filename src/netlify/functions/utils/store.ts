@@ -20,9 +20,11 @@ const isNetlifyLinked = () => !!process.env.NETLIFY_SITE_ID;
 
 const logWarning = () => {
     // This warning is only logged once per session to avoid spamming the console.
-    if (isNetlifyLinked() || (global as any).__has_warned_blob_fallback) return;
-    console.warn('Netlify Blob Store not available. Falling back to a temporary in-memory store. Run `netlify link` to connect to a live blob store for persistent data during local development.');
-    (global as any).__has_warned_blob_fallback = true;
+    if ((global as any).__has_warned_blob_fallback) return;
+    if (!isNetlifyLinked()) {
+        console.warn('Netlify Blob Store not available. Falling back to a temporary in-memory store. Run `netlify link` to connect to a live blob store for persistent data during local development.');
+        (global as any).__has_warned_blob_fallback = true;
+    }
 }
 
 // ====== PROFILES ======
@@ -73,6 +75,7 @@ export const getNextId = async (profiles: Profile[]): Promise<number> => {
 
 export const getConversationsFromStore = async (): Promise<any[]> => {
     if (!isNetlifyLinked()) {
+        logWarning();
         if (!localConversationsCache) {
             localConversationsCache = structuredClone(rawConversationsData);
         }
@@ -102,6 +105,7 @@ export const saveConversationsToStore = async (data: any[]): Promise<void> => {
 
 export const getCreditsForUser = async (userId: number): Promise<number> => {
     if (!isNetlifyLinked()) {
+        logWarning();
         if (!localCreditsCache.has(userId)) {
              // Give new daddies 10 credits on first check
             localCreditsCache.set(userId, 10);
