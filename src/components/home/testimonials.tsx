@@ -18,7 +18,7 @@ import { getProfiles } from "@/lib/data";
 import { Skeleton } from "@/components/ui/skeleton";
 
 
-const testimonialProfileIds = [1, 2, 4, 3, 8]; // Admin, Darianna, Mark, Kateryna, Richard
+const testimonialProfileIds = [2, 4, 3, 8]; // Darianna, Mark, Kateryna, Richard
 
 export function Testimonials() {
   const { content: siteContent } = useLanguage();
