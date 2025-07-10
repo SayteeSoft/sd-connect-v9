@@ -1,5 +1,5 @@
 
-import type { Profile as ProfileType } from './seed-data';
+import type { Profile as ProfileType } from './types';
 export type Profile = ProfileType;
 // export type Profile = any;
 

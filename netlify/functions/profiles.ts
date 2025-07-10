@@ -1,7 +1,7 @@
 
 import type { Handler, HandlerEvent } from '@netlify/functions';
 import { getProfilesFromStore, getProfileByIdFromStore, saveProfilesToStore, getNextId } from './utils/store';
-import type { Profile } from './utils/seed-data';
+import type { Profile } from './utils/types';
 
 export const handler: Handler = async (event: HandlerEvent) => {
   const id = event.queryStringParameters?.id;
@@ -18,7 +18,7 @@ export const handler: Handler = async (event: HandlerEvent) => {
           return { statusCode: 404, body: JSON.stringify({ error: 'Profile not found' }) };
         } else {
           const profiles = await getProfilesFromStore();
-          const profilesToReturn = profiles.map((p: any) => {
+          const profilesToReturn = profiles.map((p: Profile) => {
             const { password, ...rest } = p;
             return rest;
           });

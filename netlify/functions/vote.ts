@@ -1,7 +1,12 @@
 
 import type { Handler, HandlerEvent } from '@netlify/functions';
 import { getProfilesFromStore, saveProfilesToStore } from './utils/store';
-import type { Profile } from './utils/seed-data';
+import type { Profile } from './utils/types';
+
+type Vote = {
+  voterId: number;
+  choice: 'met' | 'notMet';
+};
 
 export const handler: Handler = async (event: HandlerEvent) => {
   if (event.httpMethod !== 'POST') {
@@ -15,7 +20,7 @@ export const handler: Handler = async (event: HandlerEvent) => {
       return { statusCode: 400, body: JSON.stringify({ error: 'Missing required fields: voterId, targetId, choice' }) };
     }
 
-    const profiles = await getProfilesFromStore();
+    const profiles: Profile[] = await getProfilesFromStore();
     const targetProfileIndex = profiles.findIndex((p: Profile) => p.id === targetId);
 
     if (targetProfileIndex === -1) {
@@ -29,19 +34,36 @@ export const handler: Handler = async (event: HandlerEvent) => {
       targetProfile.votes = [];
     }
 
-    // Check if user has already voted
-    if (targetProfile.votes.some(v => v.voterId === voterId)) {
-      return { statusCode: 403, body: JSON.stringify({ error: 'You have already provided feedback for this profile.' }) };
-    }
-    
-    // Add new vote
-    targetProfile.votes.push({ voterId, choice });
+    const existingVoteIndex = targetProfile.votes.findIndex((v: Vote) => v.voterId === voterId);
 
-    // Increment count only if it's the first 'met' vote from anyone
-    if (choice === 'met') {
-      targetProfile.metCount = (targetProfile.metCount || 0) + 1;
+    if (existingVoteIndex !== -1) {
+      const existingVote = targetProfile.votes[existingVoteIndex];
+      // If user has already voted 'met', they cannot change their vote.
+      if (existingVote.choice === 'met') {
+        return { statusCode: 403, body: JSON.stringify({ error: 'You have already confirmed that you met this user.' }) };
+      }
+      
+      // If they previously voted 'notMet', they can change to 'met'.
+      if (existingVote.choice === 'notMet' && choice === 'met') {
+        // Update their vote
+        targetProfile.votes[existingVoteIndex].choice = 'met';
+        // Adjust counts: decrement notMet, increment met
+        targetProfile.notMetCount = (targetProfile.notMetCount || 1) - 1;
+        targetProfile.metCount = (targetProfile.metCount || 0) + 1;
+      } else {
+        // If they try to vote 'notMet' again, do nothing.
+         const { password, ...profileToReturn } = targetProfile;
+         return { statusCode: 200, body: JSON.stringify(profileToReturn) };
+      }
+
     } else {
-      targetProfile.notMetCount = (targetProfile.notMetCount || 0) + 1;
+      // It's a new vote
+      targetProfile.votes.push({ voterId, choice });
+      if (choice === 'met') {
+        targetProfile.metCount = (targetProfile.metCount || 0) + 1;
+      } else {
+        targetProfile.notMetCount = (targetProfile.notMetCount || 0) + 1;
+      }
     }
     
     profiles[targetProfileIndex] = targetProfile;

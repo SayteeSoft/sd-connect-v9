@@ -1,7 +1,7 @@
 
 import type { Handler, HandlerEvent } from '@netlify/functions';
 import { getProfilesFromStore } from './utils/store';
-import type { Profile } from './utils/seed-data';
+import type { Profile } from './utils/types';
 
 export const handler: Handler = async (event: HandlerEvent) => {
   if (event.httpMethod !== 'POST') {
@@ -12,7 +12,7 @@ export const handler: Handler = async (event: HandlerEvent) => {
   }
 
   try {
-    const { email, password, profiles } = JSON.parse(event.body || '{}');
+    const { email, password, profiles: clientProfiles } = JSON.parse(event.body || '{}');
 
     if (!email || !password) {
       return {
@@ -23,7 +23,7 @@ export const handler: Handler = async (event: HandlerEvent) => {
     
     // If a list of profiles is passed from the client (e.g., after signup), use it.
     // Otherwise, always fetch the latest from the store to ensure reliability.
-    const profilesToSearch = profiles || await getProfilesFromStore();
+    const profilesToSearch: Profile[] = clientProfiles || await getProfilesFromStore();
 
     const foundUser = profilesToSearch.find(
       (p: Profile) => p.email && p.email.toLowerCase() === email.toLowerCase() && p.password === password
@@ -43,9 +43,10 @@ export const handler: Handler = async (event: HandlerEvent) => {
       };
     }
   } catch (error) {
+    console.error('Auth function error:', error);
     return {
       statusCode: 500,
-      body: JSON.stringify({ error: 'An internal error occurred.' }),
+      body: JSON.stringify({ error: 'An internal server error occurred.' }),
     };
   }
 };
