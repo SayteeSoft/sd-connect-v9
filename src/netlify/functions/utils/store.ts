@@ -27,6 +27,10 @@ const logWarning = () => {
     }
 }
 
+const deepCopy = <T>(obj: T): T => {
+    return JSON.parse(JSON.stringify(obj));
+}
+
 // ====== PROFILES ======
 
 export const getProfilesFromStore = async (): Promise<Profile[]> => {
@@ -34,10 +38,10 @@ export const getProfilesFromStore = async (): Promise<Profile[]> => {
         logWarning();
         if (!localProfilesCache) {
             // Seed the cache only once
-            localProfilesCache = structuredClone(featuredProfiles);
+            localProfilesCache = deepCopy(featuredProfiles);
         }
         // Always return a fresh clone to prevent mutation across function calls
-        return structuredClone(localProfilesCache!);
+        return deepCopy(localProfilesCache!);
     }
 
     const store = getStore(PROFILES_STORE_NAME);
@@ -57,9 +61,7 @@ export const getProfileByIdFromStore = async (id: number): Promise<Profile | und
 
 export const saveProfilesToStore = async (data: Profile[]): Promise<void> => {
     if (!isNetlifyLinked()) {
-        // This is the critical fix. We must save a deep clone of the new data
-        // to prevent corrupting the original cache reference.
-        localProfilesCache = structuredClone(data);
+        localProfilesCache = deepCopy(data);
         return;
     }
     const store = getStore(PROFILES_STORE_NAME);
@@ -77,9 +79,9 @@ export const getConversationsFromStore = async (): Promise<any[]> => {
     if (!isNetlifyLinked()) {
         logWarning();
         if (!localConversationsCache) {
-            localConversationsCache = structuredClone(rawConversationsData);
+            localConversationsCache = deepCopy(rawConversationsData);
         }
-        return structuredClone(localConversationsCache!);
+        return deepCopy(localConversationsCache!);
     }
 
     const store = getStore(CONVERSATIONS_STORE_NAME);
@@ -94,7 +96,7 @@ export const getConversationsFromStore = async (): Promise<any[]> => {
 
 export const saveConversationsToStore = async (data: any[]): Promise<void> => {
     if (!isNetlifyLinked()) {
-        localConversationsCache = structuredClone(data);
+        localConversationsCache = deepCopy(data);
         return;
     }
     const store = getStore(CONVERSATIONS_STORE_NAME);
