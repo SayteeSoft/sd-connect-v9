@@ -39,14 +39,12 @@ export function FeaturedProfiles() {
       if (profile.id === 1) return false;
       
       if (loggedInUser) {
-        // Don't show the user their own profile on the homepage
-        if (profile.id === loggedInUser.id) {
-          return false;
-        }
-        // If logged in, show opposite roles. This now applies to the admin as well.
-        if (profile.role === loggedInUser.role) {
-          return false;
-        }
+        // If logged in, show opposite roles.
+        if (profile.id === loggedInUser.id) return false;
+        if (profile.role === loggedInUser.role) return false;
+      } else {
+        // If logged out, only show baby profiles.
+        if (profile.role !== 'baby') return false;
       }
       return true;
     })
