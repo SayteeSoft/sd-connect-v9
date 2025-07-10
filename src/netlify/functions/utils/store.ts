@@ -1,7 +1,7 @@
 
 import { getStore } from '@netlify/blobs';
 import { featuredProfiles, rawConversationsData } from './seed-data';
-import type { Profile } from './seed-data';
+import type { Profile } from './types';
 
 const PROFILES_STORE_NAME = 'profiles_data';
 const CONVERSATIONS_STORE_NAME = 'conversations_data';
