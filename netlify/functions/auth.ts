@@ -1,7 +1,7 @@
 
 import type { Handler, HandlerEvent } from '@netlify/functions';
 import { getProfilesFromStore } from './utils/store';
-import type { Profile } from './utils/types';
+import type { Profile } from './utils/seed-data';
 
 export const handler: Handler = async (event: HandlerEvent) => {
   if (event.httpMethod !== 'POST') {

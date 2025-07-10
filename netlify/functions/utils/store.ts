@@ -1,7 +1,7 @@
 
 import { getStore } from '@netlify/blobs';
 import { featuredProfiles, rawConversationsData } from './seed-data';
-import type { Profile } from './types';
+import type { Profile } from './seed-data';
 
 const PROFILES_STORE_NAME = 'profiles_data';
 const CONVERSATIONS_STORE_NAME = 'conversations_data';
@@ -39,11 +39,9 @@ export const getProfilesFromStore = async (): Promise<Profile[]> => {
     if (!isNetlifyLinked()) {
         if (!localProfilesCache) {
             logWarning();
-            // Use structuredClone to ensure the original seed data is never mutated
-            localProfilesCache = structuredClone(featuredProfiles);
+            localProfilesCache = JSON.parse(JSON.stringify(featuredProfiles));
         }
-        // Return a clone to prevent mutation of the cache
-        return structuredClone(localProfilesCache!);
+        return localProfilesCache!;
     }
 
     const store = getStore(PROFILES_STORE_NAME);
@@ -63,8 +61,7 @@ export const getProfileByIdFromStore = async (id: number): Promise<Profile | und
 
 export const saveProfilesToStore = async (data: Profile[]): Promise<void> => {
     if (!isNetlifyLinked()) {
-        // Create a deep copy to ensure the cache is not pointing to a mutated object
-        localProfilesCache = structuredClone(data);
+        localProfilesCache = data;
         return;
     }
     const store = getStore(PROFILES_STORE_NAME);
@@ -81,9 +78,9 @@ export const getNextId = async (profiles: Profile[]): Promise<number> => {
 export const getConversationsFromStore = async (): Promise<any[]> => {
     if (!isNetlifyLinked()) {
         if (!localConversationsCache) {
-            localConversationsCache = structuredClone(rawConversationsData);
+            localConversationsCache = JSON.parse(JSON.stringify(rawConversationsData));
         }
-        return structuredClone(localConversationsCache!);
+        return localConversationsCache!;
     }
 
     const store = getStore(CONVERSATIONS_STORE_NAME);
@@ -98,7 +95,7 @@ export const getConversationsFromStore = async (): Promise<any[]> => {
 
 export const saveConversationsToStore = async (data: any[]): Promise<void> => {
     if (!isNetlifyLinked()) {
-        localConversationsCache = structuredClone(data);
+        localConversationsCache = data;
         return;
     }
     const store = getStore(CONVERSATIONS_STORE_NAME);

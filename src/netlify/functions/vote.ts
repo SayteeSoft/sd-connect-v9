@@ -1,7 +1,7 @@
 
 import type { Handler, HandlerEvent } from '@netlify/functions';
 import { getProfilesFromStore, saveProfilesToStore } from './utils/store';
-import type { Profile } from './utils/seed-data';
+import type { Profile } from './utils/types';
 
 type Vote = {
   voterId: number;
@@ -52,7 +52,8 @@ export const handler: Handler = async (event: HandlerEvent) => {
         targetProfile.metCount = (targetProfile.metCount || 0) + 1;
       } else {
         // If they try to vote 'notMet' again, do nothing.
-         return { statusCode: 200, body: JSON.stringify(targetProfile) };
+         const { password, ...profileToReturn } = targetProfile;
+         return { statusCode: 200, body: JSON.stringify(profileToReturn) };
       }
 
     } else {

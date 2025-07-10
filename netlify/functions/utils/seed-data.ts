@@ -1,9 +1,21 @@
 
-import type { Profile as ProfileType, Message as MessageType, Conversation as ConversationType } from './types';
-
+import type { Profile as ProfileType } from './seed-data';
 export type Profile = ProfileType;
-export type Message = MessageType;
-export type Conversation = ConversationType;
+// export type Profile = any;
+
+export type Message = {
+  id: number;
+  senderId: number; // Corresponds to a Profile ID
+  text: string;
+  timestamp: string; // ISO string for simplicity
+};
+
+export type Conversation = {
+  id: number;
+  participant: Profile;
+  messages: Message[];
+  unreadCount: number;
+};
 
 export const wantsOptions = [
   'Mentorship', 'Discreet', 'Long-term', 'Travel Partner', 
