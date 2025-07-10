@@ -6,3 +6,10 @@
 [functions]
   directory = "netlify/functions"
   node_bundler = "esbuild"
+
+[dev]
+  # This proxies requests from the Next.js app to the functions server
+  # on port 9998. It replaces the `rewrites` config in `next.config.js`.
+  proxy = "http://localhost:9998"
+  # The port for the Next.js dev server
+  port = 9002
