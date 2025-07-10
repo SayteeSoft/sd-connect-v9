@@ -1,7 +1,12 @@
 
 import type { Handler, HandlerEvent } from '@netlify/functions';
-import { getProfilesFromStore, saveProfilesToStore } from '@/netlify/functions/utils/store';
-import type { Profile } from '@/netlify/functions/utils/seed-data';
+import { getProfilesFromStore, saveProfilesToStore } from './utils/store';
+import type { Profile } from './utils/seed-data';
+
+type Vote = {
+  voterId: number;
+  choice: 'met' | 'notMet';
+};
 
 export const handler: Handler = async (event: HandlerEvent) => {
   if (event.httpMethod !== 'POST') {
@@ -30,14 +35,14 @@ export const handler: Handler = async (event: HandlerEvent) => {
     }
 
     // Check if user has already voted
-    if (targetProfile.votes.some(v => v.voterId === voterId)) {
+    if (targetProfile.votes.some((v: Vote) => v.voterId === voterId)) {
       return { statusCode: 403, body: JSON.stringify({ error: 'You have already provided feedback for this profile.' }) };
     }
     
     // Add new vote
     targetProfile.votes.push({ voterId, choice });
 
-    // Increment count only if it's the first 'met' vote from anyone
+    // Increment count
     if (choice === 'met') {
       targetProfile.metCount = (targetProfile.metCount || 0) + 1;
     } else {

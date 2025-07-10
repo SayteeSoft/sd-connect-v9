@@ -1,6 +1,7 @@
 
 import type { Profile as ProfileType } from './seed-data';
-export type Profile = ProfileType;
+// export type Profile = ProfileType;
+export type Profile = any;
 
 export type Message = {
   id: number;
