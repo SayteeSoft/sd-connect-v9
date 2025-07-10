@@ -23,16 +23,16 @@ const logWarning = () => {
     console.warn('Netlify Blob Store not available. Falling back to a temporary in-memory store. Run `netlify link` to connect to a live blob store for persistent data during local development.');
 }
 
+
 // ====== PROFILES ======
 
 export const getProfilesFromStore = async (): Promise<Profile[]> => {
     if (!isNetlifyLinked()) {
         if (!localProfilesCache) {
             logWarning();
-            // Use structuredClone for a reliable deep copy that preserves all fields.
-            localProfilesCache = structuredClone(featuredProfiles);
+            localProfilesCache = JSON.parse(JSON.stringify(featuredProfiles));
         }
-        return structuredClone(localProfilesCache!);
+        return localProfilesCache!;
     }
 
     const store = getStore(PROFILES_STORE_NAME);
@@ -52,7 +52,7 @@ export const getProfileByIdFromStore = async (id: number): Promise<Profile | und
 
 export const saveProfilesToStore = async (data: Profile[]): Promise<void> => {
     if (!isNetlifyLinked()) {
-        localProfilesCache = structuredClone(data);
+        localProfilesCache = data;
         return;
     }
     const store = getStore(PROFILES_STORE_NAME);
@@ -69,7 +69,7 @@ export const getNextId = async (profiles: Profile[]): Promise<number> => {
 export const getConversationsFromStore = async (): Promise<any[]> => {
     if (!isNetlifyLinked()) {
         if (!localConversationsCache) {
-            localConversationsCache = structuredClone(rawConversationsData);
+            localConversationsCache = JSON.parse(JSON.stringify(rawConversationsData));
         }
         return localConversationsCache!;
     }
