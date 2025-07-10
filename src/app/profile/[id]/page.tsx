@@ -64,11 +64,11 @@ const InteractionCard = ({ profile, onVote, hasVoted, hasMet }: {
       <CardDescription>Have you met {profile.name} in person?</CardDescription>
     </CardHeader>
     <CardContent className="flex gap-4">
-      <Button className="flex-1 relative" size="lg" disabled={hasVoted && hasMet} onClick={() => onVote('met')}>
+      <Button className="flex-1 relative" size="lg" disabled={hasMet} onClick={() => onVote('met')}>
         We Met
         <Badge variant="secondary" className="absolute -top-2 -right-2">{profile.metCount || 0}</Badge>
       </Button>
-      <Button className="flex-1 relative" size="lg" variant="outline" disabled={hasVoted && hasMet} onClick={() => onVote('notMet')}>
+      <Button className="flex-1 relative" size="lg" variant="outline" disabled={hasMet} onClick={() => onVote('notMet')}>
         Didn't Meet
         <Badge variant="outline" className="absolute -top-2 -right-2">{profile.notMetCount || 0}</Badge>
       </Button>
@@ -794,7 +794,7 @@ export default function ProfilePage() {
   };
 
   const handleVote = async (choice: 'met' | 'notMet') => {
-    if (!loggedInUser || !profileData || (hasVoted && hasMet)) return;
+    if (!loggedInUser || !profileData || hasMet) return;
 
     const updatedProfile = await castVote(loggedInUser.id, profileData.id, choice);
 
