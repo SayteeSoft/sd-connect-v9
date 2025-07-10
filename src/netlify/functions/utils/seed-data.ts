@@ -20,7 +20,7 @@ export type Profile = {
   };
   metCount?: number;
   notMetCount?: number;
-  votes?: {
+  votes: {
     voterId: number;
     choice: 'met' | 'notMet';
   }[];

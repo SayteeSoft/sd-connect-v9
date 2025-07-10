@@ -64,16 +64,17 @@ const InteractionCard = ({ profile, onVote, hasVoted, hasMet }: {
       <CardDescription>Have you met {profile.name} in person?</CardDescription>
     </CardHeader>
     <CardContent className="flex gap-4">
-      <Button className="flex-1 relative" size="lg" disabled={hasVoted} onClick={() => onVote('met')}>
+      <Button className="flex-1 relative" size="lg" disabled={hasVoted && hasMet} onClick={() => onVote('met')}>
         We Met
         <Badge variant="secondary" className="absolute -top-2 -right-2">{profile.metCount || 0}</Badge>
       </Button>
-      <Button className="flex-1 relative" size="lg" variant="outline" disabled={hasVoted || hasMet || (profile.metCount || 0) > 0} onClick={() => onVote('notMet')}>
+      <Button className="flex-1 relative" size="lg" variant="outline" disabled={hasVoted && hasMet} onClick={() => onVote('notMet')}>
         Didn't Meet
         <Badge variant="outline" className="absolute -top-2 -right-2">{profile.notMetCount || 0}</Badge>
       </Button>
     </CardContent>
-    {hasVoted && <CardFooter className="pt-4"><p className="text-sm text-muted-foreground italic">You have already submitted your feedback for this profile.</p></CardFooter>}
+    {hasVoted && hasMet && <CardFooter className="pt-4"><p className="text-sm text-muted-foreground italic">Thank you for your feedback! Meeting confirmed.</p></CardFooter>}
+    {hasVoted && !hasMet && <CardFooter className="pt-4"><p className="text-sm text-muted-foreground italic">You can update your feedback if you meet later.</p></CardFooter>}
   </Card>
 );
 
@@ -96,6 +97,7 @@ const ProfileView = ({ profile, onEdit, isOwnProfile, canEdit, onMessage, onFavo
   onOpenGallery: (index: number) => void;
 }) => {
     const canMessage = !isOwnProfile && loggedInUser && profile.role !== loggedInUser.role;
+    const canViewEmail = isOwnProfile || isAdmin || (profile.metCount ?? 0) > 0;
 
     return (
   <div className="flex flex-col lg:flex-row gap-6 lg:gap-8 items-start">
@@ -128,7 +130,7 @@ const ProfileView = ({ profile, onEdit, isOwnProfile, canEdit, onMessage, onFavo
            <div>
             <h1 className="text-3xl font-bold font-headline flex items-center gap-2">
                 {profile.name}
-                {profile.metCount && profile.metCount > 5 && (
+                {(profile.metCount ?? 0) > 5 && (
                     <TooltipProvider>
                     <Tooltip>
                         <TooltipTrigger>
@@ -151,7 +153,7 @@ const ProfileView = ({ profile, onEdit, isOwnProfile, canEdit, onMessage, onFavo
               <Mail className="h-4 w-4" />
               <span className={cn(
                 "text-sm",
-                !isOwnProfile && !isAdmin && !hasMet && "blur-sm select-none"
+                !canViewEmail && "blur-sm select-none"
               )}>
                 {profile.email}
               </span>
@@ -283,9 +285,9 @@ const ProfileView = ({ profile, onEdit, isOwnProfile, canEdit, onMessage, onFavo
           )}
         </CardContent>
       </Card>
-      
-      {!isOwnProfile && <InteractionCard profile={profile} onVote={onVote} hasVoted={hasVoted} hasMet={hasMet} />}
 
+      {!isOwnProfile && <InteractionCard profile={profile} onVote={onVote} hasVoted={hasVoted} hasMet={hasMet} />}
+      
       <Card>
         <CardHeader>
           <CardTitle>Attributes</CardTitle>
@@ -792,7 +794,7 @@ export default function ProfilePage() {
   };
 
   const handleVote = async (choice: 'met' | 'notMet') => {
-    if (!loggedInUser || !profileData || hasVoted) return;
+    if (!loggedInUser || !profileData || (hasVoted && hasMet)) return;
 
     const updatedProfile = await castVote(loggedInUser.id, profileData.id, choice);
 
