@@ -1,4 +1,5 @@
-import type { Profile as ProfileType } from '@/src/netlify/functions/utils/seed-data';
+
+import type { Profile as ProfileType } from './seed-data';
 export type Profile = ProfileType;
 
 export type Message = {
