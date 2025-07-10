@@ -39,7 +39,9 @@ export const getProfilesFromStore = async (): Promise<Profile[]> => {
     if (!isNetlifyLinked()) {
         if (!localProfilesCache) {
             logWarning();
-            localProfilesCache = JSON.parse(JSON.stringify(featuredProfiles));
+            // The JSON.parse(JSON.stringify(...)) was stripping the optional password field.
+            // Removing it ensures the seed data is used as is.
+            localProfilesCache = featuredProfiles;
         }
         return localProfilesCache!;
     }
