@@ -39,11 +39,10 @@ export const getProfilesFromStore = async (): Promise<Profile[]> => {
     if (!isNetlifyLinked()) {
         if (!localProfilesCache) {
             logWarning();
-            // The JSON.parse(JSON.stringify(...)) was stripping the optional password field.
-            // Removing it ensures the seed data is used as is.
-            localProfilesCache = featuredProfiles;
+            // Create a deep copy of the seed data to avoid mutation issues in local dev.
+            localProfilesCache = structuredClone(featuredProfiles);
         }
-        return localProfilesCache!;
+        return structuredClone(localProfilesCache!);
     }
 
     const store = getStore(PROFILES_STORE_NAME);
@@ -63,7 +62,7 @@ export const getProfileByIdFromStore = async (id: number): Promise<Profile | und
 
 export const saveProfilesToStore = async (data: Profile[]): Promise<void> => {
     if (!isNetlifyLinked()) {
-        localProfilesCache = data;
+        localProfilesCache = structuredClone(data);
         return;
     }
     const store = getStore(PROFILES_STORE_NAME);
