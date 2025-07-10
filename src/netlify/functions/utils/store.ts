@@ -23,14 +23,32 @@ const logWarning = () => {
     console.warn('Netlify Blob Store not available. Falling back to a temporary in-memory store. Run `netlify link` to connect to a live blob store for persistent data during local development.');
 }
 
-const getStoreSafe = (name: string) => {
-    try {
-        return getStore(name);
-    } catch (error) {
-        logWarning();
-        return null;
+// A safe, simple deep-copy function that preserves properties with `undefined` values, unlike JSON.parse(JSON.stringify()).
+const deepCopy = <T>(obj: T): T => {
+    if (obj === null || typeof obj !== 'object') {
+        return obj;
     }
-}
+
+    if (obj instanceof Date) {
+        return new Date(obj.getTime()) as any;
+    }
+
+    if (Array.isArray(obj)) {
+        return obj.reduce((acc, item, i) => {
+            acc[i] = deepCopy(item);
+            return acc;
+        }, []) as any;
+    }
+
+    if (obj instanceof Object) {
+        return Object.keys(obj).reduce((acc: {[key: string]: any}, key) => {
+            acc[key] = deepCopy((obj as {[key: string]: any})[key]);
+            return acc;
+        }, {}) as any;
+    }
+
+    return obj;
+};
 
 
 // ====== PROFILES ======
@@ -39,10 +57,10 @@ export const getProfilesFromStore = async (): Promise<Profile[]> => {
     if (!isNetlifyLinked()) {
         if (!localProfilesCache) {
             logWarning();
-            // Create a deep copy of the seed data to avoid mutation issues in local dev.
-            localProfilesCache = structuredClone(featuredProfiles);
+            // Use a safe deep copy to avoid mutation issues in local dev.
+            localProfilesCache = deepCopy(featuredProfiles);
         }
-        return structuredClone(localProfilesCache!);
+        return deepCopy(localProfilesCache!);
     }
 
     const store = getStore(PROFILES_STORE_NAME);
@@ -62,7 +80,7 @@ export const getProfileByIdFromStore = async (id: number): Promise<Profile | und
 
 export const saveProfilesToStore = async (data: Profile[]): Promise<void> => {
     if (!isNetlifyLinked()) {
-        localProfilesCache = structuredClone(data);
+        localProfilesCache = deepCopy(data);
         return;
     }
     const store = getStore(PROFILES_STORE_NAME);
@@ -79,7 +97,7 @@ export const getNextId = async (profiles: Profile[]): Promise<number> => {
 export const getConversationsFromStore = async (): Promise<any[]> => {
     if (!isNetlifyLinked()) {
         if (!localConversationsCache) {
-            localConversationsCache = JSON.parse(JSON.stringify(rawConversationsData));
+            localConversationsCache = deepCopy(rawConversationsData);
         }
         return localConversationsCache!;
     }

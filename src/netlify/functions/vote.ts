@@ -20,7 +20,7 @@ export const handler: Handler = async (event: HandlerEvent) => {
       return { statusCode: 400, body: JSON.stringify({ error: 'Missing required fields: voterId, targetId, choice' }) };
     }
 
-    const profiles = await getProfilesFromStore();
+    const profiles: Profile[] = await getProfilesFromStore();
     const targetProfileIndex = profiles.findIndex((p: Profile) => p.id === targetId);
 
     if (targetProfileIndex === -1) {
