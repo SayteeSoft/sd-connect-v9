@@ -1,7 +1,7 @@
 
 import { getStore } from '@netlify/blobs';
 import { featuredProfiles, rawConversationsData } from './seed-data';
-import type { Profile } from './seed-data';
+import type { Profile } from './types';
 
 const PROFILES_STORE_NAME = 'profiles_data';
 const CONVERSATIONS_STORE_NAME = 'conversations_data';
@@ -20,28 +20,28 @@ const isNetlifyLinked = () => !!process.env.NETLIFY_SITE_ID;
 
 const logWarning = () => {
     // This warning is only logged once per session to avoid spamming the console.
-    console.warn('Netlify Blob Store not available. Falling back to a temporary in-memory store. Run `netlify link` to connect to a live blob store for persistent data during local development.');
-}
-
-const getStoreSafe = (name: string) => {
-    try {
-        return getStore(name);
-    } catch (error) {
-        logWarning();
-        return null;
+    if ((global as any).__has_warned_blob_fallback) return;
+    if (!isNetlifyLinked()) {
+        console.warn('Netlify Blob Store not available. Falling back to a temporary in-memory store. Run `netlify link` to connect to a live blob store for persistent data during local development.');
+        (global as any).__has_warned_blob_fallback = true;
     }
 }
 
+const deepCopy = <T>(obj: T): T => {
+    return structuredClone(obj);
+}
 
 // ====== PROFILES ======
 
 export const getProfilesFromStore = async (): Promise<Profile[]> => {
     if (!isNetlifyLinked()) {
+        logWarning();
         if (!localProfilesCache) {
-            logWarning();
-            localProfilesCache = JSON.parse(JSON.stringify(featuredProfiles));
+            // Seed the cache only once
+            localProfilesCache = deepCopy(featuredProfiles);
         }
-        return localProfilesCache!;
+        // Always return a fresh clone to prevent mutation across function calls
+        return deepCopy(localProfilesCache!);
     }
 
     const store = getStore(PROFILES_STORE_NAME);
@@ -61,7 +61,7 @@ export const getProfileByIdFromStore = async (id: number): Promise<Profile | und
 
 export const saveProfilesToStore = async (data: Profile[]): Promise<void> => {
     if (!isNetlifyLinked()) {
-        localProfilesCache = data;
+        localProfilesCache = deepCopy(data);
         return;
     }
     const store = getStore(PROFILES_STORE_NAME);
@@ -77,10 +77,11 @@ export const getNextId = async (profiles: Profile[]): Promise<number> => {
 
 export const getConversationsFromStore = async (): Promise<any[]> => {
     if (!isNetlifyLinked()) {
+        logWarning();
         if (!localConversationsCache) {
-            localConversationsCache = JSON.parse(JSON.stringify(rawConversationsData));
+            localConversationsCache = deepCopy(rawConversationsData);
         }
-        return localConversationsCache!;
+        return deepCopy(localConversationsCache!);
     }
 
     const store = getStore(CONVERSATIONS_STORE_NAME);
@@ -95,7 +96,7 @@ export const getConversationsFromStore = async (): Promise<any[]> => {
 
 export const saveConversationsToStore = async (data: any[]): Promise<void> => {
     if (!isNetlifyLinked()) {
-        localConversationsCache = data;
+        localConversationsCache = deepCopy(data);
         return;
     }
     const store = getStore(CONVERSATIONS_STORE_NAME);
@@ -106,6 +107,7 @@ export const saveConversationsToStore = async (data: any[]): Promise<void> => {
 
 export const getCreditsForUser = async (userId: number): Promise<number> => {
     if (!isNetlifyLinked()) {
+        logWarning();
         if (!localCreditsCache.has(userId)) {
              // Give new daddies 10 credits on first check
             localCreditsCache.set(userId, 10);
