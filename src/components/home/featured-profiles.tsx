@@ -9,8 +9,8 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { useAuth } from "@/hooks/use-auth";
 
 // Define specific IDs for curated featured profiles
-const featuredBabyIds = [2, 3, 5, 7]; // e.g., Darianna, Kateryna, Sofia, Vanessa
-const featuredDaddyIds = [4, 6, 8, 10]; // e.g., Mark, James, Richard, William
+const featuredBabyIds = [2, 3, 5, 7]; // Darianna, Kateryna, Sofia, Vanessa
+const featuredDaddyIds = [4, 6, 8, 10]; // Mark, James, Richard, William
 
 export function FeaturedProfiles() {
   const [profiles, setProfiles] = useState<Profile[]>([]);
@@ -24,7 +24,7 @@ export function FeaturedProfiles() {
             setProfiles(profilesData);
         }
         setIsDataLoading(false);
-    });
+    }).catch(() => setIsDataLoading(false));
   }, []);
 
   useEffect(() => {
@@ -38,11 +38,14 @@ export function FeaturedProfiles() {
   const isComponentLoading = isAuthLoading || isDataLoading;
 
   const displayedProfiles = useMemo(() => {
-    if (isComponentLoading) return [];
+    if (!profiles.length) return [];
 
     let relevantIds: number[];
 
-    if (isLoggedIn && loggedInUser) {
+    if (!isLoggedIn) {
+      // If logged out, default to showing featured 'baby' profiles.
+      relevantIds = featuredBabyIds;
+    } else if (loggedInUser) {
       // If logged in as a 'daddy', show featured 'babies'.
       if (loggedInUser.role === 'daddy') {
         relevantIds = featuredBabyIds;
@@ -52,8 +55,8 @@ export function FeaturedProfiles() {
         relevantIds = featuredDaddyIds;
       }
     } else {
-      // If logged out, default to showing featured 'baby' profiles.
-      relevantIds = featuredBabyIds;
+        // Fallback for when isLoggedIn is false, or user object isn't available yet
+        relevantIds = featuredBabyIds;
     }
     
     return profiles
@@ -61,7 +64,7 @@ export function FeaturedProfiles() {
       // Ensure the order is consistent with the defined IDs
       .sort((a, b) => relevantIds.indexOf(a.id) - relevantIds.indexOf(b.id));
 
-  }, [isComponentLoading, isLoggedIn, loggedInUser, profiles]);
+  }, [isLoggedIn, loggedInUser, profiles]);
 
 
   return (
