@@ -1,5 +1,5 @@
 import type { Handler, HandlerEvent } from '@netlify/functions';
-import { getCreditsForUser, setCreditsForUser } from './utils/store';
+import { getCreditsForUser, setCreditsForUser } from '@/src/netlify/functions/utils/store';
 
 export const handler: Handler = async (event: HandlerEvent) => {
   const userId = event.queryStringParameters?.userId;

@@ -1,30 +1,5 @@
-
-export type Profile = {
-  id: number;
-  name: string;
-  email: string;
-  password?: string;
-  age: number;
-  location: string;
-  imageUrl: string;
-  role: 'baby' | 'daddy';
-  online: boolean;
-  hint: string;
-  verified?: boolean;
-  bio?: string;
-  wants?: string[];
-  interests?: string[];
-  gallery?: string[];
-  attributes?: {
-    [key: string]: string;
-  };
-  metCount?: number;
-  notMetCount?: number;
-  votes?: {
-    voterId: number;
-    choice: 'met' | 'notMet';
-  }[];
-};
+import type { Profile as ProfileType } from '@/src/netlify/functions/utils/seed-data';
+export type Profile = ProfileType;
 
 export type Message = {
   id: number;
