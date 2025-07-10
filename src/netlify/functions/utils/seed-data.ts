@@ -18,6 +18,12 @@ export type Profile = {
   attributes?: {
     [key: string]: string;
   };
+  metCount?: number;
+  notMetCount?: number;
+  votes?: {
+    voterId: number;
+    choice: 'met' | 'notMet';
+  }[];
 };
 
 export type Message = {
@@ -49,7 +55,7 @@ export const ethnicityOptions = ["Black/African Descent", "North/African Descent
 export const hairColorOptions = ["Brown", "Black", "Blonde", "Chestnut", "Grey", "Auburn", "Red"];
 export const eyeColorOptions = ["Blue", "Brown", "Green", "Grey", "Hazel"];
 export const smokerDrinkerOptions = ['Yes', 'Socially', 'Sometimes', 'No'];
-export const yesNoOptions = [{value: 'Yes', label: 'Yes'}, {value: 'No', label: 'No'}];
+export const yesNoOptions = [{value: 'Yes', label: 'Yes'}, {value: 'No', 'label': 'No'}];
 
 export const attributeKeys = [
   'Height',
@@ -79,9 +85,7 @@ export const featuredProfiles: Profile[] = [
     bio: "I'm a successful entrepreneur with a passion for the finer things in life. I enjoy mentoring ambitious individuals and exploring the world. Looking for a genuine connection with someone who is intelligent, driven, and has a great sense of humor.",
     wants: ['Mentorship', 'Discreet', 'Long-term', 'Travel Partner'],
     interests: ['Art', 'Travel', 'Fine Dining', 'Theatre', 'Wine Tasting'],
-    gallery: [
-      ''
-    ],
+    gallery: [],
     attributes: {
       'Height': "6'0\"",
       'Body Type': 'Athletic',
@@ -93,6 +97,9 @@ export const featuredProfiles: Profile[] = [
       'Piercings': 'No',
       'Tattoos': 'No',
     },
+    metCount: 10,
+    notMetCount: 1,
+    votes: [],
   },
   {
     id: 2,
@@ -125,6 +132,9 @@ export const featuredProfiles: Profile[] = [
       'Piercings': 'No',
       'Tattoos': 'No',
     },
+    metCount: 8,
+    notMetCount: 0,
+    votes: [],
   },
   {
     id: 3,
@@ -156,6 +166,9 @@ export const featuredProfiles: Profile[] = [
       'Piercings': 'No',
       'Tattoos': 'No',
     },
+    metCount: 2,
+    notMetCount: 0,
+    votes: [],
   },
   {
     id: 4,
@@ -186,6 +199,9 @@ export const featuredProfiles: Profile[] = [
       'Piercings': 'No',
       'Tattoos': 'No',
     },
+    metCount: 6,
+    notMetCount: 1,
+    votes: [],
   },
   {
     id: 5,
@@ -193,8 +209,8 @@ export const featuredProfiles: Profile[] = [
     email: 'sofia@gmail.com',
     password: 'password123',
     age: 26,
-    location: 'Paris, FR',
-    imageUrl: '/default_Profiles/Male_Gemini_Generated_Image(small)-002.jpg',
+    location: 'Cartagena, CO',
+    imageUrl: '/default_Profiles/Sofia_Gemini_Generated_Image(small)-001.jpg',
     hint: 'woman fashion designer',
     role: 'baby',
     online: false,
@@ -203,7 +219,9 @@ export const featuredProfiles: Profile[] = [
     wants: ['Discreet', 'Casual', 'Travel Partner'],
     interests: ['Art', 'Theatre', 'Reading', 'Cooking'],
     gallery: [
-      ''
+      '/default_Profiles/Sofia_Gemini_Generated_Image(small)-002.jpg',
+      '/default_Profiles/Sofia_Gemini_Generated_Image(small)-003.jpg',
+      '/default_Profiles/Sofia_Gemini_Generated_Image(small)-004.jpg'
     ],
     attributes: {
       'Height': "5'8\"",
@@ -213,9 +231,12 @@ export const featuredProfiles: Profile[] = [
       'Eye Color': 'Brown',
       'Smoker': 'No',
       'Drinker': 'No',
-      'Piercings': 'Yes',
+      'Piercings': 'No',
       'Tattoos': 'No',
     },
+    metCount: 4,
+    notMetCount: 0,
+    votes: [],
   },
   {
     id: 6,
@@ -246,11 +267,14 @@ export const featuredProfiles: Profile[] = [
       'Piercings': 'No',
       'Tattoos': 'No',
     },
+    metCount: 1,
+    notMetCount: 2,
+    votes: [],
   },
   {
     id: 7,
     name: 'Vanessa',
-    email: 'Vanessa@gmail.com',
+    email: 'vanessa@gmail.com',
     password: 'password123',
     age: 21,
     location: 'Franfurt, DE',
@@ -264,8 +288,7 @@ export const featuredProfiles: Profile[] = [
     interests: ['Reading', 'Cooking', 'Art', 'Travel'],
     gallery: [
       '/default_Profiles/Vansessa_Gemini_Generated_Image(small)-002.jpg',
-      '/default_Profiles/Vansessa_Gemini_Generated_Image(small)-003.jpg',
-      '/default_Profiles/Vansessa_Gemini_Generated_Image(small)-004.jpg'
+      '/default_Profiles/Vansessa_Gemini_Generated_Image(small)-003.jpg'
     ],
     attributes: {
       'Height': "5'4\"",
@@ -278,6 +301,9 @@ export const featuredProfiles: Profile[] = [
       'Piercings': 'No',
       'Tattoos': 'No',
     },
+    metCount: 0,
+    notMetCount: 0,
+    votes: [],
   },
   {
     id: 8,
@@ -285,7 +311,7 @@ export const featuredProfiles: Profile[] = [
     email: 'richard@gmail.com',
     password: 'password123',
     age: 49,
-    location: 'Edinburgh, UK',
+    location: 'London, UK',
     imageUrl: '/default_Profiles/Male_Gemini_Generated_Image(small)-002.jpg',
     hint: 'portrait man',
     role: 'daddy',
@@ -308,6 +334,9 @@ export const featuredProfiles: Profile[] = [
       'Piercings': 'No',
       'Tattoos': 'No',
     },
+    metCount: 3,
+    notMetCount: 0,
+    votes: [],
   },
   {
     id: 9,
@@ -315,8 +344,8 @@ export const featuredProfiles: Profile[] = [
     email: 'olivia@gmail.com',
     password: 'password123',
     age: 23,
-    location: 'Sheffield, UK',
-    imageUrl: 'https://placehold.co/608x608.png',
+    location: 'Medellín, CO',
+    imageUrl: '/default_Profiles/Female_Gemini_Generated_Image(small)-001.jpg',
     hint: 'woman nature',
     role: 'baby',
     online: false,
@@ -325,8 +354,7 @@ export const featuredProfiles: Profile[] = [
     wants: ['Friendship', 'Casual', 'Long-term'],
     interests: ['Fitness', 'Cooking', 'Travel', 'Reading'],
     gallery: [
-      'https://placehold.co/600x400.png',
-      'https://placehold.co/600x400.png',
+      ''
     ],
     attributes: {
       'Height': "5'6\"",
@@ -339,6 +367,9 @@ export const featuredProfiles: Profile[] = [
       'Piercings': 'Yes',
       'Tattoos': 'Yes',
     },
+    metCount: 0,
+    notMetCount: 0,
+    votes: [],
   },
   {
     id: 10,
@@ -369,11 +400,14 @@ export const featuredProfiles: Profile[] = [
       'Piercings': 'No',
       'Tattoos': 'No',
     },
+    metCount: 1,
+    notMetCount: 0,
+    votes: [],
   },
   {
     id: 11,
     name: 'Cecilia',
-    email: 'Cecilia@gmail.com',
+    email: 'cecilia@gmail.com',
     password: 'password123',
     age: 25,
     location: 'Rio, Brazil',
@@ -399,6 +433,9 @@ export const featuredProfiles: Profile[] = [
       'Piercings': 'No',
       'Tattoos': 'Yes',
     },
+    metCount: 0,
+    notMetCount: 0,
+    votes: [],
   },
   {
     id: 12,
@@ -429,6 +466,9 @@ export const featuredProfiles: Profile[] = [
       'Piercings': 'No',
       'Tattoos': 'Yes',
     },
+    metCount: 2,
+    notMetCount: 1,
+    votes: [],
   },
   {
     id: 13,
@@ -459,6 +499,9 @@ export const featuredProfiles: Profile[] = [
       'Piercings': 'No',
       'Tattoos': 'No',
     },
+    metCount: 0,
+    notMetCount: 0,
+    votes: [],
   },
 ];
 

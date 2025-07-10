@@ -1,7 +1,7 @@
 
 import type { Handler, HandlerEvent } from '@netlify/functions';
-import { getProfilesFromStore } from './utils/store';
-import type { Profile } from './utils/seed-data';
+import { getProfilesFromStore } from '@/src/netlify/functions/utils/store';
+import type { Profile } from '@/src/netlify/functions/utils/seed-data';
 
 export const handler: Handler = async (event: HandlerEvent) => {
   if (event.httpMethod !== 'POST') {
@@ -12,7 +12,7 @@ export const handler: Handler = async (event: HandlerEvent) => {
   }
 
   try {
-    const { email, password } = JSON.parse(event.body || '{}');
+    const { email, password, profiles } = JSON.parse(event.body || '{}');
 
     if (!email || !password) {
       return {
@@ -21,8 +21,9 @@ export const handler: Handler = async (event: HandlerEvent) => {
       };
     }
     
-    // Always fetch the latest profiles from the store to ensure reliability.
-    const profilesToSearch = await getProfilesFromStore();
+    // If a list of profiles is passed from the client (e.g., after signup), use it.
+    // Otherwise, always fetch the latest from the store to ensure reliability.
+    const profilesToSearch = profiles || await getProfilesFromStore();
 
     const foundUser = profilesToSearch.find(
       (p: Profile) => p.email && p.email.toLowerCase() === email.toLowerCase() && p.password === password
