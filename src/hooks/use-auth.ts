@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
@@ -91,7 +92,7 @@ export function useAuth() {
   const signup = async (email: string, password: string, role: 'baby' | 'daddy'): Promise<SignupResult> => {
     const creationResult = await createProfile(email, password, role);
 
-    if (creationResult.error || !creationResult.user || !creationResult.profiles) {
+    if ('error' in creationResult) {
         return { error: creationResult.error || 'Failed to create user.' };
     }
     
