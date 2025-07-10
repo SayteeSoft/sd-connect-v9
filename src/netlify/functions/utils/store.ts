@@ -55,7 +55,9 @@ export const getProfileByIdFromStore = async (id: number): Promise<Profile | und
 
 export const saveProfilesToStore = async (data: Profile[]): Promise<void> => {
     if (!isNetlifyLinked()) {
-        localProfilesCache = data;
+        // This is the critical fix. We must save a deep clone of the new data
+        // to prevent corrupting the original cache reference.
+        localProfilesCache = structuredClone(data);
         return;
     }
     const store = getStore(PROFILES_STORE_NAME);
@@ -89,7 +91,7 @@ export const getConversationsFromStore = async (): Promise<any[]> => {
 
 export const saveConversationsToStore = async (data: any[]): Promise<void> => {
     if (!isNetlifyLinked()) {
-        localConversationsCache = data;
+        localConversationsCache = structuredClone(data);
         return;
     }
     const store = getStore(CONVERSATIONS_STORE_NAME);
